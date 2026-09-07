@@ -1,0 +1,97 @@
+{
+  "version": {
+    "quality": "quality-v1",
+    "prompt_digest": "6169e82413340627",
+    "manifest_digest": "d55b59e374bfca48"
+  },
+  "task_uuid": "d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f",
+  "model": "glm-5.3",
+  "run_id": "run_3",
+  "status": "scored",
+  "calibrated": false,
+  "judge": {
+    "member": "gpt-5.6-sol",
+    "model": "openai/responses/gpt-5.6-sol"
+  },
+  "patch": {
+    "source": "git",
+    "sha256": "56c63fb7dae04391acb6d3a50f22b0c34cc0bc143db419a6eb0d4592bd1c4570",
+    "bytes": 108934,
+    "truncated": false
+  },
+  "evidence_digest": "2375bc2ef6be9114",
+  "quality_fingerprint": "e8ed4371450afd9a",
+  "score": 0.8571,
+  "counts": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "undecided": 0
+  },
+  "reasons": [],
+  "items": [
+    {
+      "id": "Q1",
+      "dimension": "conventions",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": false,
+      "rationale": "The change introduces formatting inconsistent with normal surrounding Python style, notably an over-indented multiline `.get()` call and a closing dictionary brace placed on the same line as the final list terminator.",
+      "evidence_ref": "src/air/tags/utils.py, `clean_html_attr_key` hunk: `key = dict(...).get(` is followed by lines indented 12 and 8 spaces; src/air/tags/config.py, `SVG_ATTRIBUTES` hunk ends with `],}`."
+    },
+    {
+      "id": "Q2",
+      "dimension": "minimal_diff",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "Every hunk supports adding SVG tag signatures and forwarding their declared attributes: the SVG classes gain typed constructors, the SVG attribute map identifies constructor arguments for cleanup, and the utility distinguishes SVG attributes while translating reserved-name proxies. No unrelated files, renames, moves, or standalone reformatting are shown.",
+      "evidence_ref": "src/air/tags/models/svg.py hunk adding `__init__` signatures; src/air/tags/config.py hunk adding `SVG_ATTRIBUTES`; src/air/tags/utils.py hunks selecting the SVG map and mapping `in_`/`from_`."
+    },
+    {
+      "id": "Q3",
+      "dimension": "abstraction",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The change follows the existing HTML attribute-map/helper pattern for SVG rather than adding a separate processing layer, and `locals_cleanup` centrally handles attribute extraction and name normalization. The explicit repetition in constructors is necessary to expose distinct inspectable function signatures rather than duplicated implementation logic.",
+      "evidence_ref": "src/air/tags/utils.py, `locals_cleanup` hunk: `attribute_map = SVG_ATTRIBUTES if isinstance(obj, CaseTag) else HTML_ATTRIBUTES` and shared processing via `attrs = attrs + [\"class_\", \"id\", \"style\"]`"
+    },
+    {
+      "id": "Q4",
+      "dimension": "readability",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added SVG constructors follow a uniform, shallow pattern\u2014explicit typed parameters followed by a single delegation\u2014and `locals_cleanup` selects the relevant attribute map with straightforward control flow. Its comments explain the non-obvious HTML/SVG name-collision concern and why the shared list is copied rather than merely restating operations.",
+      "evidence_ref": "`src/air/tags/utils.py`, hunk `@@ -35,9 +37,15 @@ class SafeStr(str)`; `src/air/tags/models/svg.py`, hunk beginning `@@ -10,378 +13,2346 @@ class CaseTag(Tag)`"
+    },
+    {
+      "id": "Q5",
+      "dimension": "naming",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The new `SVG_ATTRIBUTES` mapping and `attribute_map` variable clearly describe their contents, while parameters such as `preserveAspectRatio`, `stroke_width`, `in_`, and `from_` consistently follow native SVG vocabulary and the existing underscore-proxy convention.",
+      "evidence_ref": "`src/air/tags/config.py` hunk adding `SVG_ATTRIBUTES`; `src/air/tags/models/svg.py` hunk adding explicit SVG parameters; `src/air/tags/utils.py` hunk selecting `attribute_map = SVG_ATTRIBUTES if isinstance(obj, CaseTag) else HTML_ATTRIBUTES`"
+    },
+    {
+      "id": "Q6",
+      "dimension": "idiomaticity",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The SVG constructors follow the repository\u2019s existing tag pattern by using typed keyword-only arguments, `super().__init__`, and the shared `locals_cleanup` helper; the helper itself extends the existing attribute-map mechanism rather than introducing a foreign abstraction.",
+      "evidence_ref": "`src/air/tags/models/svg.py` constructor hunks, e.g. `super().__init__(*children, **kwargs | locals_cleanup(locals(), self))`, and `src/air/tags/utils.py` `locals_cleanup` hunk selecting `SVG_ATTRIBUTES` or `HTML_ATTRIBUTES`."
+    },
+    {
+      "id": "Q7",
+      "dimension": "dead_code",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added SVG attribute map, `Any` and `CaseTag` imports, explicit constructors, and SVG/HTML map selection are all used by the new SVG signatures; the comments explain behavior rather than preserving disabled code, and no unreachable guards or debugging leftovers are added.",
+      "evidence_ref": "`src/air/tags/utils.py`, hunk around `locals_cleanup`: `attribute_map = SVG_ATTRIBUTES if isinstance(obj, CaseTag) else HTML_ATTRIBUTES`; `src/air/tags/models/svg.py`, hunk beginning at imports and the added `__init__` methods."
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+ M src/air/tags/utils.py
+?? repro_svg_signatures.py
+$ cd /workspace/air && git --no-pager diff src/air/tags/utils.py
+diff --git a/src/air/tags/utils.py b/src/air/tags/utils.py
+index 5c639d2..4da720f 100644
+--- a/src/air/tags/utils.py
++++ b/src/air/tags/utils.py
+@@ -1,5 +1,23 @@
++import inspect
++
+ from .config import HTML_ATTRIBUTES
+
++# Cache of the attribute names each tag class accepts via its __init__
++# signature. Keeps instantiation cheap by avoiding repeated introspection.
++_SIGNATURE_PARAMS: dict[type, tuple[str, ...]] = {}
++
++
++def _signature_params(cls: type) -> tuple[str, ...]:
++    """Attribute names carried by a tag class's own __init__ signature."""
++    try:
++        return _SIGNATURE_PARAMS[cls]
++    except KeyError:
++        parameters = inspect.signature(cls.__init__).parameters
++        skip = ("self", "children", "args", "kwargs")
++        names = tuple(name for name in parameters if name not in skip)
++        _SIGNATURE_PARAMS[cls] = names
++        return names
++
+
+ def clean_html_attr_key(key: str) -> str:
+     """Clean up HTML attribute keys to match the standard W3C HTML spec.
+@@ -11,9 +29,11 @@ def clean_html_attr_key(key: str) -> str:
+
+         Cleaned HTML attribute key
+     """
+-    # If a "_"-suffixed proxy for "class", "for", or "id" is used,
+-    # convert it to its normal HTML equivalent.
+-    key = dict(class_="class", for_="for", id_="id", as_="as").get(key, key)
++    # If a "_"-suffixed proxy for a reserved Python keyword is used,
++    # convert it to its normal HTML/SVG equivalent.
++    key = dict(
++        class_="class", for_="for", id_="id", as_="as", in_="in", from_="from"
++    ).get(key, key)
+     # Remove leading underscores and replace underscores with dashes
+     return key.lstrip("_").replace("_", "-")
+
+@@ -38,7 +58,11 @@ def locals_cleanup(local_data, obj):
+     data = {}
+     attrs = HTML_ATTRIBUTES.get(obj.__class__.__name__, [])
+     attrs += ["class_", "id", "style"]
+-    for attr in attrs:
++    # Tags defining their own signature (e.g. the SVG tags) carry their
++    # allowed attribute names there, so those names take precedence.
++    attrs += _signature_params(obj.__class__)
++    ordered = dict.fromkeys(attrs)
++    for attr in ordered:
+         if local_data.get(attr) is not None:
+             data[attr] = local_data[attr]
+     return data
+$ cd /workspace/air && python -m compileall -q src/air && echo "COMPILE OK"; grep -nE " +$" src/air/tags/models/svg.py src/air/tags/utils.py | head; echo "trailing-ws checked"; python -c "
+$ import ast, sys
+$ src = open('src/air/tags/models/svg.py').read()
+$ tree = ast.parse(src)
+$ print('AST parse OK; classes:', sum(isinstance(n, ast.ClassDef) for n in tree.body))
+$ "
+COMPILE OK
+trailing-ws checked
+AST parse OK; classes: 64
+$ cd /workspace/air && python repro_svg_signatures.py && python -m pytest tests/test_svg.py tests/test_tags.py -o addopts="" --no-cov -q 2>&1 | tail -2 && python -m pytest tests/ -o addopts="" --no-cov -q 2>&1 | tail -3 && python -m pytest tests/ -q 2>&1 | tail -3
+All 63 SVG tags have explicit signatures.
+Spot-checked keyword arguments all present.
+.................................                                        [100%]
+33 passed in 0.20s
+=========================== short test summary info ============================
+FAILED tests/test_forms.py::test_form_sync_check - AssertionError: assert [{'...
+1 failed, 70 passed in 0.33s
+FAILED tests/test_forms.py::test_form_sync_check - AssertionError: assert [{'type': 'in...'Hello', ...}] == [{'type': 'in...'H...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 7 passed in 0.29s
+$ cd /workspace/air && rm -f repro_svg_signatures.py && git status --short && ls src/air/tags/models/
+M src/air/tags/models/svg.py
+ M src/air/tags/utils.py
+__init__.py  __pycache__  base.py  special.py  stock.py  svg.py
+# file_editor: Expand svg.A with full anchor attribute set
+The file /workspace/air/src/air/tags/models/svg.py has been edited. Here's the result of running `cat -n` on a snippet of /workspace/air/src/air/tags/models/svg.py:
+    12	        return self._name[0].lower() + self._name[1:]
+    13	
+    14	
+    15	class A(CaseTag):
+    16	    """Defines an SVG hyperlink
+    17	
+    18	    Args:
+    19	        children: Tags, strings, or other rendered content.
+    20	        href: Specifies the URL of the hyperlink destination.
+    21	        target: Specifies where to open the linked document.
+    22	        download: Specifies that the target will be downloaded when the hyperlink is followed.
+    23	        rel: Specifies the relationship between the current document and the linked document.
+    24	        hreflang: Specifies the language of the linked document.
+    25	        type: Specifies the media type of the linked document.
+    26	        referrerpolicy: Specifies which referrer information to send with the link.
+    27	        media: Specifies what media/device the linked document is optimized for.
+    28	        ping: Specifies a space-separated list of URLs to ping when the link is followed.
+    29	        class_: Substituted as the DOM `class` attribute.
+    30	        id: DOM ID attribute.
+    31	        style: Inline style attribute.
+    32	        kwargs: Keyword arguments transformed into tag attributes.
+    33	    """
+    34	
+    35	    def __init__(
+    36	        self,
+    37	        *children: Any,
+    38	        href: str | None = None,
+    39	        target: str | None = None,
+    40	        download: str | None = None,
+    41	        rel: str | None = None,
+    42	        hreflang: str | None = None,
+    43	        type: str | None = None,
+    44	        referrerpolicy: str | None = None,
+    45	        media: str | None = None,
+    46	        ping: str | None = None,
+    47	        class_: str | None = None,
+    48	        id: str | None = None,
+    49	        style: str | None = None,
+    50	        **kwargs: str | float | int | bool,
+    51	    ):
+    52	        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+    53	
+    54	
+    55	class Animate(CaseTag):
+    56	    """Defines animation on an SVG element
+    57	
+Review the changes and make sure they are as expected. Edit the file again if necessary.
+$ cd /workspace/air && python -c "
+$ import sys; sys.path.insert(0, 'src')
+$ import air
+$ svg = air.svg
+$ # svg.A now carries the full anchor set
+$ print(svg.A('doc', href='/doc.pdf', download=None, hreflang='en', type='application/pdf', rel='noopener', ping='https://a', media='print', referrerpolicy='no-referrer', target='_blank').render())
+$ print(svg.A().render())
+$ " && python -m pytest tests/ -o addopts="" --no-cov -q 2>&1 | tail -3 && python -m compileall -q src/air && echo COMPILE_OK
+<a href="/doc.pdf" target="_blank" rel="noopener" hreflang="en" media="print" ping="https://a" type="application/pdf" referrerpolicy="no-referrer">doc</a>
+<a></a>
+=========================== short test summary info ============================
+FAILED tests/test_forms.py::test_form_sync_check - AssertionError: assert [{'...
+1 failed, 70 passed in 0.39s
+COMPILE_OK
+$ cd /workspace/air && head -15 src/air/tags/models/svg.py && echo "..." && sed -n '/^class Use/,/^$/p' src/air/tags/models/svg.py | head -5 && grep -c "^class " src/air/tags/models/svg.py && awk 'length > 88 && $0 !~ /: / {print FNR": "$0}' src/air/tags/models/svg.py | head
+from typing import Any
+
+from ..utils import locals_cleanup
+from .base import Tag
+
+
+class CaseTag(Tag):
+    """This is for case-sensitive tags like those used in SVG generation."""
+
+    @property
+    def name(self) -> str:
+        return self._name[0].lower() + self._name[1:]
+
+
+class A(CaseTag):
+...
+class Use(CaseTag):
+    """References another element
+
+64
+$ cd /workspace/air && git status --short && echo "--- files touched (none under tests/):" && git --no-pager diff --name-only && echo "--- final test run:" && python -m pytest tests/test_svg.py tests/test_tags.py -o addopts="" --no-cov -q 2>&1 | tail -2
+M src/air/tags/models/svg.py
+ M src/air/tags/utils.py
+--- files touched (none under tests/):
+src/air/tags/models/svg.py
+src/air/tags/utils.py
+--- final test run:
+.................................                                        [100%]
+33 passed in 0.19s
+# finish: Added explicit signatures to all 63 Air SVG tags
+Completed all 63 checklist items from Issue #55 ("Add function signatures to Air SVG Tags").
+
+## Checklist
+63 issues found (62 numbered items plus the final `- [ ] View` entry; the four `FeFunc*` variants counted individually). Every item was addressed — **63 DONE, 0 BLOCKED**.
+
+## What was wrong
+Every class in `src/air/tags/models/svg.py` was a bare `class X(CaseTag): pass`. Users could only pass SVG attributes via `**kwargs` — no autocompletion, no typed signature, no docstring parameter list. A reproduction script confirmed all 63 classes lacked an explicit `__init__`.
+
+## Changes (non-test files only)
+
+**`src/air/tags/models/svg.py`** — every one of the 63 tags (`A` … `View`) now declares an explicit `__init__` signature carrying its real SVG attributes, with Google-style docstrings matching the repo's existing `stock.py` conventions (children, per-attribute docs, `class_`/`id`/`style`, `kwargs`). Examples: `A(href, target, download, rel, hreflang, type, referrerpolicy, media, ping, …)`, `Circle(cx, cy, r, pathLength, transform)`, `Rect(x, y, width, height, rx, ry, pathLength)`, `Filter(x, y, width, height, filterUnits, primitiveUnits, filterRes)`, `FeBlend(in_, in2, mode, …)`, `Svg(width, height, viewBox, xmlns, …)`, `Marker(markerWidth, markerHeight, refX, refY, orient, …)`, etc. camelCase SVG names (`viewBox`, `stdDeviation`, `refX`, `keySplines`, `gradientUnits`, `clipPathUnits`, …) are preserved verbatim; Python keywords map to `in_`/`from_` proxies; numeric SVG attributes are typed `str | int | float | None` like the repo's `Img.width`/`height`.
+
+**`src/air/tags/utils.py`** — two supporting fixes so the new signatures actually render:
+- `locals_cleanup` now also derives allowed attribute names from the tag class's own `__init__` signature (cached). Without this, `cx`/`viewBox`/`stdDeviation` etc. were silently dropped by the `HTML_ATTRIBUTES` filter. `HTML_ATTRIBUTES` class-name lookups remain primary for HTML tags, and class-name collisions (`A`, `Script`, `Style`, `Title` exist in both modules) are resolved correctly since the signature is introspected per class. Ordering stays deterministic (order-preserving `dict.fromkeys` dedup).
+- `clean_html_attr_key` gained `in_`→`in` and `from_`→`from` proxies (existing `class_`/`for_`/`id_`/`as_` proxies unchanged).
+
+## Verification
+- Reproduction script: all 63 tags report explicit signatures with expected keywords.
+- Attribute rendering spot-checked across ~30 tags (camelCase preserved, `in`/`from` proxies, booleans as bare attributes, zero values not dropped, extra `**kwargs` still pass through, children still HTML-escaped).
+- Deterministic attribute ordering confirmed over 300 instantiations; HTML tag ordering unchanged (`air.A(href, class_)` renders `href` before `class`).
+- `dict_to_airtag` reconstruction in `air/responses.py` still works with SVG tags.
+- `python -m compileall src/air` clean; no test files touched.
+- Test suite: **70 passed**, 1 failed — `tests/test_forms.py::test_form_sync_check`, a **pre-existing environment failure** (pydantic error-URL version string 2.13 vs 2.11 expected) that fails identically on the unmodified baseline (verified via `git stash`), unrelated to tags.

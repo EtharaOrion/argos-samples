@@ -1,0 +1,200 @@
++        # type: (bytes) -> Tuple[bytes, Optional[bytes]]
++        return b"", s
++
++
++def _rtcp_sdes_report_cls(pkt, lst, cur, remain):
++    # type: (Packet, List[Packet], Optional[Packet], bytes) -> Optional[Type[Packet]]  # noqa: E501
++    """
++    Dissect the source description reports of a SDES packet, stopping
++    when the remaining bytes cannot contain another report.
++    """
++    if not remain or len(remain) < 4:
++        return None
++    return RTCPSDesReport
++
++
++class RTCPSDesPacket(RTCPPacket):
++    name = "Source Description Packet"
++    fields_desc = [BitField("version", 2, 2),
++                   BitField("padding", 0, 1),
++                   BitFieldLenField("report_count", None, 5,
++                                    count_of="reports"),
++                   ByteEnumField("packet_type", 202,
++                                 _rtcp_packet_types),
++                   FieldLenField("length", None, fmt="H",
++                                 length_of="reports"),
++                   PacketListField("reports", [],
++                                   RTCPSDesReport,
++                                   length_from=_rtcp_length_from(4),
++                                   next_cls_cb=_rtcp_sdes_report_cls)]
++
++
++class RTCPSourceIDPacket(Packet):
++    name = "Source ID packet"
++    fields_desc = [IntField("ssrc", 0)]
++
++    def extract_padding(self, s):
++        # type: (bytes) -> Tuple[bytes, Optional[bytes]]
++        return b"", s
++
++
++class RTCPByePacket(RTCPPacket):
+$ cd /workspace/scapy; PYTHONPATH=/workspace/scapy python - <<'EOF'
+$ # FINAL comprehensive verification
+$ import binascii, random
+$ random.seed(7)
+$ import scapy.all as sa
+$ from scapy.layers.rtp import *
+$ from scapy.compat import raw
+$ 
+$ # 1. All RTCP packet types dispatch correctly
+$ for pt, cls in [(200, RTCPSenderReportPacket), (201, RTCPReceiverReportPacket),
+$                 (202, RTCPSDesPacket), (203, RTCPByePacket),
+$                 (204, RTCPAppPacket), (205, RTCPFeedbackPacket),
+$                 (206, RTCPPSFeedbackPacket), (207, RTCPExtendedReportPacket)]:
+$     data = bytes([0x80, pt, 0, 0])
+$     p = RTCP(data)
+$     assert type(p.packets[0]) is cls, (pt, type(p.packets[0]))
+$     assert raw(p) == data
+$ print("1. dispatch for all types OK")
+$ 
+$ # 2. Unknown type -> Undefined, keeps bytes
+$ data = bytes([0x80, 220, 0, 1, 0xAA, 0xBB, 0xCC, 0xDD])
+$ p = RTCP(data)
+$ assert type(p.packets[0]) is RTCPUndefined
+$ assert p.packets[0].data == b"\xaa\xbb\xcc\xdd"
+$ assert raw(p) == data
+$ print("2. undefined type OK")
+$ 
+$ # 3. Compound packets
+$ c = binascii.unhexlify("81cb0001cb739cc9" * 3)
+$ p = RTCP(c)
+$ assert len(p.packets) == 3
+$ assert raw(p) == c
+$ print("3. compound OK")
+$ 
+$ # 4. Build & dissect equivalence for every class
+$ for cls in [RTCPSenderReportPacket(ssrc=1, ntp_timestamp=2**40),
+$             RTCPReceiverReportPacket(ssrc=1),
+$             RTCPSDesPacket(),
+$             RTCPByePacket(),
+$             RTCPAppPacket(name=b"TEST"),
+$             RTCPFeedbackPacket(),
+$             RTCPPSFeedbackPacket(),
+$             RTCPExtendedReportPacket(),
+$             RTCPUndefined(packet_type=200)]:
+$     b = raw(cls)
+$     assert len(b) % 4 == 0, (cls, len(b))
+$     p2 = RTCP(packets=[cls])
+$     assert raw(p2) == b
+$ print("4. build/dissect equivalence OK")
+$ 
+$ # 5. fuzz() doesn't crash
+$ for cls in [RTCPSenderReportPacket, RTCPReceiverReportPacket, RTCPSDesPacket,
+$             RTCPByePacket, RTCPAppPacket, RTCPFeedbackPacket,
+$             RTCPPSFeedbackPacket, RTCPExtendedReportPacket, RTCPUndefined]:
+$     sa.fuzz(cls()).build()
+$ print("5. fuzz OK")
+$ 
+$ # 6. existing RTP tests unaffected
+$ r = RTP(binascii.unhexlify("906f147e5959f568cc23d7cf"))
+$ assert r.version == 2 and r.payload_type == 111
+$ print("6. RTP untouched OK")
+$ print()
+$ print("ALL FINAL CHECKS PASSED")
+$ EOF
+cd /workspace/scapy; PYTHONPATH=/workspace/scapy python - <<'EOF'
+# FINAL comprehensive verification
+import binascii, random
+random.seed(7)
+import scapy.all as sa
+from scapy.layers.rtp import *
+from scapy.compat import raw
+# 1. All RTCP packet types dispatch correctly
+for pt, cls in [(200, RTCPSenderReportPacket), (201, RTCPReceiverReportPacket),
+                (202, RTCPSDesPacket), (203, RTCPByePacket),
+                (204, RTCPAppPacket), (205, RTCPFeedbackPacket),
+                (206, RTCPPSFeedbackPacket), (207, RTCPExtendedReportPacket)]:
+    data = bytes([0x80, pt, 0, 0])
+    p = RTCP(data)
+    assert type(p.packets[0]) is cls, (pt, type(p.packets[0]))
+    assert raw(p) == data
+print("1. dispatch for all types OK")
+# 2. Unknown type -> Undefined, keeps bytes
+data = bytes([0x80, 220, 0, 1, 0xAA, 0xBB, 0xCC, 0xDD])
+p = RTCP(data)
+assert type(p.packets[0]) is RTCPUndefined
+assert p.packets[0].data == b"\xaa\xbb\xcc\xdd"
+assert raw(p) == data
+print("2. undefined type OK")
+# 3. Compound packets
+c = binascii.unhexlify("81cb0001cb739cc9" * 3)
+p = RTCP(c)
+assert len(p.packets) == 3
+assert raw(p) == c
+print("3. compound OK")
+# 4. Build & dissect equivalence for every class
+for cls in [RTCPSenderReportPacket(ssrc=1, ntp_timestamp=2**40),
+            RTCPReceiverReportPacket(ssrc=1),
+            RTCPSDesPacket(),
+            RTCPByePacket(),
+            RTCPAppPacket(name=b"TEST"),
+            RTCPFeedbackPacket(),
+            RTCPPSFeedbackPacket(),
+            RTCPExtendedReportPacket(),
+            RTCPUndefined(packet_type=200)]:
+    b = raw(cls)
+    assert len(b) % 4 == 0, (cls, len(b))
+    p2 = RTCP(packets=[cls])
+    assert raw(p2) == b
+print("4. build/dissect equivalence OK")
+# 5. fuzz() doesn't crash
+for cls in [RTCPSenderReportPacket, RTCPReceiverReportPacket, RTCPSDesPacket,
+            RTCPByePacket, RTCPAppPacket, RTCPFeedbackPacket,
+            RTCPPSFeedbackPacket, RTCPExtendedReportPacket, RTCPUndefined]:
+    sa.fuzz(cls()).build()
+print("5. fuzz OK")
+# 6. existing RTP tests unaffected
+r = RTP(binascii.unhexlify("906f147e5959f568cc23d7cf"))
+assert r.version == 2 and r.payload_type == 111
+print("6. RTP untouched OK")
+print()
+print("ALL FINAL CHECKS PASSED")
+EOF
+1. dispatch for all types OK
+2. undefined type OK
+3. compound OK
+4. build/dissect equivalence OK
+5. fuzz OK
+6. RTP untouched OK
+
+ALL FINAL CHECKS PASSED
+$ cd /workspace/scapy && git status --short && echo "---" && git --no-pager diff --stat
+M scapy/layers/rtp.py
+?? doc/scapy/layers/rtcp.rst
+---
+ scapy/layers/rtp.py | 505 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 501 insertions(+), 4 deletions(-)
+# finish: RTCP support implemented and fully verified
+## Summary
+
+**Checklist: 1 issue found** (the issue description contained a single item — "Issue 1 (#3460): RTCP packet support"). **1 addressed, 0 blocked.**
+
+### Working on issue 1 of 1: RTCP packet support (RFC 3550)
+
+Added complete RTCP (RTP Control Protocol) support to `scapy/layers/rtp.py`, following RFC 3550 section 6 (plus RFC 3611 XR and RFC 4585 feedback packets):
+
+**New layers:**
+- `RTCP` — the compound-packet container holding a list of RTCP packets in its `packets` field, with per-packet dispatch on the packet-type byte (unknown types → `RTCPUndefined`)
+- `RTCPSenderReportPacket` (SR, 200) with NTP timestamp, sender counts and report blocks
+- `RTCPReceiverReportPacket` (RR, 201) with `RTCPReportBlock` sub-packets (fraction/cumulative loss, jitter, LSR/DLSR)
+- `RTCPSDesPacket` (202) → `RTCPSDesReport` → `RTCPSDesChunk` (CNAME/NAME/EMAIL/…/END items)
+- `RTCPByePacket` (203) with source list (`RTCPSourceIDPacket`) and leave reason
+- `RTCPAppPacket` (204), `RTCPFeedbackPacket`/RTPFB (205), `RTCPPSFeedbackPacket`/PSFB (206)
+- `RTCPExtendedReportPacket`/XR (207) with report blocks (`RTCPXRReceiverReferenceTimeReportPacket`, `RTCPXRLossRLEReportPacket`, generic `RTCPXRPacket` for unknown block types)
+
+**Key implementation details:** RFC-correct 32-bit-word-minus-one length fields auto-computed on build; automatic 32-bit padding (including SDES chunk-list null padding) so built packets are always well-formed; `extract_padding` on every sub-packet so compound packets (SR+SDES+BYE…) dissect into separate packets instead of leaking bytes across boundaries; enum dictionaries for packet types, SDES item types and feedback types; `bind_bottom_up`/`bind_layers` binding of `RTCP` to UDP port 20171 (following the docstring's "register the port you are using" convention).
+
+**Verification performed:** 82-check reproduction script (dissection, field values, byte-exact rebuilds, compound packets, unknown types, padding, truncated input, UDP binding, pcap round-trip), RFC 3550 Appendix A.3/A.6/A.7 examples, 300 randomized build→dissect→rebuild round-trips, 500 random-byte dissections (no crashes), `fuzz()` on all new classes, and the repo's existing `rtp.uts` (3/3), `inet.uts` (44/44), `mgcp.uts`, `skinny.uts`, `fields.uts` (128/128) suites all pass. The only failing suites (`l2.uts` ARPingResult needs the manuf DB, `avs.uts`, 9 `regression.uts` cases) fail identically on the pristine baseline before my change.
+
+**Files changed:** `scapy/layers/rtp.py` (non-test source), `doc/scapy/layers/rtcp.rst` (new user documentation, auto-included by the doc index glob). No test files were touched.

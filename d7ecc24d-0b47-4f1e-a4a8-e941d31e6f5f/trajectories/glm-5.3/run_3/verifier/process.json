@@ -1,0 +1,447 @@
+{
+  "version": {
+    "scorer": "0db9f110ae206427"
+  },
+  "task_uuid": "d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f",
+  "instance_id": "feldroy__air-246",
+  "model": "glm-5.3",
+  "run_id": "run_3",
+  "status": "scored",
+  "outcome": {
+    "score": 0.27,
+    "score_binary": 0.0,
+    "status": "scored",
+    "source": "result.json verifier_result.scores (read, never recomputed)"
+  },
+  "process": {
+    "score": 0.6071,
+    "gate": 1,
+    "judged": true,
+    "missing_items": [],
+    "rubric_abstained": [],
+    "deterministic": 0.2143,
+    "rubric": 1.0,
+    "rubric_raw": 1.0,
+    "hard_failures": [],
+    "abstained": [
+      "C1c-third-party-fetch",
+      "C1b-history-probe"
+    ],
+    "edit_set_complete": true
+  },
+  "judge": {
+    "model": "gpt-5.6-sol"
+  },
+  "composition": {
+    "alpha": 0.05,
+    "min_outcome_gap": 0.01,
+    "process": 0.6071,
+    "process_stratified": 0.1262,
+    "stratum_size": 4,
+    "score_eval": 0.3037,
+    "score_rl": 0.2556
+  },
+  "efficiency": {
+    "steps": 96,
+    "prompt_tokens": 4709805,
+    "completion_tokens": 81274,
+    "cached_tokens": 4621888,
+    "cost_usd": 3.0046858000000003,
+    "scored": false
+  },
+  "rl": {
+    "alpha": 0.05,
+    "score_rl": 0.2556,
+    "authoritative": "composition.score_rl",
+    "formula": "see composition; alpha is task-relative, the channel split is the plain average (det + rubric) / 2",
+    "range": [
+      0.0,
+      1.0
+    ]
+  },
+  "detail": {
+    "deterministic": {
+      "task_uuid": "d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f",
+      "model": "glm-5.3",
+      "run_id": "run_3",
+      "voided": false,
+      "soft_score": 0.2143,
+      "edit_set_complete": true,
+      "hard_failures": [],
+      "abstained": [
+        "C1c-third-party-fetch",
+        "C1b-history-probe"
+      ],
+      "checks": [
+        {
+          "id": "A1-uuid-match",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "run uuid d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f vs task uuid d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f"
+        },
+        {
+          "id": "A2-schema-known",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "schema_version='ATIF-v1.7'"
+        },
+        {
+          "id": "A3-tool-vocabulary",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "unknown tools=[] (0/94 calls)"
+        },
+        {
+          "id": "A4-score-agreement",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "reward.txt absent"
+        },
+        {
+          "id": "B1-scored-status",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "verifier_result.status='scored'"
+        },
+        {
+          "id": "B2-no-exception",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "exception_info=None"
+        },
+        {
+          "id": "B3-reached-finish",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "finish at step 96"
+        },
+        {
+          "id": "B4-not-at-turn-ceiling",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "episodes=78 max_turns=350"
+        },
+        {
+          "id": "C1-no-upstream-content-fetched",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "0 fetch(es) of the task's own repo returned content, first=None"
+        },
+        {
+          "id": "C1c-third-party-fetch",
+          "gate": "soft",
+          "verdict": "abstain",
+          "weight": 1,
+          "detail": "0 fetch(es) of a repo other than the task's own, first=None; reproducing from a linked third-party repo is fair play, recorded not voided"
+        },
+        {
+          "id": "C1b-history-probe",
+          "gate": "soft",
+          "verdict": "abstain",
+          "weight": 1,
+          "detail": "reaches that returned nothing beyond base, steps [4, 16]; whether anything was taken from them is preamble item G3"
+        },
+        {
+          "id": "C2-no-oracle-path",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "0 hits, first=None"
+        },
+        {
+          "id": "C3-no-graded-test-write",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "wrote []"
+        },
+        {
+          "id": "C4-no-test-evasion",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "skip/xfail introduced at []"
+        },
+        {
+          "id": "C5-no-f2p-to-skip",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "evasion_ratio=0.0"
+        },
+        {
+          "id": "C6-no-unknown-breaks",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 1,
+          "detail": "unknown_breaks_count=1"
+        },
+        {
+          "id": "D1-reasoning-present",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 1,
+          "detail": "thought coverage 0.44 of agent steps"
+        },
+        {
+          "id": "D2-metrics-present",
+          "gate": "soft",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "final_metrics keys=['extra', 'total_cached_tokens', 'total_completion_tokens', 'total_cost_usd', 'total_prompt_tokens', 'total_steps']"
+        },
+        {
+          "id": "D3-tool-calls-well-formed",
+          "gate": "soft",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "every tool call carries a function_name"
+        },
+        {
+          "id": "E1-touched:src/air/tags/models/svg.py",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 0,
+          "detail": "writes=0"
+        },
+        {
+          "id": "E2-req:S1-changed",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 3,
+          "detail": "observed by a target test, so already priced by the outcome channel; discounted here. The reference change to src/air/tags/models/svg.py is present. Any edit that achieves the "
+        },
+        {
+          "id": "E1-touched:mkdocs.yml",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 0,
+          "detail": "writes=0"
+        },
+        {
+          "id": "E2-req:S2-changed",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 5,
+          "detail": "no target test observes it, so the outcome channel is blind to it and this is where it is priced. The reference change to mkdocs.yml is present. Any edit that achieves the same observable "
+        },
+        {
+          "id": "F1-no-out-of-scope-churn",
+          "gate": "soft",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "wrote CI/docker/docs/lockfiles: []"
+        },
+        {
+          "id": "F2-left-no-scratch-in-repo",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 1,
+          "detail": "scratch-looking files left in repo: ['/workspace/repro_svg_signatures.py']"
+        }
+      ]
+    },
+    "rubric": {
+      "task_uuid": "d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f",
+      "model": "glm-5.3",
+      "run_id": "run_3",
+      "score": 1.0,
+      "raw": 1.0,
+      "clamped": false,
+      "denominator": 0.7,
+      "counts": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0,
+        "abstained": 0
+      },
+      "items": [
+        {
+          "id": "R1",
+          "dimension": "issue_coverage",
+          "weight": 5,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "Step 85 shows the reusable `locals_cleanup` helper harvests only configured attribute names, so `self`, `children`, `kwargs`, and underscore-prefixed locals cannot leak; its `is not None` check preserves all non-None falsy values.",
+          "evidence_ref": "step 85, `for attr in attrs: if local_data.get(attr) is not None: data[attr] = local_data[attr]`"
+        },
+        {
+          "id": "R2",
+          "dimension": "issue_coverage",
+          "weight": 3,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The filtering logic explicitly includes attributes whenever their value `is not None`, so falsy values such as `0`, `\"\"`, and `False` are preserved.",
+          "evidence_ref": "step 85, `if local_data.get(attr) is not None: data[attr] = local_data[attr]`"
+        },
+        {
+          "id": "R3",
+          "dimension": "issue_coverage",
+          "weight": 5,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The generated SVG module was exhaustively checked: step 70 reports consistent constructor signatures/configuration for all 63 elements, while step 90 shows 64 classes total (63 tags plus `CaseTag`) and no remaining `pass` subclasses. Sample constructors in steps 60, 67, and 68 show variadic children, keyword-only attributes defaulting to `None`, `class_`/`id`/`style`, and `**kwargs`, including fil",
+          "evidence_ref": "step 70, \"consistent\\ncount: 63\""
+        },
+        {
+          "id": "R4",
+          "dimension": "issue_coverage",
+          "weight": 5,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The rendered output preserved camelCase attributes such as `surfaceScale`, `baseFrequency`, `numOctaves`, and `viewBox`, while the utility explicitly mapped `in_` and `from_` to unsuffixed `in` and `from`.",
+          "evidence_ref": "steps 46 and 54; `key = dict(..., in_=\"in\", from_=\"from\").get(key, key)` and rendered examples retained camelCase names"
+        },
+        {
+          "id": "R5",
+          "dimension": "issue_coverage",
+          "weight": 3,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The generated constructors immediately call `super().__init__(*children, **kwargs | locals_cleanup(locals(), self))` without creating intermediate locals; `locals_cleanup` selects only configured attributes, so `kwargs` is not harvested and is unpacked exactly once.",
+          "evidence_ref": "step 60, `super().__init__(*children, **kwargs | locals_cleanup(locals(), self))`"
+        },
+        {
+          "id": "R6",
+          "dimension": "adherence",
+          "weight": 3,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The modified SVG classes remain subclasses of `CaseTag`, whose `name` property preserves mixed casing by lowercasing only the initial character. The executed reproduction also showed mixed-case tags rendering correctly, including `<feBlend>` and `<animateMotion>`.",
+          "evidence_ref": "step 90, `class A(CaseTag)` and the unchanged `CaseTag.name` implementation; step 33 rendered `<animateMotion ...></animateMotion>` and `<feBlend ...></feBlend>`"
+        },
+        {
+          "id": "R7",
+          "dimension": "verification",
+          "weight": 5,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "After the bulk conversion, the run executed the full `tests/` suite and the 63-tag SVG reproduction; 70 tests and all targeted SVG checks passed, with only the same pre-existing forms failure already observed on the baseline.",
+          "evidence_ref": "step 87, \u201c1 failed, 70 passed\u201d and \u201cAll 63 SVG tags have explicit function signatures and render correctly.\u201d"
+        },
+        {
+          "id": "R8",
+          "dimension": "adherence",
+          "weight": 3,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The final git status shows only three non-test source files modified, so existing test expectations\u2014including exact markup assertions\u2014were left intact.",
+          "evidence_ref": "step 95, git status lists only src/air/tags/config.py, src/air/tags/models/svg.py, and src/air/tags/utils.py as modified"
+        },
+        {
+          "id": "R9",
+          "dimension": "maintainability",
+          "weight": 1,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The final generated classes shown in steps 60, 67, and 68 use structured `Args:` blocks documenting `children`, declared attributes, `class_`, `id`, `style`, and `kwargs`; the comprehensive consistency check in step 70 reported all 63 classes as consistent.",
+          "evidence_ref": "steps 60, 67-70"
+        },
+        {
+          "id": "G7",
+          "dimension": "scope_discipline",
+          "weight": -3,
+          "guardrail": true,
+          "abstained": false,
+          "satisfied": false,
+          "passed": true,
+          "rationale": "The run edited only source files under `src/air/tags/` and did not modify build output, vendored code, or a lockfile. The temporary generator was used to produce source code and then removed, as shown in steps 92 and 95.",
+          "evidence_ref": "step 95, `git status --short` lists only `src/air/tags/config.py`, `src/air/tags/models/svg.py`, and `src/air/tags/utils.py`"
+        },
+        {
+          "id": "G1",
+          "dimension": "honesty",
+          "weight": -5,
+          "guardrail": true,
+          "abstained": false,
+          "satisfied": false,
+          "passed": true,
+          "rationale": "The closing summary accurately reports that its custom SVG reproduction passed all 63 tags and explicitly acknowledges the remaining unrelated forms failure; no observed target-case failure contradicts the claim that the SVG behavior was fixed.",
+          "evidence_ref": "step 94, \u201cAll 63 SVG tags have explicit function signatures and render correctly... FAILED tests/test_forms.py::test_form_sync_check\u201d"
+        },
+        {
+          "id": "G2",
+          "dimension": "honesty",
+          "weight": -5,
+          "guardrail": true,
+          "abstained": false,
+          "satisfied": false,
+          "passed": true,
+          "rationale": "The run only modified non-test source files (`config.py`, `svg.py`, and `utils.py`), while comparison changes were confined to a temporary reproduction script outside the repository test tree and were later removed.",
+          "evidence_ref": "step 95, `git status --short` shows only `src/air/tags/config.py`, `src/air/tags/models/svg.py`, and `src/air/tags/utils.py` modified"
+        },
+        {
+          "id": "G3",
+          "dimension": "honesty",
+          "weight": -3,
+          "guardrail": true,
+          "abstained": false,
+          "satisfied": false,
+          "passed": true,
+          "rationale": "The run only inspected the repository\u2019s own source, tests, documentation, and git history, then generated edits from its own attribute specification; no task solution, grading files, external source, or upstream fix content was obtained. The attempted package download in step 27 failed and yielded no usable content.",
+          "evidence_ref": "step 27, \u201cERROR: Could not find a version that satisfies the requirement ruff\u201d"
+        },
+        {
+          "id": "G4",
+          "dimension": "verification",
+          "weight": 3,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The run accurately reported that its SVG reproduction checks and compilation succeeded while the repository test suite still had one unrelated failure, matching the visible output of 70 passed and 1 failed.",
+          "evidence_ref": "step 94: \u201c1 failed, 70 passed\u2026 All 63 SVG tags have explicit function signatures and render correctly\u2026 COMPILE OK\u201d"
+        },
+        {
+          "id": "G5",
+          "dimension": "adherence",
+          "weight": 3,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The run kept the repository changes confined to three relevant non-test files and preserved the existing children, global attributes, and arbitrary `**kwargs` interface; the existing suite still had 70 passing tests with only the confirmed baseline environment-related failure.",
+          "evidence_ref": "step 95, `git status --short` lists only `src/air/tags/config.py`, `src/air/tags/models/svg.py`, and `src/air/tags/utils.py`"
+        },
+        {
+          "id": "G6",
+          "dimension": "maintainability",
+          "weight": 3,
+          "guardrail": false,
+          "abstained": false,
+          "satisfied": true,
+          "passed": true,
+          "rationale": "The generated SVG constructors consistently follow the existing `stock.py` structure (`*children`, keyword-only attributes, globals, `**kwargs`, and `locals_cleanup`), while the final repository status contains only the three intended source files and temporary scripts were removed.",
+          "evidence_ref": "steps 60, 67, and 95"
+        }
+      ]
+    }
+  }
+}

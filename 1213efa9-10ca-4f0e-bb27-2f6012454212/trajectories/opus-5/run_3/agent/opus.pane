@@ -1,0 +1,200 @@
+test/scapy/layers/ldap.uts: 0 failed
+test/scapy/layers/llmnr.uts: 0 failed
+test/scapy/layers/lltd.uts: 0 failed
+test/scapy/layers/mgcp.uts: 0 failed
+test/scapy/layers/mobileip.uts: 0 failed
+test/scapy/layers/netbios.uts: 0 failed
+test/scapy/layers/netflow.uts: 0 failed
+test/scapy/layers/ntp.uts: 0 failed
+test/scapy/layers/pflog.uts: 0 failed
+test/scapy/layers/ppp.uts: 0 failed
+test/scapy/layers/pptp.uts: 0 failed
+test/scapy/layers/radius.uts: 0 failed
+test/scapy/layers/rip.uts: 0 failed
+test/scapy/layers/rtp.uts: 0 failed
+test/scapy/layers/sctp.uts: 0 failed
+test/scapy/layers/skinny.uts: 0 failed
+test/scapy/layers/smb.uts: 0 failed
+test/scapy/layers/smb2.uts: 0 failed
+test/scapy/layers/snmp.uts: 0 failed
+test/scapy/layers/tftp.uts: 0 failed
+test/scapy/layers/usb.uts: 2 failed
+test/scapy/layers/vrrp.uts: 0 failed
+test/scapy/layers/vxlan.uts: 0 failed
+test/scapy/layers/x509.uts: 0 failed
+$ cd /workspace/scapy && git stash -q && for f in dhcp dot11 http ipsec l2 usb; do out=$(timeout 300 python -m scapy.tools.UTscapy -t test/scapy/layers/$f.uts -N 2>&1 | grep -ic "\[failed\]"); echo "baseline $f: $out failed"; done; git stash pop
+baseline dhcp: 1 failed
+baseline dot11: 2 failed
+baseline http: 2 failed
+baseline ipsec: 108 failed
+baseline l2: 1 failed
+baseline usb: 2 failed
+Not currently on any branch.
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   scapy/layers/rtp.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} (b5d5b746dd67737fbae15b58db6c2e04850b565d)
+$ cd /workspace/scapy && git status --short && sed -n 190,270p scapy/layers/rtp.py && python -c "import scapy.layers.rtp; print('import ok')"
+M scapy/layers/rtp.py
+    return max(0, (pkt.length + 1) * 4 - 12)
+
+
+class RTCP(Packet):
+    """RTP Control Protocol (RFC 3550 - 6)"""
+    name = "RTCP"
+    fields_desc = [
+        BitField('version', 2, 2),
+        BitField('padding', 0, 1),
+        _RTCPReportCountField('count', None, 5),
+        ByteEnumField('packet_type', 200, _rtcp_packet_types),
+        # Length of the packet in 32 bits words, minus one
+        LenField('length', None, fmt='!H'),
+        # SR/RR/APP
+        ConditionalField(
+            IntField('sourcesync', 0),
+            lambda pkt: pkt.packet_type in (200, 201, 204)),
+        # SR
+        ConditionalField(
+            PacketField('sender_info', SenderInfo(), SenderInfo),
+            lambda pkt: pkt.packet_type == 200),
+        # SR/RR
+        ConditionalField(
+            PacketListField('report_blocks', [], ReceptionReport,
+                            count_from=lambda pkt: pkt.count),
+            lambda pkt: pkt.packet_type in (200, 201)),
+        # SDES
+        ConditionalField(
+            PacketListField('sdes_chunks', [], SDESChunk,
+                            count_from=lambda pkt: pkt.count),
+            lambda pkt: pkt.packet_type == 202),
+        # BYE
+        ConditionalField(
+            FieldListField('sources', [], IntField('id', 0),
+                           count_from=lambda pkt: pkt.count),
+            lambda pkt: pkt.packet_type == 203),
+        ConditionalField(
+            FieldLenField('reason_length', None, length_of='reason', fmt='B'),
+            _rtcp_bye_has_reason),
+        ConditionalField(
+            StrLenField('reason', b'',
+                        length_from=lambda pkt: pkt.reason_length),
+            _rtcp_bye_has_reason),
+        # APP
+        ConditionalField(
+            StrFixedLenField('app_name', b'\x00' * 4, 4),
+            lambda pkt: pkt.packet_type == 204),
+        ConditionalField(
+            StrLenField('app_data', b'', length_from=_rtcp_app_data_length),
+            lambda pkt: pkt.packet_type == 204),
+    ]
+
+    def post_build(self, pkt, pay):
+        # A RTCP packet always ends on a 32 bits boundary
+        if len(pkt) % 4:
+            pkt += b"\x00" * (4 - len(pkt) % 4)
+        if self.length is None:
+            length = len(pkt)
+            if not isinstance(self.payload, RTCP):
+                # Everything that is not a stacked RTCP packet (padding
+                # octets, body of an unsupported packet type, ...) belongs
+                # to this packet
+                length += len(self.payload)
+            pkt = pkt[:2] + struct.pack('!H', length // 4 - 1) + pkt[4:]
+        return pkt + pay
+
+    def extract_padding(self, s):
+        if self.padding and self.length is not None and self.raw_packet_cache:
+            # The packet ends with padding octets, the last one holding the
+            # number of octets that must be ignored (RFC 3550 - 6.4.1)
+            pad_len = (self.length + 1) * 4 - len(self.raw_packet_cache)
+            if 0 < pad_len <= len(s):
+                return s[pad_len:], s[:pad_len]
+        return s, None
+
+    def guess_payload_class(self, payload):
+        # RTCP packets are usually sent as compound packets: several RTCP
+        # packets are stacked in a single lower layer packet
+        if len(payload) >= 4 and orb(payload[0]) >> 6 == self.version and \
+                orb(payload[1]) in _rtcp_packet_types:
+            return RTCP
+import ok
+$ cd /workspace/scapy && git --no-pager diff --stat && git status --short && python -c "
+$ from scapy.all import *
+$ p = RTCP(b'\x81\xc9\x00\x07\x8f\xd3\xf0\xc9\x93\x1b\xef\x2c\x00\x00\x00\x00\x00\x00\x22\x9d\x00\x00\x00\x0d\xd0\x76\x0a\x9c\x00\x00\x1a\x8a\x81\xca\x00\x04\x8f\xd3\xf0\xc9\x01\x09\x31\x32\x33\x34\x35\x36\x37\x38\x39\x00')
+$ p.show()
+$ "
+scapy/layers/rtp.py | 216 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 215 insertions(+), 1 deletion(-)
+ M scapy/layers/rtp.py
+###[ RTCP ]###
+  version   = 2
+  padding   = 0
+  count     = 1
+  packet_type= Receiver Report
+  length    = 7
+  sourcesync= 2413031625
+  \report_blocks\
+   |###[ Reception report ]###
+   |  sourcesync= 2468081452
+   |  fraction_lost= 0
+   |  cumulative_lost= 0
+   |  highest_seqnum_recvd= 8861
+   |  interarrival_jitter= 13
+   |  last_SR_timestamp= 3497396892
+   |  delay_since_last_SR= 6794
+###[ RTCP ]###
+     version   = 2
+     padding   = 0
+     count     = 1
+     packet_type= Source Description
+     length    = 4
+     \sdes_chunks\
+      |###[ SDES chunk ]###
+      |  sourcesync= 2413031625
+      |  \items     \
+      |   |###[ SDES item ]###
+      |   |  chunk_type= CNAME
+      |   |  length    = 9
+      |   |  value     = '123456789'
+# finish: Report completion of RTCP support implementation
+## Final answer
+
+**Checklist: 1 issue found in the description — 1 DONE, 0 BLOCKED.**
+
+1. **Issue 1 (#3460): RTCP packet support (RFC 3550) — DONE**
+
+### What was changed
+Only one non-test file was modified: `scapy/layers/rtp.py` (+215 lines). No file under `test/` (or any other test tree) was touched.
+
+**New enums**
+- `_rtcp_packet_types`: 200 Sender Report, 201 Receiver Report, 202 Source Description, 203 Goodbye, 204 Application-Defined
+- `_rtcp_sdes_types`: END, CNAME, NAME, EMAIL, PHONE, LOC, TOOL, NOTE, PRIV
+
+**New packet classes**
+- `SenderInfo` (RFC 3550 §6.4.1): `ntp_timestamp_msw`, `ntp_timestamp_lsw`, `rtp_timestamp`, `packet_count`, `octet_count`
+- `ReceptionReport` (§6.4.1): `sourcesync`, `fraction_lost`, `cumulative_lost`, `highest_seqnum_recvd`, `interarrival_jitter`, `last_SR_timestamp`, `delay_since_last_SR`
+- `SDESItem` (§6.5): `chunk_type`, `length`, `value`
+- `SDESChunk` (§6.5): `sourcesync` + `items`, null-octet terminator and 32-bit alignment generated on build and stripped on dissection
+- `RTCP` (§6): header (`version`, `padding`, `count`, `packet_type`, `length`) plus conditional bodies per packet type:
+  - SR → `sourcesync`, `sender_info`, `report_blocks`
+  - RR → `sourcesync`, `report_blocks`
+  - SDES → `sdes_chunks`
+  - BYE → `sources`, optional `reason_length`/`reason`
+  - APP → `sourcesync`, `app_name`, `app_data`
+
+**Behavioural logic**
+- `_RTCPReportCountField`: the 5-bit `count` is auto-computed from the list matching the packet type (report blocks / SDES chunks / BYE sources).
+- `post_build`: pads the packet to a 32-bit boundary and fills `length` with “size in 32-bit words minus one”, counting non-RTCP payloads (padding octets, unsupported-type bodies) but never a stacked RTCP packet.
+- `extract_padding`: honours the P bit — the trailing padding octets described by `length` are separated out instead of being mis-dissected.
+- `guess_payload_class`: dissects compound RTCP packets (several RTCP packets in one datagram), but only when the remaining bytes really look like an RTCP header, otherwise falls back to `Raw`.
+
+### Verification
+- Exact build/dissect round-trips (`raw(RTCP(raw(p))) == raw(p)`) for SR, RR, SDES (single/multiple chunks and items, aligned and unaligned), BYE with and without reason, APP, padded packets, compound packets and a realistic RR+SDES capture, all with `conf.debug_dissector = True`.
+- 2000+ randomized well-formed RTCP packets dissected, rebuilt, `show()`n, `summary()`d and `copy()`d with zero exceptions; `fuzz(RTCP())` builds; pcap write/read round-trip verified; UDP `bind_layers` encapsulation verified.
+- `test/scapy/layers/rtp.uts` passes unchanged; every other layer test file plus `test/regression.uts` produce exactly the same failure counts as the pre-change baseline (dhcp 1, dot11 2, http 2, ipsec 108, l2 1, usb 2 — all pre-existing environment issues: missing crypto/tcpdump/network). Nothing that worked before is broken.
+- The module compiles and imports cleanly, has no unused imports and no lines over 79 characters (flake8/mypy cannot be installed offline, so style was checked manually; `rtp.py` is not in `.config/mypy/mypy_enabled.txt`, so type comments are not required).
+
+No issues were blocked.

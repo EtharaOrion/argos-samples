@@ -1,0 +1,200 @@
++    if count_of is None:
++        count_field_desc = BitField(count_field, 0, 5)  # type: AnyField
++    else:
++        count_field_desc = BitFieldLenField(count_field, None, 5,
++                                            count_of=count_of)
++    return [BitField("version", 2, 2),
++            BitField("padding", 0, 1),
++            count_field_desc,
++            ByteEnumField("packet_type", pt, _rtcp_packet_types),
++            ShortField("length", None)]
++
++
++class RTCPSenderReport(RTCP):
++    """
++    Sender report, sent by active senders (RFC 3550, section 6.4.1).
++    """
++
++    name = "Sender Report"
++    fields_desc = _rtcp_header_fields(200, "reports") + [
++        IntField("ssrc", 0),
++        LongField("ntp_time", 0),
++        IntField("rtp_time", 0),
++        IntField("packet_count", 0),
++        IntField("octet_count", 0),
++        PacketListField("reports", [], RTCPReportBlock,
++                        count_from=lambda p: p.rrc)]
++
++    def mysummary(self):
++        # type: () -> str
++        return self.sprintf("RTCP Sender Report (SSRC=%ssrc%)")
++
++
++class RTCPReceiverReport(RTCP):
++    """
++    Receiver report, sent by receivers which are not active senders
++    (RFC 3550, section 6.4.2).
++    """
++
++    name = "Receiver Report"
++    fields_desc = _rtcp_header_fields(201, "reports") + [
+No task list found. Use the "plan" command to create one.
+Task list has been updated with 1 item(s).
+$ cd /workspace/scapy && PYTHONPATH=/workspace/scapy python -c "
+$ # Final acceptance check covering all RTCP packet types of RFC 3550
+$ from scapy.layers.rtp import (
+$     RTCP, RTCPSenderReport, RTCPReceiverReport, RTCPSourceDescription,
+$     RTCPGoodbye, RTCPApplicationSpecific, RTCPReportBlock, RTCPSDESChunk,
+$     RTCPSDESItem)
+$ from scapy.compat import raw
+$ 
+$ # RFC 3550 section 6.4.1 SR example layout check
+$ sr = RTCPSenderReport(ssrc=0xdeadbeef, ntp_time=0x83AA7E80DA4821E0,
+$                       rtp_time=1234567, packet_count=1000, octet_count=160000,
+$                       reports=[RTCPReportBlock(ssrc=0x12345678, fractionlost=25,
+$                                                cumlost=5, extseq=0x0000ABCD,
+$                                                jitter=12, lsr=0x12345678,
+$                                                dlsr=0x00012345)])
+$ b = raw(sr)
+$ assert len(b) % 4 == 0 and b[0] >> 6 == 2 and b[1] == 200
+$ assert len(sr.reports) == 1
+$ p = RTCP(b)
+$ assert isinstance(p, RTCPSenderReport) and raw(p) == b
+$ print('SR ok')
+$ 
+$ rr = RTCPReceiverReport(ssrc=1, reports=[RTCPReportBlock(ssrc=2)] * 5)
+$ b = raw(rr); p = RTCP(b)
+$ assert isinstance(p, RTCPReceiverReport) and len(p.reports) == 5 and raw(p) == b
+$ print('RR ok')
+$ 
+$ sdes = RTCPSourceDescription(chunks=[
+$     RTCPSDESChunk(ssrc=1, items=[RTCPSDESItem(type='CNAME', value=b'a@b'),
+$                                  RTCPSDESItem(type='NAME', value=b'N'),
+$                                  RTCPSDESItem(type='EMAIL', value=b'e@e'),
+$                                  RTCPSDESItem(type='PHONE', value=b'123'),
+$                                  RTCPSDESItem(type='LOC', value=b'here'),
+$                                  RTCPSDESItem(type='TOOL', value=b'scapy'),
+$                                  RTCPSDESItem(type='NOTE', value=b'note')]),
+$     RTCPSDESChunk(ssrc=2, items=[RTCPSDESItem(type=8, value=b'priv')])])
+$ b = raw(sdes); p = RTCP(b)
+$ assert isinstance(p, RTCPSourceDescription) and len(p.chunks) == 2
+$ assert len(p.chunks[0].items) == 7 and p.chunks[1].items[0].type == 8
+$ assert raw(p) == b
+$ print('SDES ok')
+$ 
+$ bye = RTCPGoodbye(ssrcs=[1, 2, 3, 31], reason=b'cu')
+$ b = raw(bye); p = RTCP(b)
+$ assert p.ssrcs == [1, 2, 3, 31] and p.reason == b'cu' and raw(p) == b
+$ print('BYE ok')
+$ 
+$ app = RTCPApplicationSpecific(subtype=31, ssrc=9, name=b'XAPP', data=b'\x00\x01\x02\x03')
+$ b = raw(app); p = RTCP(b)
+$ assert p.subtype == 31 and p.getfieldval('name') == b'XAPP' and raw(p) == b
+$ print('APP ok')
+$ 
+$ # unimplemented type falls back on RTCP with its data kept
+$ xr = RTCP(packet_type=207, ssrc=1, data=b'\x00\x00\x00\x00')
+$ b = raw(xr); p = RTCP(b)
+$ assert type(p) is RTCP and p.data == b'\x00\x00\x00\x00' and raw(p) == b
+$ print('XR fallback ok')
+$ print()
+$ print('ACCEPTANCE: all RFC 3550 RTCP packet types work')
+$ "
+cd /workspace/scapy && PYTHONPATH=/workspace/scapy python -c "
+# Final acceptance check covering all RTCP packet types of RFC 3550
+from scapy.layers.rtp import (
+    RTCP, RTCPSenderReport, RTCPReceiverReport, RTCPSourceDescription,
+    RTCPGoodbye, RTCPApplicationSpecific, RTCPReportBlock, RTCPSDESChunk,
+    RTCPSDESItem)
+from scapy.compat import raw
+# RFC 3550 section 6.4.1 SR example layout check
+sr = RTCPSenderReport(ssrc=0xdeadbeef, ntp_time=0x83AA7E80DA4821E0,
+                      rtp_time=1234567, packet_count=1000, octet_count=160000,
+                      reports=[RTCPReportBlock(ssrc=0x12345678, fractionlost=25,
+                                               cumlost=5, extseq=0x0000ABCD,
+                                               jitter=12, lsr=0x12345678,
+                                               dlsr=0x00012345)])
+b = raw(sr)
+assert len(b) % 4 == 0 and b[0] >> 6 == 2 and b[1] == 200
+assert len(sr.reports) == 1
+p = RTCP(b)
+assert isinstance(p, RTCPSenderReport) and raw(p) == b
+print('SR ok')
+rr = RTCPReceiverReport(ssrc=1, reports=[RTCPReportBlock(ssrc=2)] * 5)
+b = raw(rr); p = RTCP(b)
+assert isinstance(p, RTCPReceiverReport) and len(p.reports) == 5 and raw(p) == b
+print('RR ok')
+sdes = RTCPSourceDescription(chunks=[
+    RTCPSDESChunk(ssrc=1, items=[RTCPSDESItem(type='CNAME', value=b'a@b'),
+                                 RTCPSDESItem(type='NAME', value=b'N'),
+                                 RTCPSDESItem(type='EMAIL', value=b'e@e'),
+                                 RTCPSDESItem(type='PHONE', value=b'123'),
+                                 RTCPSDESItem(type='LOC', value=b'here'),
+                                 RTCPSDESItem(type='TOOL', value=b'scapy'),
+                                 RTCPSDESItem(type='NOTE', value=b'note')]),
+    RTCPSDESChunk(ssrc=2, items=[RTCPSDESItem(type=8, value=b'priv')])])
+b = raw(sdes); p = RTCP(b)
+assert isinstance(p, RTCPSourceDescription) and len(p.chunks) == 2
+assert len(p.chunks[0].items) == 7 and p.chunks[1].items[0].type == 8
+assert raw(p) == b
+print('SDES ok')
+bye = RTCPGoodbye(ssrcs=[1, 2, 3, 31], reason=b'cu')
+b = raw(bye); p = RTCP(b)
+assert p.ssrcs == [1, 2, 3, 31] and p.reason == b'cu' and raw(p) == b
+print('BYE ok')
+app = RTCPApplicationSpecific(subtype=31, ssrc=9, name=b'XAPP', data=b'\x00\x01\x02\x03')
+b = raw(app); p = RTCP(b)
+assert p.subtype == 31 and p.getfieldval('name') == b'XAPP' and raw(p) == b
+print('APP ok')
+# unimplemented type falls back on RTCP with its data kept
+xr = RTCP(packet_type=207, ssrc=1, data=b'\x00\x00\x00\x00')
+b = raw(xr); p = RTCP(b)
+assert type(p) is RTCP and p.data == b'\x00\x00\x00\x00' and raw(p) == b
+print('XR fallback ok')
+print()
+print('ACCEPTANCE: all RFC 3550 RTCP packet types work')
+"
+SR ok
+RR ok
+SDES ok
+BYE ok
+APP ok
+Traceback (most recent call last):
+  File "<string>", line 54, in <module>
+  File "/workspace/scapy/scapy/base_classes.py", line 401, in __call__
+    i.__init__(*args, **kargs)
+  File "/workspace/scapy/scapy/packet.py", line 180, in __init__
+    raise AttributeError(fname)
+AttributeError: ssrc
+# think: Correcting base RTCP usage in test
+Your thought has been logged.
+$ cd /workspace/scapy && PYTHONPATH=/workspace/scapy python -c "
+$ from scapy.layers.rtp import RTCP
+$ from scapy.compat import raw
+$ xr = RTCP(packet_type=207, data=b'\x00\x00\x00\x01\x00\x00\x00\x00')
+$ b = raw(xr); p = RTCP(b)
+$ assert type(p) is RTCP and p.data == b'\x00\x00\x00\x01\x00\x00\x00\x00' and raw(p) == b
+$ print('XR fallback ok:', b.hex())
+$ "
+XR fallback ok: 80cf00020000000100000000
+$ cd /workspace/scapy && echo "=== FINAL VERIFICATION ===" && PYTHONPATH=/workspace/scapy python -m scapy.tools.UTscapy -t test/scapy/layers/rtp.uts -F 2>&1 | grep -E "PASSED=|FAILED=" && PYTHONPATH=/workspace/scapy python -m scapy.tools.UTscapy -t test/fields.uts -F 2>&1 | grep -E "PASSED=|FAILED=" && PYTHONPATH=/workspace/scapy python -m scapy.tools.UTscapy -t test/imports.uts -F 2>&1 | grep -E "PASSED=|FAILED=" && PYTHONPATH=/workspace/scapy python -m scapy.tools.UTscapy -t test/scapy/layers/inet.uts -F 2>&1 | grep -E "PASSED=|FAILED=" && echo "=== git status ===" && git status --short
+=== FINAL VERIFICATION ===
+PASSED=3 FAILED=0
+PASSED=128 FAILED=0
+PASSED=4 FAILED=0
+PASSED=44 FAILED=0
+=== git status ===
+ M scapy/layers/rtp.py
+# finish: Implemented RTCP (RFC 3550) support in scapy
+Implemented RTCP (RTP Control Protocol, RFC 3550) support in scapy — issue #3460.
+
+**Checklist: 1 issue found; 1 addressed, 0 blocked.**
+
+Changes (single file, `scapy/layers/rtp.py`):
+- `RTCP` base layer with the common header (version/padding/RC/SC/packet type/length) and `dispatch_hook` that routes to the right sub-packet class; unimplemented types (XR, RTPFB, PSFB, TFRC, …) fall back on `RTCP` with their body in a `data` field.
+- `RTCPSenderReport` (SSRC, 64-bit NTP timestamp, RTP timestamp, packet/octet counts), `RTCPReceiverReport`, `RTCPReportBlock` (fraction lost, cumulative loss, extended highest sequence, jitter, LSR, DLSR).
+- `RTCPSourceDescription`/`RTCPSDESChunk`/`RTCPSDESItem` with all RFC 3550 SDES item types, END-item termination and 32-bit alignment padding.
+- `RTCPGoodbye` (SSRC list + optional length-prefixed reason) and `RTCPApplicationSpecific` (subtype, SSRC, 4-byte name, app data); convenience aliases `RTCPSDES`, `RTCPBye`, `RTCPAPP`.
+- Compound packets dissect as stacked layers (bounded by each packet's `length`); padding (P bit + count byte) is stripped on dissection and regenerated on build so packets round-trip byte-exactly; `length` and report/source counts are auto-computed; `mysummary`, IANA enums and `match_subclass` included.
+
+Verification: repro scripts (single/compound/realistic packets), a 10-test UTscapy suite, exhaustive round-trip tests over all item/reason/data and padding lengths, fuzz build/re-dissect loops, pickling/copy, pcap write/read, plus the repo's own test suites (`rtp.uts` 3/3, `fields.uts` 128/128, `imports.uts` 4/4, `regression.uts`, all `test/scapy/layers/*.uts`) — no new failures versus the pre-change baseline (remaining failures are pre-existing environment issues). No test files were touched.

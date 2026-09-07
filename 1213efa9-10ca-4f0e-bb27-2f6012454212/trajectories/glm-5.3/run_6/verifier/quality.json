@@ -1,0 +1,97 @@
+{
+  "version": {
+    "quality": "quality-v1",
+    "prompt_digest": "6169e82413340627",
+    "manifest_digest": "d55b59e374bfca48"
+  },
+  "task_uuid": "1213efa9-10ca-4f0e-bb27-2f6012454212",
+  "model": "glm-5.3",
+  "run_id": "run_6",
+  "status": "scored",
+  "calibrated": false,
+  "judge": {
+    "member": "gpt-5.6-sol",
+    "model": "openai/responses/gpt-5.6-sol"
+  },
+  "patch": {
+    "source": "git",
+    "sha256": "36b6e344338678dd7f672a022a7ff0c3601eb84d368b35d703d99692b6f905b4",
+    "bytes": 22050,
+    "truncated": false
+  },
+  "evidence_digest": "a4886626c5cbc05d",
+  "quality_fingerprint": "baefa2397ca02a10",
+  "score": 0.8571,
+  "counts": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "undecided": 0
+  },
+  "reasons": [],
+  "items": [
+    {
+      "id": "Q1",
+      "dimension": "conventions",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The additions preserve the module\u2019s existing Scapy conventions: grouped Scapy imports, declarative `fields_desc` definitions, CamelCase packet classes, and `bind_layers` usage, while malformed length values are handled defensively without introducing an inconsistent logging or exception pattern.",
+      "evidence_ref": "scapy/layers/rtp.py hunks beginning `@@ -4,7 +4,7` and `@@ -55,3 +63,492`, especially the `fields_desc` declarations, `_rtcp_length_from` exception handling, and final `bind_layers(UDP, RTCP, ...)` binding."
+    },
+    {
+      "id": "Q2",
+      "dimension": "minimal_diff",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "Every hunk is directly related to adding RTCP support: the new documentation describes RTCP, while the changes to the existing RTP layer add RTCP packet definitions, parsing helpers, and UDP bindings. The minor import and module-docstring changes are necessary to support and describe that implementation, with no unrelated churn shown.",
+      "evidence_ref": "scapy/layers/rtp.py, hunks at @@ -4,7 +4,7 @@ and @@ -55,3 +63,492 @@; doc/scapy/layers/rtcp.rst, new-file hunk @@ -0,0 +1,59 @@"
+    },
+    {
+      "id": "Q3",
+      "dimension": "abstraction",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The implementation centralizes shared RTCP framing behavior in `RTCPPacket` and reuses `_rtcp_length_from` and `_rtcp_len_left` across multiple packet types, while protocol-specific classes correspond directly to distinct RFC packet or report structures. The callback helpers used once are required by `PacketListField` parsing and have a stated dissection purpose rather than adding gratuitous indir",
+      "evidence_ref": "`scapy/layers/rtp.py`, RTCP additions including `RTCPPacket`, `_rtcp_length_from`, `_rtcp_len_left`, and the packet/report subclasses."
+    },
+    {
+      "id": "Q4",
+      "dimension": "readability",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added RTCP implementation is organized into small helpers and packet classes with shallow, straightforward control flow; comments and docstrings generally explain protocol-specific intent, such as RFC length semantics and packet-boundary handling, rather than merely restating operations.",
+      "evidence_ref": "scapy/layers/rtp.py, hunk beginning at `_rtcp_length_from`; helpers such as `_rtcp_len_left`, `_rtcp_sdes_chunk_cls`, and `_rtcp_pkt_cls` each have concise branches and protocol-focused comments."
+    },
+    {
+      "id": "Q5",
+      "dimension": "naming",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": false,
+      "rationale": "The sender-report class introduces the field name `tx_reports`, even though the adjacent count field is `rx_report_count` and the list contains `RTCPReportBlock` reception reports, making the identifier misleading and inconsistent.",
+      "evidence_ref": "scapy/layers/rtp.py, `RTCPSenderReportPacket` hunk: `BitFieldLenField(\"rx_report_count\", None, 5, count_of=\"tx_reports\")` and `PacketListField(\"tx_reports\", [], RTCPReportBlock, ...)`"
+    },
+    {
+      "id": "Q6",
+      "dimension": "idiomaticity",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The implementation follows Scapy\u2019s established declarative packet-layer idioms, using `Packet` subclasses, `fields_desc`, field callbacks, `PacketListField`, `dispatch_hook`, and standard layer-binding helpers rather than introducing foreign abstractions.",
+      "evidence_ref": "scapy/layers/rtp.py, RTCP additions: `class RTCP(Packet)` defines `fields_desc = [PacketListField(...)]`, and the final hunk uses `bind_bottom_up(UDP, RTCP, ...)` and `bind_layers(UDP, RTCP, ...)`."
+    },
+    {
+      "id": "Q7",
+      "dimension": "dead_code",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added RTCP classes, helpers, dispatch maps, and callbacks are all wired into packet fields or layer bindings; the compatibility imports are used by the accompanying type annotations. The diff contains no commented-out implementation, debugging leftovers, or evidently unreachable guards.",
+      "evidence_ref": "scapy/layers/rtp.py, hunk beginning `@@ -55,3 +63,492 @@`: `_rtcp_length_from`, `_rtcp_len_left`, `_rtcp_pkt_cls`, and the packet classes are referenced by `PacketListField` callbacks, dispatch maps, and the final UDP bindings."
+    }
+  ]
+}

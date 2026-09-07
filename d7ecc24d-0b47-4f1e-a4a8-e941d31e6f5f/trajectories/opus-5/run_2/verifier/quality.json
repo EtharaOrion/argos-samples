@@ -1,0 +1,97 @@
+{
+  "version": {
+    "quality": "quality-v1",
+    "prompt_digest": "6169e82413340627",
+    "manifest_digest": "d55b59e374bfca48"
+  },
+  "task_uuid": "d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f",
+  "model": "opus-5",
+  "run_id": "run_2",
+  "status": "scored",
+  "calibrated": false,
+  "judge": {
+    "member": "gpt-5.6-sol",
+    "model": "openai/responses/gpt-5.6-sol"
+  },
+  "patch": {
+    "source": "git",
+    "sha256": "ff215ee9605760eade412420f0326fbd9cdc2298102a5c3de91829a5a59aa0e6",
+    "bytes": 107540,
+    "truncated": false
+  },
+  "evidence_digest": "619ad58aedea0317",
+  "quality_fingerprint": "4ebbe7801351b852",
+  "score": 0.8571,
+  "counts": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "undecided": 0
+  },
+  "reasons": [],
+  "items": [
+    {
+      "id": "Q1",
+      "dimension": "conventions",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The SVG constructors consistently use the repository\u2019s existing explicit keyword-only signature pattern and delegate attribute collection through `locals_cleanup`, while the helper is extended with an optional attribute registry rather than duplicated or bypassed.",
+      "evidence_ref": "`src/air/tags/models/svg.py` hunk `@@ -10,378 +14,2346 @@` and `src/air/tags/utils.py` hunk `@@ -33,11 +40,25 @@`"
+    },
+    {
+      "id": "Q2",
+      "dimension": "minimal_diff",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": false,
+      "rationale": "The new AGENTS.md contains repository guidance and testing notes for agents, which does not serve the requested SVG function-signature change and is therefore unrelated churn.",
+      "evidence_ref": "AGENTS.md, new-file hunk @@ -0,0 +1,45 @@ (\u201c# Repository notes for agents\u201d)"
+    },
+    {
+      "id": "Q3",
+      "dimension": "abstraction",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The repeated constructors are necessary to expose distinct per-tag signatures, while their attribute-collection logic remains centralized in the existing `locals_cleanup` helper, generalized via an attribute registry rather than duplicated. `SVG_ATTRIBUTES` is a task-appropriate data map consumed by all SVG tag constructors, not a single-use layer.",
+      "evidence_ref": "`src/air/tags/utils.py` hunk generalizing `locals_cleanup(..., attributes=HTML_ATTRIBUTES)`, and `src/air/tags/models/svg.py` hunk where constructors consistently call `locals_cleanup(locals(), self, SVG_ATTRIBUTES)`"
+    },
+    {
+      "id": "Q4",
+      "dimension": "readability",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The changed constructors follow a uniform, shallow pattern: explicit keyword-only signatures followed by a single delegation through `locals_cleanup`, while the utility function remains a simple lookup-and-filter loop. Comments and docstrings explain non-obvious intent such as Python keyword proxies and selecting the SVG attribute registry rather than introducing redundant control-flow narration.",
+      "evidence_ref": "`src/air/tags/models/svg.py` hunk `@@ -10,378 +14,2346 @@` and `src/air/tags/utils.py` hunk `@@ -33,11 +40,25 @@`; e.g. `super().__init__(*children, **kwargs | locals_cleanup(locals(), self, SVG_ATTRIBUTES))` and the shallow `for attr in attrs` filtering loop."
+    },
+    {
+      "id": "Q5",
+      "dimension": "naming",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The new identifiers use descriptive repository-consistent names such as `SVG_ATTRIBUTES`, `GLOBAL_ATTRIBUTES`, and `attributes`; SVG constructor parameters intentionally retain the standard SVG attribute casing and vocabulary, such as `viewBox`, `preserveAspectRatio`, and `gradientUnits`.",
+      "evidence_ref": "`src/air/tags/config.py` hunk adding `SVG_ATTRIBUTES`; `src/air/tags/models/svg.py` hunk adding SVG constructor parameters; `src/air/tags/utils.py` hunk adding `GLOBAL_ATTRIBUTES` and the `attributes` parameter to `locals_cleanup`"
+    },
+    {
+      "id": "Q6",
+      "dimension": "idiomaticity",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The SVG constructors follow the repository\u2019s established tag pattern by using keyword-only typed parameters, `locals_cleanup`, and forwarding attributes through `super().__init__`; the utility extension also preserves the existing registry-driven approach rather than introducing a foreign abstraction.",
+      "evidence_ref": "`src/air/tags/models/svg.py` hunk beginning `@@ -10,378 +14,2346 @@`, e.g. `super().__init__(*children, **kwargs | locals_cleanup(locals(), self, SVG_ATTRIBUTES))`; `src/air/tags/utils.py` hunk beginning `@@ -33,11 +40,25 @@`."
+    },
+    {
+      "id": "Q7",
+      "dimension": "dead_code",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added SVG attribute registry, constructor parameters, imports, and `locals_cleanup` extension are all used directly to build tag attributes; the diff adds no unused symbols, unreachable branches, commented-out implementations, or speculative guards.",
+      "evidence_ref": "`src/air/tags/models/svg.py` hunk at imports and SVG constructors uses `Any`, `SVG_ATTRIBUTES`, and `locals_cleanup`; `src/air/tags/utils.py` hunk defines and uses `GLOBAL_ATTRIBUTES` in `locals_cleanup`."
+    }
+  ]
+}

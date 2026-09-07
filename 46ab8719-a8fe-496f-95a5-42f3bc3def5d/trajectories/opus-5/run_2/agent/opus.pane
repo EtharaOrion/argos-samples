@@ -1,0 +1,200 @@
+npx jest scratch/__tests__/api.test.ts 2>&1 | tail -20
+$ cd /workspace/molecule && npx jest scratch/__tests__/api.test.ts 2>&1 | tail -20
+cd /workspace/molecule && mkdir -p scratch/__tests__ && cat > scratch/__tests__/api.test.ts <<'EOF'
+import 'reflect-metadata';
+import molecule from 'mo';
+import { ColorThemeMode } from 'mo/model/colorTheme';
+describe('public api', () => {
+    test('molecule.colorTheme.getColorThemeMode', () => {
+        const mode = molecule.colorTheme.getColorThemeMode();
+        expect(mode).toBe(ColorThemeMode.dark);
+        const changed: any[] = [];
+        molecule.colorTheme.onChange((prev, next, themeMode) => {
+            changed.push([prev.id, next.id, themeMode]);
+        });
+        molecule.colorTheme.addThemes({
+            id: 'Light+',
+            label: 'Light+',
+            uiTheme: 'vs',
+            colors: { 'editor.background': '#FFFFFE' },
+        });
+        molecule.colorTheme.setTheme('Light+');
+        expect(molecule.colorTheme.getColorThemeMode()).toBe(ColorThemeMode.light);
+        expect(changed).toEqual([['Default Dark+', 'Light+', 'light']]);
+        expect(molecule.colorTheme.getColorTheme().id).toBe('Light+');
+    });
+});
+EOF
+
+
+npx jest scratch/__tests__/api.test.ts 2>&1 | tail -20
+clear
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+PASS scratch/__tests__/api.test.ts
+  public api
+    ✓ molecule.colorTheme.getColorThemeMode (6 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        1.412 s
+Ran all test suites matching /scratch\/__tests__\/api.test.ts/i.
+
+
+clear
+
+
+cd /workspace/molecule && npx jest scratch/__tests__/api.test.ts 2>&1 | tail -20
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+PASS scratch/__tests__/api.test.ts
+  public api
+    ✓ molecule.colorTheme.getColorThemeMode (6 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        1.333 s, estimated 2 s
+Ran all test suites matching /scratch\/__tests__\/api.test.ts/i.
+$ cd /workspace/molecule && rm -rf scratch && ls AGENTS.md 2>/dev/null; npx tsc --noEmit 2>&1 | tail -5; npx jest 2>&1 | tail -6; git status --short
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+Snapshots:   49 passed, 49 total
+Time:        4.087 s
+Ran all test suites.
+ M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M website/docs/guides/extend-color-theme.md
+ M website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+?? src/common/color.ts
+$ cd /workspace/molecule && cat src/common/color.ts && sed -n '1,30p' src/services/theme/colorThemeService.ts
+/**
+ * The result of the color brightness detection
+ */
+export type ColorBrightness = 'light' | 'dark';
+
+const HEX_REG = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+const RGB_REG =
+    /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*(?:\.\d+)?)\s*)?\)$/i;
+
+/**
+ * Convert a color string to the RGB values,
+ * it supports the `HEX` and the `RGB(A)` color format
+ * @param color eg: `#1E1E1E`, `#FFF`, `rgb(0, 0, 0)`, `rgba(0, 0, 0, .5)`
+ * @returns The [red, green, blue] values, or `undefined` when the color is invalid
+ */
+export function colorToRGB(
+    color: string
+): [number, number, number] | undefined {
+    if (!color || typeof color !== 'string') return undefined;
+
+    const value = color.trim();
+
+    const rgbMatched = value.match(RGB_REG);
+    if (rgbMatched) {
+        return [
+            Number(rgbMatched[1]),
+            Number(rgbMatched[2]),
+            Number(rgbMatched[3]),
+        ];
+    }
+
+    if (HEX_REG.test(value)) {
+        let hex = value.slice(1);
+        // Convert the shorthand hex(#FFF or #FFFF) to the full hex(#FFFFFF)
+        if (hex.length <= 4) {
+            hex = hex
+                .split('')
+                .map((char) => char + char)
+                .join('');
+        }
+        const numeric = parseInt(hex.slice(0, 6), 16);
+        return [numeric >> 16, (numeric >> 8) & 255, numeric & 255];
+    }
+
+    return undefined;
+}
+
+/**
+ * Detect the color whether is a light or a dark color,
+ * it's using the HSP(Highly Sensitive Poo) color model,
+ * more info please visit: http://alienryderflex.com/hsp.html
+ * @param color eg: `#1E1E1E`, `#FFF`, `rgb(0, 0, 0)`, `rgba(0, 0, 0, .5)`
+ * @returns `light` or `dark`, the default value is `dark` when the color is invalid
+ */
+export function colorLightOrDark(color: string): ColorBrightness {
+    const rgb = colorToRGB(color);
+    if (!rgb) return 'dark';
+
+    const [r, g, b] = rgb;
+    const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+
+    return hsp > 127.5 ? 'light' : 'dark';
+}
+/**
+ * VSCode theme extends guides: https://code.visualstudio.com/api/extension-guides/color-theme
+ * https://code.visualstudio.com/api/references/theme-color
+ */
+
+import 'reflect-metadata';
+import {
+    ColorScheme,
+    ColorThemeEvent,
+    ColorThemeMode,
+    IColorTheme,
+} from 'mo/model/colorTheme';
+import { singleton } from 'tsyringe';
+import { editor as monacoEditor } from 'mo/monaco';
+import { applyStyleSheetRules } from 'mo/common/css';
+import { getThemeData, convertToCSSVars } from './helper';
+import logger from 'mo/common/logger';
+import { prefixClaName } from 'mo/common/className';
+import { searchById } from 'mo/common/utils';
+import { colorLightOrDark } from 'mo/common/color';
+import { GlobalEvent } from 'mo/common/event';
+
+export { ColorThemeEvent, ColorThemeMode };
+
+export interface IColorThemeService {
+    /**
+     * Add themes into `colorThemes`
+     *
+     * This will update the duplicated themes found in `colorThemes`
+     * @param themes
+# finish: Implemented colorTheme mode API and change event
+**Checklist: 1 issue found.**
+
+1. Issue 1 (#627): "How to get current theme?" — no way to obtain the current theme's mode (dark/light) or to react to theme changes. — **DONE**
+
+## What I did
+
+**Reproduction:** wrote a temporary jest scratch test that resolved `ColorThemeService` and confirmed `getColorThemeMode` was `undefined` (only `getColorTheme()`/`getThemes()` existed, and neither exposed the dark/light mode). The scratch dir was deleted afterwards.
+
+**Changes (non-test files only):**
+
+1. `src/common/color.ts` (new)
+   - `colorToRGB(color)` — parses `#RGB`, `#RGBA`, `#RRGGBB`, `#RRGGBBAA`, `rgb(...)` and `rgba(...)` strings (monaco's `Color.toString()` emits both hex and `rgba()` forms).
+   - `colorLightOrDark(color)` — HSP-based brightness detection returning `'light' | 'dark'`, defaulting to `'dark'` for invalid/empty input.
+
+2. `src/model/colorTheme.ts`
+   - Added `ColorThemeMode` enum (`dark`/`light`) — the simplified mode developers need to sync a third-party UI library (e.g. antd).
+   - Added `ColorThemeEvent` enum with `onChange = 'colorTheme.onChange'`.
+
+3. `src/services/theme/colorThemeService.ts`
+   - `ColorThemeService` now extends `GlobalEvent` (same pattern as `SettingsService`) so it can emit/subscribe events.
+   - New `getColorThemeMode(): ColorThemeMode` — resolves the mode from the theme's `colors['editor.background']`, falling back to the declared `type` (`ColorScheme`) and finally to the built-in colors derived from `uiTheme`; default is `dark`.
+   - New `onChange(callback(prev, next, themeMode))` — `setTheme()` now emits `ColorThemeEvent.onChange` with the previous theme, the next theme and the new mode (so `updateTheme`/`reset`, which reload, also notify listeners).
+   - Fixed the incorrect interface signature `getThemeById(id: string): void` → `IColorTheme | undefined`, and added the two new methods to `IColorThemeService`.
+   - Re-exported `ColorThemeMode`/`ColorThemeEvent` from the service module so they can be imported either from `mo/model/colorTheme` or from the service (and hence from `molecule.api`).
+
+4. Docs: `website/docs/guides/extend-color-theme.md` and its zh-CN counterpart now document `getColorTheme()`, `getColorThemeMode()` and `onChange()` with usage examples for syncing a third-party UI theme.
+
+**Verification:**
+- Temporary jest scratch tests (deleted afterwards) verified: default mode is `dark`; light via explicit `colors['editor.background']`; light via `uiTheme: 'vs'`; mode via `type: ColorScheme.LIGHT`; unknown `uiTheme` falls back to `dark`; `onChange` fires with `(prev, next, mode)`; and the public path `molecule.colorTheme.getColorThemeMode()/onChange()` works.
+- `npx tsc --noEmit` clean, `eslint` and `prettier --check` clean on all touched files.
+- Full suite: **96 suites / 704 tests passing**, same as before my changes (no regressions).
+
+**Tally:** 1 of 1 issue addressed (DONE); 0 blocked.

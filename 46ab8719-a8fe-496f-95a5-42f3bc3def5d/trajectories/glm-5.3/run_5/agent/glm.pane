@@ -1,0 +1,200 @@
+@@ -125,10 +152,22 @@ export class ColorThemeService implements IColorThemeService {
+         return Object.assign({}, this.colorTheme);
+     }
+
++    public getCurrentTheme(): IColorTheme {
++        return this.getColorTheme();
++    }
++
++    public getCurrentColorScheme(): ColorScheme {
++        return this.getCurrentTheme().type || getColorScheme();
++    }
++
+     public setTheme(id: string) {
+         const theme = this.getThemeById(id);
+         if (theme) {
+-            this.colorTheme = { ...theme };
++            const prevTheme = this.getColorTheme();
++            this.colorTheme = {
++                ...theme,
++                type: theme.type || getColorScheme(theme.uiTheme),
++            };
+             const themeData = getThemeData(theme);
+             const styleSheetContent = convertToCSSVars(themeData.colors);
+             applyStyleSheetRules(styleSheetContent, DEFAULT_THEME_CLASS_NAME);
+@@ -136,6 +175,16 @@ export class ColorThemeService implements IColorThemeService {
+             // Update monaco-editor theme
+             monacoEditor.defineTheme(DEFAULT_THEME_CLASS_NAME, themeData);
+             monacoEditor.setTheme(DEFAULT_THEME_CLASS_NAME);
++
++            const nextTheme = this.getColorTheme();
++            // Only notify the theme changed event when the theme
++            // or the color scheme of the theme is changed
++            if (
++                prevTheme.id !== nextTheme.id ||
++                prevTheme.type !== nextTheme.type
++            ) {
++                this.emit(ColorThemeEvent.OnChange, prevTheme, nextTheme);
++            }
+         } else {
+             logger.error(`Can't get the theme by id:` + id);
+         }
+@@ -153,4 +202,10 @@ export class ColorThemeService implements IColorThemeService {
+         this.colorThemes = [BuiltInColorTheme];
+         this.setTheme(BuiltInColorTheme.id);
+     }
++
++    public onChange(
++        callback: (prevTheme: IColorTheme, nextTheme: IColorTheme) => void
++    ): void {
++        this.subscribe(ColorThemeEvent.OnChange, callback);
++    }
+ }
+# file_editor: /workspace/molecule/repro/builtinThemes.test.ts
+File created successfully at: /workspace/molecule/repro/builtinThemes.test.ts
+$ cd /workspace/molecule && npx jest -c repro/jest.repro.config.js 2>&1 | grep -E "PASS|FAIL|Tests:|✓|✕" | head -20
+PASS repro/apiSurface.test.ts
+PASS repro/getCurrentTheme.test.ts
+PASS repro/builtinThemes.test.ts
+Tests:       9 passed, 9 total
+Task list has been updated with 1 item(s).
+$ cd /workspace/molecule && npx jest 2>&1 | grep -E "Test Suites:|Tests:|Snapshots:" | head
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+Snapshots:   49 passed, 49 total
+$ cd /workspace/molecule && rm -rf repro && git status --short
+M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M website/docs/guides/extend-color-theme.md
+ M website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+$ cd /workspace/molecule && npx tsc --noEmit -p tsconfig.json && echo "TSC OK" && npx tsc --noEmit -p tsconfig.build.json && echo "BUILD TSC OK" && npx jest 2>&1 | grep -E "Test Suites:|Tests:"
+TSC OK
+BUILD TSC OK
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+# file_editor: /workspace/molecule/src/model/colorTheme.ts
+Here's the result of running `cat -n` on /workspace/molecule/src/model/colorTheme.ts:
+     1	export interface IColors {
+     2	    [colorId: string]: string;
+     3	}
+     4	export interface TokenColor extends Object {
+     5	    name?: string;
+     6	    scope?: string | string[];
+     7	    settings?: object;
+     8	}
+     9	
+    10	/**
+    11	 * Color scheme used by the OS and by color themes.
+    12	 */
+    13	export enum ColorScheme {
+    14	    DARK = 'dark',
+    15	    LIGHT = 'light',
+    16	    HIGH_CONTRAST = 'hc',
+    17	}
+    18	
+    19	/**
+    20	 * Get the color scheme(`dark`/`light`/`hc`) from the `uiTheme` of the theme,
+    21	 * the `uiTheme` is the theme type declared in the VSCode theme extension,
+    22	 * e.g. `vs-dark`, `vs`, `hc-black`.
+    23	 * @param uiTheme
+    24	 */
+    25	export function getColorScheme(uiTheme?: string): ColorScheme {
+    26	    switch (uiTheme) {
+    27	        case 'vs-dark': {
+    28	            return ColorScheme.DARK;
+    29	        }
+    30	        case 'vs': {
+    31	            return ColorScheme.LIGHT;
+    32	        }
+    33	        default: {
+    34	            return ColorScheme.HIGH_CONTRAST;
+    35	        }
+    36	    }
+    37	}
+    38	
+    39	export interface IColorTheme {
+    40	    /**
+    41	     * The id of component, theme will be applied by this ID
+    42	     */
+    43	    id: string;
+    44	    label: string;
+    45	    name?: string;
+    46	    uiTheme?: string;
+    47	    path?: string;
+    48	    description?: string;
+    49	    type?: ColorScheme;
+    50	    colors?: IColors;
+    51	    tokenColors?: TokenColor[];
+    52	    /**
+    53	     * The semanticTokenColors mappings as well as
+    54	     * the semanticHighlighting setting
+    55	     * allow to enhance the highlighting in the editor
+    56	     * More info visit: https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
+    57	     */
+    58	    semanticHighlighting?: boolean;
+    59	}
+    60	
+    61	/**
+    62	 * The ColorTheme configuration event definition
+    63	 */
+    64	export enum ColorThemeEvent {
+    65	    /**
+    66	     * The current color theme changed
+    67	     */
+    68	    OnChange = 'colorTheme.onchange',
+    69	}
+    70	
+# file_editor: /workspace/molecule/src/__tmp_api_check.ts
+File created successfully at: /workspace/molecule/src/__tmp_api_check.ts
+$ cd /workspace/molecule && npx tsc --noEmit -p tsconfig.json 2>&1 | head -20; echo "EXIT: $?"
+src/__tmp_api_check.ts(16,41): error TS2367: This condition will always return 'false' since the types 'ColorScheme.DARK' and 'ColorScheme.LIGHT' have no overlap.
+EXIT: 0
+# file_editor: /workspace/molecule/src/__tmp_api_check.ts
+The file /workspace/molecule/src/__tmp_api_check.ts has been edited. Here's the result of running `cat -n` on a snippet of /workspace/molecule/src/__tmp_api_check.ts:
+    13	    void next;
+    14	});
+    15	
+    16	if (colorScheme === ColorScheme.DARK) {
+    17	    void currentTheme.type;
+    18	}
+    19	
+    20	void schemeFromModel;
+    21	
+Review the changes and make sure they are as expected. Edit the file again if necessary.
+$ cd /workspace/molecule && npx tsc --noEmit -p tsconfig.json; echo "EXIT: $?"
+EXIT: 0
+$ cd /workspace/molecule && rm -f src/__tmp_api_check.ts && git status --short && npx jest 2>&1 | grep -E "Test Suites:|Tests:"
+M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M website/docs/guides/extend-color-theme.md
+ M website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+# finish: Implemented current-theme/theme-mode API for issue #627
+Checklist: 1 issue found (the issue_description contains a single `## Issue 1 (#627)` entry).
+
+**Working on issue 1 of 1: "How to get current theme?" (#627) — DONE**
+
+What the issue asked for: a consumer (an antd-based app in the example) needs to read the currently applied Molecule theme and distinguish dark from light, e.g. `const currentTheme = molecule.colorTheme.getCurrentTheme(); if (currentTheme === 'dark') changeAntDesignTheme();`
+
+Changes made (non-test source only):
+
+1. `src/model/colorTheme.ts`
+   - Added exported `getColorScheme(uiTheme?: string): ColorScheme` helper that maps a theme's `uiTheme` (`vs-dark` → `DARK`, `vs` → `LIGHT`, anything else/`hc-black` → `HIGH_CONTRAST`, mirroring `getBuiltInColors`).
+   - Added `ColorThemeEvent.OnChange` (`colorTheme.onchange`), following the existing `SettingsEvent`/`LocalizationEvent` pattern. Both are re-exported publicly through `mo/model` → `molecule.model`.
+
+2. `src/services/theme/colorThemeService.ts`
+   - `IColorThemeService` (and `ColorThemeService`) gained `getCurrentTheme(): IColorTheme` (alias of `getColorTheme`, matching the naming the issue asked for), `getCurrentColorScheme(): ColorScheme`, and `onChange(callback)` for reacting when the current theme changes (needed to re-apply the antd theme at runtime).
+   - `setTheme()` now always fills the applied theme's `type` (declared `type` wins, otherwise inferred from `uiTheme`), so `getCurrentTheme().type` / `getCurrentColorScheme()` work for built-in themes, VSCode-community theme extensions, and custom themes alike.
+   - `BuiltInColorTheme` now carries `type: ColorScheme.DARK`.
+   - The service extends `GlobalEvent` and emits `ColorThemeEvent.OnChange` only when the theme id or color scheme actually changes (so `reload()`/re-applying the same theme stays silent), and an unrecognized theme id never emits.
+
+3. Docs: `website/docs/guides/extend-color-theme.md` and its zh-CN counterpart gained a "Get the current Color Theme" section showing `getCurrentTheme()`, `getCurrentColorScheme()`, `molecule.model.ColorScheme`, and an antd sync example wired to `onChange`. Versioned docs were left untouched (they are frozen for released versions).
+
+Verification:
+- Reproduction first failed (`getCurrentTheme is not a function`, no `type`), then passed after the change; edge cases covered: light/dark/hc/unknown `uiTheme`, explicit `type` overriding inference, extension-contributed themes, event not fired on unknown ids or no-op re-sets, and the real `theme-defaults` built-in extension end-to-end. Scratch repro files were deleted afterwards.
+- Public API surface type-checked via a temporary consumer file (removed): `molecule.colorTheme.getCurrentTheme()`, `getCurrentColorScheme()`, `onChange`, and `molecule.model.ColorScheme` all resolve.
+- `tsc --noEmit -p tsconfig.json` and `-p tsconfig.build.json` both pass; eslint and prettier clean on the touched files.
+- Full suite: 96 suites / 704 tests / 49 snapshots — all passing (no test files were modified).
+
+Final tally: 1 issue addressed, 1 done, 0 blocked.

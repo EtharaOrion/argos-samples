@@ -1,0 +1,272 @@
+diff --git a/src/model/colorTheme.ts b/src/model/colorTheme.ts
+index c05f78c..7211591 100644
+--- a/src/model/colorTheme.ts
++++ b/src/model/colorTheme.ts
+@@ -16,6 +16,26 @@ export enum ColorScheme {
+     HIGH_CONTRAST = 'hc',
+ }
+ 
++/**
++ * Get the color scheme(`dark`/`light`/`hc`) from the `uiTheme` of the theme,
++ * the `uiTheme` is the theme type declared in the VSCode theme extension,
++ * e.g. `vs-dark`, `vs`, `hc-black`.
++ * @param uiTheme
++ */
++export function getColorScheme(uiTheme?: string): ColorScheme {
++    switch (uiTheme) {
++        case 'vs-dark': {
++            return ColorScheme.DARK;
++        }
++        case 'vs': {
++            return ColorScheme.LIGHT;
++        }
++        default: {
++            return ColorScheme.HIGH_CONTRAST;
++        }
++    }
++}
++
+ export interface IColorTheme {
+     /**
+      * The id of component, theme will be applied by this ID
+@@ -37,3 +57,13 @@ export interface IColorTheme {
+      */
+     semanticHighlighting?: boolean;
+ }
++
++/**
++ * The ColorTheme configuration event definition
++ */
++export enum ColorThemeEvent {
++    /**
++     * The current color theme changed
++     */
++    OnChange = 'colorTheme.onchange',
++}
+diff --git a/src/services/theme/colorThemeService.ts b/src/services/theme/colorThemeService.ts
+index 95225b2..ede41f0 100644
+--- a/src/services/theme/colorThemeService.ts
++++ b/src/services/theme/colorThemeService.ts
+@@ -4,7 +4,12 @@
+  */
+ 
+ import 'reflect-metadata';
+-import { IColorTheme } from 'mo/model/colorTheme';
++import {
++    ColorScheme,
++    ColorThemeEvent,
++    getColorScheme,
++    IColorTheme,
++} from 'mo/model/colorTheme';
+ import { singleton } from 'tsyringe';
+ import { editor as monacoEditor } from 'mo/monaco';
+ import { applyStyleSheetRules } from 'mo/common/css';
+@@ -12,6 +17,7 @@ import { getThemeData, convertToCSSVars } from './helper';
+ import logger from 'mo/common/logger';
+ import { prefixClaName } from 'mo/common/className';
+ import { searchById } from 'mo/common/utils';
++import { GlobalEvent } from 'mo/common/event/eventBus';
+ 
+ export interface IColorThemeService {
+     /**
+@@ -45,6 +51,15 @@ export interface IColorThemeService {
+      * Get the current Color Theme
+      */
+     getColorTheme(): IColorTheme;
++    /**
++     * Get the current Color Theme, the alias of the `getColorTheme` method
++     */
++    getCurrentTheme(): IColorTheme;
++    /**
++     * Get the color scheme of the current Color Theme,
++     * it helps to distinguish the `dark`/`light`/`hc` theme
++     */
++    getCurrentColorScheme(): ColorScheme;
+     /**
+      * Reload current theme
+      */
+@@ -53,6 +68,13 @@ export interface IColorThemeService {
+      * Reset theme
+      */
+     reset(): void;
++    /**
++     * Listen to the current Color Theme changed event
++     * @param callback
++     */
++    onChange(
++        callback: (prevTheme: IColorTheme, nextTheme: IColorTheme) => void
++    ): void;
+ }
+ 
+ /**
+@@ -63,6 +85,7 @@ export const BuiltInColorTheme: IColorTheme = {
+     name: 'Default Dark+',
+     label: 'Default Dark+',
+     uiTheme: 'vs-dark',
++    type: getColorScheme('vs-dark'),
+ };
+ /**
+  * @ignore
+@@ -70,11 +93,15 @@ export const BuiltInColorTheme: IColorTheme = {
+ export const DEFAULT_THEME_CLASS_NAME = prefixClaName('customize-theme');
+ 
+ @singleton()
+-export class ColorThemeService implements IColorThemeService {
++export class ColorThemeService
++    extends GlobalEvent
++    implements IColorThemeService
++{
+     private colorThemes: IColorTheme[] = [BuiltInColorTheme];
+     private colorTheme: IColorTheme = BuiltInColorTheme;
+ 
+     constructor() {
++        super();
+         if (this.colorTheme) {
+             this.setTheme(this.colorTheme.id);
+         }
+@@ -125,10 +152,22 @@ export class ColorThemeService implements IColorThemeService {
+         return Object.assign({}, this.colorTheme);
+     }
+ 
++    public getCurrentTheme(): IColorTheme {
++        return this.getColorTheme();
++    }
++
++    public getCurrentColorScheme(): ColorScheme {
++        return this.getCurrentTheme().type || getColorScheme();
++    }
++
+     public setTheme(id: string) {
+         const theme = this.getThemeById(id);
+         if (theme) {
+-            this.colorTheme = { ...theme };
++            const prevTheme = this.getColorTheme();
++            this.colorTheme = {
++                ...theme,
++                type: theme.type || getColorScheme(theme.uiTheme),
++            };
+             const themeData = getThemeData(theme);
+             const styleSheetContent = convertToCSSVars(themeData.colors);
+             applyStyleSheetRules(styleSheetContent, DEFAULT_THEME_CLASS_NAME);
+@@ -136,6 +175,16 @@ export class ColorThemeService implements IColorThemeService {
+             // Update monaco-editor theme
+             monacoEditor.defineTheme(DEFAULT_THEME_CLASS_NAME, themeData);
+             monacoEditor.setTheme(DEFAULT_THEME_CLASS_NAME);
++
++            const nextTheme = this.getColorTheme();
++            // Only notify the theme changed event when the theme
++            // or the color scheme of the theme is changed
++            if (
++                prevTheme.id !== nextTheme.id ||
++                prevTheme.type !== nextTheme.type
++            ) {
++                this.emit(ColorThemeEvent.OnChange, prevTheme, nextTheme);
++            }
+         } else {
+             logger.error(`Can't get the theme by id:` + id);
+         }
+@@ -153,4 +202,10 @@ export class ColorThemeService implements IColorThemeService {
+         this.colorThemes = [BuiltInColorTheme];
+         this.setTheme(BuiltInColorTheme.id);
+     }
++
++    public onChange(
++        callback: (prevTheme: IColorTheme, nextTheme: IColorTheme) => void
++    ): void {
++        this.subscribe(ColorThemeEvent.OnChange, callback);
++    }
+ }
+diff --git a/website/docs/guides/extend-color-theme.md b/website/docs/guides/extend-color-theme.md
+index c0bd335..85dd914 100644
+--- a/website/docs/guides/extend-color-theme.md
++++ b/website/docs/guides/extend-color-theme.md
+@@ -244,3 +244,42 @@ molecule.colorTheme.getThemes();
+ ```
+ 
+ For more information about [ColorTheme](../api/classes/molecule.ColorThemeService) operations, please refer to [API](../api/classes/molecule.ColorThemeService).
++
++### Get the current Color Theme
++
++We could get the current Color Theme, and the **color scheme**(`dark`/`light`/`hc`) of it via the [ColorTheme](../api/classes/molecule.ColorThemeService) service object:
++
++```ts
++// Get the current Color Theme object
++const currentTheme = molecule.colorTheme.getCurrentTheme();
++// Get the color scheme of the current Color Theme
++const colorScheme = molecule.colorTheme.getCurrentColorScheme();
++
++if (colorScheme === molecule.model.ColorScheme.DARK) {
++    // The current Color Theme is a dark theme
++}
++```
++
++:::tip
++The `type` property of the theme is inferred from the `uiTheme` of the theme extension, so we could also distinguish the dark/light theme via the `currentTheme.type`.
++:::
++
++It's helpful when we want to keep the third-party UI library(for example the [Ant Design](https://ant.design/)) in step with the current Molecule Color Theme:
++
++```ts
++import molecule from '@dtinsight/molecule';
++
++// Sync the theme of the Ant Design with the Molecule Color Theme
++function syncAntDesignTheme() {
++    const { ColorScheme } = molecule.model;
++    const colorScheme = molecule.colorTheme.getCurrentColorScheme();
++    changeAntDesignTheme(colorScheme === ColorScheme.DARK ? 'dark' : 'light');
++}
++
++syncAntDesignTheme();
++
++// Listen to the Color Theme changed event
++molecule.colorTheme.onChange((prevTheme, nextTheme) => {
++    syncAntDesignTheme();
++});
++```
+diff --git a/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md b/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+index ccd09a3..fdc3608 100644
+--- a/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
++++ b/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+@@ -245,3 +245,42 @@ molecule.colorTheme.getThemes();
+ ```
+ 
+ 更多有关 [ColorTheme](../api/classes/molecule.ColorThemeService) 的操作，请参考[API](../api/classes/molecule.ColorThemeService)。
++
++### 获取当前的颜色主题
++
++我们可以通过 [ColorTheme](../api/classes/molecule.ColorThemeService) 服务对象获取当前的颜色主题，以及该主题的**色彩模式**（`dark`/`light`/`hc`）：
++
++```ts
++// Get the current Color Theme object
++const currentTheme = molecule.colorTheme.getCurrentTheme();
++// Get the color scheme of the current Color Theme
++const colorScheme = molecule.colorTheme.getCurrentColorScheme();
++
++if (colorScheme === molecule.model.ColorScheme.DARK) {
++    // The current Color Theme is a dark theme
++}
++```
++
++:::tip
++主题的 `type` 属性是通过主题扩展的 `uiTheme` 推断出来的，所以我们也可以通过 `currentTheme.type` 来区分暗色/亮色主题。
++:::
++
++当我们希望第三方 UI 组件库（例如 [Ant Design](https://ant.design/)）与 Molecule 当前的颜色主题保持一致时，这个能力非常有用：
++
++```ts
++import molecule from '@dtinsight/molecule';
++
++// Sync the theme of the Ant Design with the Molecule Color Theme
++function syncAntDesignTheme() {
++    const { ColorScheme } = molecule.model;
++    const colorScheme = molecule.colorTheme.getCurrentColorScheme();
++    changeAntDesignTheme(colorScheme === ColorScheme.DARK ? 'dark' : 'light');
++}
++
++syncAntDesignTheme();
++
++// Listen to the Color Theme changed event
++molecule.colorTheme.onChange((prevTheme, nextTheme) => {
++    syncAntDesignTheme();
++});
++```

@@ -1,0 +1,69 @@
+diff --git a/src/common/__tests__/utils.test.ts b/src/common/__tests__/utils.test.ts
+index 6052b23f3..57397c950 100644
+--- a/src/common/__tests__/utils.test.ts
++++ b/src/common/__tests__/utils.test.ts
+@@ -1,4 +1,4 @@
+-import { normalizeFlattedObject } from '../utils';
++import { normalizeFlattedObject, colorLightOrDark } from '../utils';
+ 
+ describe('Test Utils', () => {
+     test('The normalizeFlattedObject function', () => {
+@@ -35,4 +35,9 @@ describe('Test Utils', () => {
+         const normalized = normalizeFlattedObject(testData);
+         expect(normalized).toEqual(expected);
+     });
++
++    test('The colorLightOrDark function', () => {
++        expect(colorLightOrDark('#000')).toBe('dark');
++        expect(colorLightOrDark('rgb(255,255,255)')).toBe('light');
++    });
+ });
+diff --git a/src/services/__tests__/colorThemeService.test.ts b/src/services/__tests__/colorThemeService.test.ts
+index c6d63d7ec..e2f7e7631 100644
+--- a/src/services/__tests__/colorThemeService.test.ts
++++ b/src/services/__tests__/colorThemeService.test.ts
+@@ -7,6 +7,7 @@ import {
+     ColorThemeService,
+     DEFAULT_THEME_CLASS_NAME,
+ } from '../theme/colorThemeService';
++import { ColorThemeMode, ColorScheme } from 'mo/model/colorTheme';
+ 
+ const DarkTestTheme = {
+     id: 'Default Test',
+@@ -133,4 +134,36 @@ describe('The Color Theme Service', () => {
+             colorThemeService.updateTheme(DarkTestTheme);
+         });
+     });
++
++    test('Should support to get colorThemeMode', () => {
++        colorThemeService.updateTheme({
++            ...BuiltInColorTheme,
++            type: ColorScheme.DARK,
++        });
++        expect(colorThemeService.getColorThemeMode()).toBe(ColorThemeMode.dark);
++
++        colorThemeService.updateTheme({
++            ...BuiltInColorTheme,
++            type: ColorScheme.LIGHT,
++        });
++        expect(colorThemeService.getColorThemeMode()).toBe(
++            ColorThemeMode.light
++        );
++
++        colorThemeService.updateTheme({
++            ...BuiltInColorTheme,
++            type: undefined,
++            colors: {
++                'molecule.welcomeBackground': '#252526',
++            },
++        });
++        expect(colorThemeService.getColorThemeMode()).toBe(ColorThemeMode.dark);
++
++        colorThemeService.updateTheme({
++            ...BuiltInColorTheme,
++            type: undefined,
++            colors: {},
++        });
++        expect(colorThemeService.getColorThemeMode()).toBe(ColorThemeMode.dark);
++    });
+ });

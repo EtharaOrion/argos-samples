@@ -1,0 +1,200 @@
++     * The color scheme of the theme, it's used to distinguish the theme
++     * is `dark`, `light` or `hc` (high contrast).
++     *
++     * It comes from the theme data itself, and if the theme doesn't
++     * declare it, it's inferred from the `uiTheme`, so the current theme
++     * (e.g. `getColorTheme()`) always has this field.
++     */
+     type?: ColorScheme;
+     colors?: IColors;
+     tokenColors?: TokenColor[];
+$ cd /workspace/molecule && grep -rn "colorTheme.onChange\|'settings.onchange'\|'localization.onchange'" --include=*.ts --include=*.tsx src/ test/ stories/ | head
+src/i18n/localization.ts:9:    OnChange = 'localization.onchange',
+src/model/colorTheme.ts:26:    OnChange = 'colorTheme.onChange',
+src/model/settings.ts:10:    OnChange = 'settings.onchange',
+$ cd /workspace/molecule && cat build/webpack.umd.js | head -50
+const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
+
+module.exports = function () {
+    return {
+        mode: 'production',
+        devtool: 'source-map',
+        externals: [
+            {
+                react: {
+                    commonjs: 'react',
+                    commonjs2: 'react',
+                    amd: 'react',
+                    root: 'React',
+                },
+                'react-dom': {
+                    commonjs: 'react-dom',
+                    commonjs2: 'react-dom',
+                    amd: 'react-dom',
+                    root: 'ReactDOM',
+                },
+                lodash: {
+                    commonjs: 'lodash',
+                    commonjs2: 'lodash',
+                    amd: 'lodash',
+                    root: '_',
+                },
+            },
+            /^monaco-editor.*$/,
+        ],
+        optimization: {
+            minimize: false,
+        },
+        entry: {
+            index: path.resolve(__dirname, '../src/index.ts'),
+        },
+        output: {
+            path: path.resolve(__dirname, '../umd'),
+            library: 'molecule',
+            libraryTarget: 'umd',
+            libraryExport: 'var',
+            filename: 'index.js',
+            umdNamedDefine: true,
+        },
+        resolve: {
+            extensions: ['.js', '.jsx', '.tsx', '.ts', '.css', '.scss'],
+            alias: {
+                mo: path.resolve(__dirname, '../src'),
+            },
+$ cd /workspace/molecule && sed -n 50,120p build/webpack.umd.js
+},
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.(js|jsx|tsx|ts)$/,
+                    exclude: /node_modules/,
+                    use: [
+                        {
+                            loader: 'babel-loader',
+                        },
+                    ],
+                },
+                {
+                    test: /\.(jpg|png|gif|eot|woff|svg|ttf|woff2|gif|appcache|webp)(\?|$)/,
+                    use: ['file-loader'],
+                },
+                {
+                    test: /\.[s]?css$/,
+                    use: [
+                        {
+                            loader: 'file-loader',
+                            options: {
+                                name: '[name].css',
+                            },
+                        },
+                        {
+                            loader: 'extract-loader',
+                        },
+                        {
+                            loader: 'css-loader',
+                        },
+                        {
+                            loader: 'sass-loader',
+                            options: {
+                                sourceMap: true,
+                            },
+                        },
+                    ],
+                },
+            ],
+        },
+        plugins: [
+            new webpack.DefinePlugin({
+                __DEVELOPMENT__: false,
+            }),
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: path.resolve(__dirname, '../src/extensions'),
+                        to: path.resolve(__dirname, '../umd/extensions'),
+                        globOptions: {
+                            dot: true,
+                            gitignore: true,
+                            ignore: ['**/*.ts', '**/*.tsx'],
+                        },
+                    },
+                ],
+            }),
+        ],
+    };
+};
+$ cd /workspace/molecule && npx webpack --config ./build/webpack.umd.js > /tmp/umd_build.log 2>&1; echo "exit=$?"; tail -15 /tmp/umd_build.log
+exit=0
+WARNING in asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+This can impact web performance.
+Assets:
+  index.js (3.05 MiB)
+  extensions/github-plus-theme-master/screenshot.jpg (347 KiB)
+
+WARNING in entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+Entrypoints:
+  index (3.05 MiB)
+      index.js
+
+
+WARNING in webpack performance recommendations:
+You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
+For more info visit https://webpack.js.org/guides/code-splitting/
+$ cd /workspace/molecule && grep -n "colorTheme.onChange\|getColorScheme\|getCurrentTheme" umd/index.js | head -10; echo "=== enum presence ==="; grep -c "ColorThemeKind" umd/index.js
+60735:__webpack_require__.d(model_namespaceObject, "getColorScheme", function() { return colorTheme_getColorScheme; });
+78319:  ColorThemeEvent["OnChange"] = "colorTheme.onChange";
+78338:function colorTheme_getColorScheme(uiTheme) {
+78786:    key: "getCurrentTheme",
+78787:    value: function getCurrentTheme() {
+78794:     * if (molecule.colorTheme.getColorScheme() === ColorScheme.DARK) {
+78801:    key: "getColorScheme",
+78802:    value: function getColorScheme() {
+78803:      return this.getColorTheme().type || colorTheme_getColorScheme();
+78820:          type: theme.type || colorTheme_getColorScheme(theme.uiTheme)
+=== enum presence ===
+9
+$ cd /workspace/molecule && rm -rf umd && git status --porcelain
+M src/extensions/github-plus-theme-master/package.json
+ M src/extensions/theme-defaults/package.json
+ M src/extensions/theme-monokai/package.json
+ M src/extensions/vscode-intellij-darcula-theme-master/package.json
+ M src/extensions/vscode-palenight-theme/package.json
+ M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M website/docs/guides/extend-color-theme.md
+ M website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+$ cd /workspace/molecule && npx tsc --noEmit && echo "TYPECHECK OK" && npx jest 2>&1 | grep -E "Tests:|Suites:|✕"
+TYPECHECK OK
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+# finish: Implemented theme-mode (dark/light/hc) API for issue #627
+## Summary
+
+The issue_description contained exactly **one** issue (`## Issue 1 (#627): How to get current theme?`). Checklist: 1 found → **1 DONE, 0 BLOCKED**.
+
+### Problem
+A developer building on molecule + ant design could not tell whether the current color theme is dark or light in order to switch the antd theme. `IColorTheme.type?: ColorScheme` existed but was never populated by anything (not the built-in theme, not the built-in theme JSONs, not `setTheme()`), there was no change event to re-sync on, and `IColorThemeService.getThemeById()` was mistyped as returning `void`.
+
+### Changes (non-test files only)
+1. **`src/model/colorTheme.ts`** — added `ColorThemeEvent.OnChange` (`'colorTheme.onChange'`, following the `SettingsEvent`/`LocalizationEvent` convention), the `ColorThemeKind` enum (`vs`/`vs-dark`/`hc-black`), and `getColorScheme(uiTheme?)` which maps `vs`→LIGHT, `hc-black`→HIGH_CONTRAST and defaults to DARK; documented the `type` field semantics.
+2. **`src/services/theme/colorThemeService.ts`** — `ColorThemeService` now `extends GlobalEvent`; `setTheme()` resolves the current theme's `type` (`theme.type || getColorScheme(theme.uiTheme)`) and emits `ColorThemeEvent.OnChange` with `(prevTheme, nextTheme)` when the id or scheme changes; added `getCurrentTheme()` (alias of `getColorTheme()`, the name used in the issue), `getColorScheme()`, and `onChange(callback)` to both the interface and the class; fixed `getThemeById(): IColorTheme | undefined`; `BuiltInColorTheme` now declares `type: ColorScheme.DARK`.
+3. **`src/extensions/{theme-defaults,theme-monokai,vscode-palenight-theme,vscode-intellij-darcula-theme-master,github-plus-theme-master}/package.json`** — all 9 built-in themes declare `type` (`dark`/`light`/`hc`) in their contributes so theme data is self-describing. Edits are byte-preserving (the CRLF-formatted palenight file kept CRLF).
+4. **Docs** — `website/docs/guides/extend-color-theme.md` and its zh-CN mirror gained a "Get the current theme" section demonstrating the antd dark/light sync via `getCurrentTheme()`, `getColorScheme()`, `uiTheme`, and `onChange()`.
+
+### The requested API now works
+```ts
+const currentTheme = molecule.colorTheme.getCurrentTheme();
+if (currentTheme.type === ColorScheme.DARK) changeAntDesignTheme();
+// or: molecule.colorTheme.getColorScheme() === 'dark'
+molecule.colorTheme.onChange((prev, next) =>
+    changeAntDesignTheme(next.type === ColorScheme.DARK ? 'dark' : 'light'));
+```
+
+### Verification
+- Reproduction script (run under jest for the repo's Babel/`mo/*` aliases): **8 checks failed before** the change, **all 10 main + 27 edge-case checks pass after** — built-in extension themes (dark/light/hc), unknown or missing `uiTheme` falling back to dark, explicit `type` winning over `uiTheme`, `updateTheme` re-resolving the scheme and emitting, `reload` not re-emitting, unknown theme id being a no-op, copies returned from getters, and the new symbols being reachable through the public `molecule.model` / `molecule.colorTheme` API.
+- Full test suite: **96 suites / 704 tests passing** — identical to the pre-change baseline (no regressions).
+- `tsc --noEmit` clean, `eslint` clean on touched files, `gulp` esm build (including `.d.ts` generation) and the webpack UMD build both compile cleanly with the new APIs present in the output bundle. Generated `esm/` and `umd/` artifacts were deleted afterwards; the working tree contains only the 9 intended file modifications.
+- No test files, test helpers, fixtures, CI workflows, or lockfiles were modified.

@@ -1,0 +1,119 @@
+<svg width="1760" height="532" viewBox="0 0 1760 532" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Argos — agentic software-engineering capability, measured offline on outcome and process">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050c0c"/>
+      <stop offset="55%" stop-color="#0a1e1c"/>
+      <stop offset="100%" stop-color="#071313"/>
+    </linearGradient>
+
+    <radialGradient id="vignette" cx="68%" cy="45%" r="75%">
+      <stop offset="0%" stop-color="#0d2624" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#020707" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#010404" stop-opacity="0.55"/>
+    </radialGradient>
+
+    <radialGradient id="iris" cx="42%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#f4d896"/>
+      <stop offset="28%" stop-color="#e2ac52"/>
+      <stop offset="62%" stop-color="#b9781f"/>
+      <stop offset="100%" stop-color="#4a2c0c"/>
+    </radialGradient>
+
+    <radialGradient id="irisGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#35d0ba" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#35d0ba" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix in="noise" type="matrix"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.65 0"/>
+    </filter>
+
+    <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+
+    <clipPath id="frame">
+      <rect x="0" y="0" width="1760" height="532" rx="0"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1760" height="532" fill="url(#bg)"/>
+    <rect width="1760" height="532" fill="url(#vignette)"/>
+
+    <!-- orbital rings, off-center right, some bleeding past the frame -->
+    <g stroke="#35d0ba" fill="none">
+      <ellipse cx="1330" cy="262" rx="330" ry="330" stroke-opacity="0.10" stroke-width="1.5"/>
+      <ellipse cx="1330" cy="262" rx="255" ry="255" stroke-opacity="0.16" stroke-width="1.5"/>
+      <ellipse cx="1300" cy="255" rx="200" ry="176" stroke-opacity="0.22" stroke-width="1.5"
+                transform="rotate(-12 1300 255)"/>
+      <ellipse cx="1330" cy="262" rx="150" ry="150" stroke-opacity="0.28" stroke-width="1.5"
+                stroke-dasharray="2 10"/>
+    </g>
+
+    <!-- satellite node + trailing arc on the outer ring -->
+    <g>
+      <path d="M 1620 130 A 330 330 0 0 1 1655 262" fill="none" stroke="#35d0ba" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="1 7"/>
+      <circle cx="1620" cy="130" r="5.5" fill="#e2ac52"/>
+      <circle cx="1620" cy="130" r="11" fill="none" stroke="#e2ac52" stroke-opacity="0.5" stroke-width="1"/>
+    </g>
+
+    <!-- the eye -->
+    <g>
+      <circle cx="1330" cy="262" r="150" fill="url(#irisGlow)"/>
+      <circle cx="1330" cy="262" r="122" fill="none" stroke="#8fe3d4" stroke-opacity="0.45" stroke-width="1.5"/>
+
+      <!-- iris scan ticks -->
+      <g stroke="#8fe3d4" stroke-opacity="0.5" stroke-width="1.5">
+        <line x1="1330" y1="150" x2="1330" y2="132"/>
+        <line x1="1330" y1="374" x2="1330" y2="392"/>
+        <line x1="1218" y1="262" x2="1200" y2="262"/>
+        <line x1="1442" y1="262" x2="1460" y2="262"/>
+        <line x1="1250.6" y1="182.6" x2="1237.5" y2="169.5"/>
+        <line x1="1409.4" y1="182.6" x2="1422.5" y2="169.5"/>
+        <line x1="1250.6" y1="341.4" x2="1237.5" y2="354.5"/>
+        <line x1="1409.4" y1="341.4" x2="1422.5" y2="354.5"/>
+      </g>
+
+      <circle cx="1330" cy="262" r="92" fill="url(#iris)"/>
+      <circle cx="1330" cy="262" r="92" fill="none" stroke="#2c1a06" stroke-opacity="0.4" stroke-width="1"/>
+      <circle cx="1330" cy="262" r="33" fill="#050c0c"/>
+      <circle cx="1330" cy="262" r="33" fill="none" stroke="#e2ac52" stroke-opacity="0.3" stroke-width="1"/>
+      <ellipse cx="1310" cy="240" rx="12" ry="8" fill="#fdf3df" fill-opacity="0.55" transform="rotate(-28 1310 240)"/>
+    </g>
+
+    <!-- wordmark -->
+    <g font-family="Georgia, 'Iowan Old Style', 'Times New Roman', ui-serif, serif">
+      <text x="112" y="268" font-size="164" letter-spacing="20" fill="#f2f4ee">ARGOS</text>
+    </g>
+
+    <line x1="115" y1="300" x2="700" y2="300" stroke="#35d0ba" stroke-opacity="0.4" stroke-width="1.5"/>
+
+    <text x="114" y="336" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace"
+          font-size="27" letter-spacing="5.5" fill="#35d0ba" fill-opacity="0.92">REAL ISSUES · OFFLINE · OUTCOME + PROCESS</text>
+
+    <text x="114" y="472" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace"
+          font-size="19" letter-spacing="3.5" fill="#cfe4dd" fill-opacity="0.45">3 TASKS · 2 MODELS · 8 RUNS EACH · 48 GRADED ROLLOUTS</text>
+
+    <!-- measurement ticks, bottom right, echoes a percentage scale -->
+    <g transform="translate(1140,472)" font-family="'JetBrains Mono','SF Mono',ui-monospace,monospace" font-size="15" fill="#8fe3d4" fill-opacity="0.4">
+      <line x1="0" y1="0" x2="500" y2="0" stroke="#8fe3d4" stroke-opacity="0.3" stroke-width="1"/>
+      <g stroke="#8fe3d4" stroke-opacity="0.35" stroke-width="1">
+        <line x1="0" y1="-6" x2="0" y2="0"/>
+        <line x1="125" y1="-6" x2="125" y2="0"/>
+        <line x1="250" y1="-6" x2="250" y2="0"/>
+        <line x1="375" y1="-6" x2="375" y2="0"/>
+        <line x1="500" y1="-6" x2="500" y2="0"/>
+      </g>
+      <text x="-8" y="20" text-anchor="middle">0</text>
+      <text x="125" y="20" text-anchor="middle">25</text>
+      <text x="250" y="20" text-anchor="middle">50</text>
+      <text x="375" y="20" text-anchor="middle">75</text>
+      <text x="508" y="20" text-anchor="middle">100</text>
+    </g>
+
+    <rect width="1760" height="532" filter="url(#grain)" opacity="0.05" style="mix-blend-mode:overlay"/>
+  </g>
+</svg>

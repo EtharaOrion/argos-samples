@@ -1,0 +1,200 @@
+$ from scapy.compat import raw
+$ import random
+$ random.seed(1234)
+$ 
+$ def padit(b):
+$     b = bytearray(b)
+$     b[0] |= 0x20
+$     padlen = -len(b) % 4 or 4
+$     b += b'\x00' * (padlen - 1) + bytes([padlen])
+$     b[2:4] = ((len(b)//4)-1).to_bytes(2, 'big')
+$     return bytes(b)
+$ 
+$ def rnd_pkt():
+$     t = random.choice([RTCPSenderReport, RTCPReceiverReport, RTCPSDES, RTCPBye, RTCPApp])
+$     p = fuzz(t())
+$     p.version = 2
+$     p.padding = random.randint(0, 1)
+$     if hasattr(p, 'reportcount'): p.reportcount = min(p.reportcount or 0, 3)
+$     if hasattr(p, 'count') and hasattr(p, 'srcs'):
+$         p.srcs = p.srcs[:p.count or 0] if isinstance(p.srcs, list) else []
+$     if hasattr(p, 'chunks'):
+$         p.count = min(p.count or 0, len(p.chunks))
+$         p.chunks = p.chunks[:p.count or 0]
+$     return p
+$ 
+$ bad = 0
+$ for i in range(500):
+$     n = random.randint(1, 4)
+$     parts = []
+$     for _ in range(n):
+$         b = raw(rnd_pkt())
+$         if random.random() < 0.5:
+$             b = padit(b)
+$         parts.append(b)
+$     data = b''.join(parts)
+$     out = RTCPHeader(data)
+$     if raw(out) != data:
+$         bad += 1
+$         if bad < 3:
+$             print('MISMATCH'); print(' in:', repr(data)); print('out:', repr(raw(out)))
+$ print('mismatches:', bad, '/500')
+$ "
+cd /workspace/scapy && PYTHONPATH=/workspace/scapy python -c "
+from scapy.layers.rtp import *
+from scapy.packet import fuzz
+from scapy.compat import raw
+import random
+random.seed(1234)
+def padit(b):
+    b = bytearray(b)
+    b[0] |= 0x20
+    padlen = -len(b) % 4 or 4
+    b += b'\x00' * (padlen - 1) + bytes([padlen])
+    b[2:4] = ((len(b)//4)-1).to_bytes(2, 'big')
+    return bytes(b)
+def rnd_pkt():
+    t = random.choice([RTCPSenderReport, RTCPReceiverReport, RTCPSDES, RTCPBye, RTCPApp])
+    p = fuzz(t())
+    p.version = 2
+    p.padding = random.randint(0, 1)
+    if hasattr(p, 'reportcount'): p.reportcount = min(p.reportcount or 0, 3)
+    if hasattr(p, 'count') and hasattr(p, 'srcs'):
+        p.srcs = p.srcs[:p.count or 0] if isinstance(p.srcs, list) else []
+    if hasattr(p, 'chunks'):
+        p.count = min(p.count or 0, len(p.chunks))
+        p.chunks = p.chunks[:p.count or 0]
+    return p
+bad = 0
+for i in range(500):
+    n = random.randint(1, 4)
+    parts = []
+    for _ in range(n):
+        b = raw(rnd_pkt())
+        if random.random() < 0.5:
+            b = padit(b)
+        parts.append(b)
+    data = b''.join(parts)
+    out = RTCPHeader(data)
+    if raw(out) != data:
+        bad += 1
+        if bad < 3:
+            print('MISMATCH'); print(' in:', repr(data)); print('out:', repr(raw(out)))
+print('mismatches:', bad, '/500')
+"
+mismatches: 0 /500
+$ rm -f /workspace/repro_rtcp.py /workspace/edge_rtcp.py /workspace/chain_rtcp.py /tmp/t_plf.py && ls /workspace && cd /workspace/scapy && git status --short
+bash_events  conversations  project  scapy
+ M scapy/layers/rtp.py
+?? scapy/contrib/rtcp.py
+$ cd /workspace/scapy && cat scapy/contrib/rtcp.py && echo "=== FINAL VERIFICATION ===" && PYTHONPATH=/workspace/scapy timeout 120 python -m scapy.tools.UTscapy -t test/scapy/layers/rtp.uts -f text 2>&1 | grep -E "Passed=|Failed=" && PYTHONPATH=/workspace/scapy python -c "
+$ from scapy.all import *
+$ from scapy.layers.rtp import RTCPHeader, RTCPSenderReport, RTCPReceiverReport, RTCPReportBlock, RTCPSDES, RTCPSDESChunk, RTCPSDESItem, RTCPBye, RTCPApp
+$ from scapy.main import load_contrib
+$ load_contrib('rtcp')
+$ # Final smoke test of the complete feature set
+$ pkt = RTCPSenderReport(ssrc=1, reportblocks=[RTCPReportBlock(ssrc=2)]) / \
+$       RTCPSDES(chunks=[RTCPSDESChunk(ssrc=1, items=[RTCPSDESItem(type='CNAME', value=b'x@y')])]) / \
+$       RTCPBye(srcs=[1], reason=b'bye') / RTCPApp(appname=b'TEST')
+$ p = RTCPHeader(raw(pkt))
+$ assert RTCPSenderReport in p and RTCPSDES in p and RTCPBye in p and RTCPApp in p
+$ assert raw(p) == raw(pkt)
+$ print('FINAL SMOKE TEST PASSED')
+$ print(p.summary())
+$ "
+# This file is part of Scapy
+# See http://www.secdev.org/projects/scapy for more information
+# Copyright (C) Philippe Biondi <phil@secdev.org>
+# This program is published under a GPLv2 license
+
+# scapy.contrib.description = RTCP (RTP Control Protocol, RFC 3550)
+# scapy.contrib.status = loads
+
+"""
+RTCP (RTP Control Protocol), as defined in RFC 3550.
+
+This module is a re-export of the RTCP implementation that lives in
+scapy.layers.rtp (which is loaded with the "rtp" layer). It allows
+loading the RTCP packets with::
+
+    load_contrib("rtcp")
+"""
+
+from scapy.layers.rtp import (
+    RTCP,
+    RTCPApp,
+    RTCPBye,
+    RTCPHeader,
+    RTCPRR,
+    RTCPReceiverReport,
+    RTCPReceiverReportPacket,
+    RTCPReportBlock,
+    RTCPSDES,
+    RTCPSDESChunk,
+    RTCPSDESItem,
+    RTCPSR,
+    RTCPSenderReport,
+    RTCPSenderReportPacket,
+    RTCPSourceDescription,
+    _rtcp_packet_types,
+    _rtcp_sdes_item_types,
+)
+
+__all__ = [
+    "RTCP",
+    "RTCPApp",
+    "RTCPBye",
+    "RTCPHeader",
+    "RTCPRR",
+    "RTCPReceiverReport",
+    "RTCPReceiverReportPacket",
+    "RTCPReportBlock",
+    "RTCPSDES",
+    "RTCPSDESChunk",
+    "RTCPSDESItem",
+    "RTCPSR",
+    "RTCPSenderReport",
+    "RTCPSenderReportPacket",
+    "RTCPSourceDescription",
+    "_rtcp_packet_types",
+    "_rtcp_sdes_item_types",
+]
+=== FINAL VERIFICATION ===
+ └ Passed=3
+ └ Failed=0
+FINAL SMOKE TEST PASSED
+RTCPSenderReport / RTCPSDES / RTCPBye / RTCPApp
+# task_tracker: Mark RTCP issue done
+Task list has been updated with 1 item(s).
+# finish: RTCP (RFC 3550) support implemented and verified
+## Summary
+
+**Checklist: 1 issue found** (the issue_description contained a single entry, `## Issue 1 (#3460): RTCP packet support`).
+
+**Issue 1 of 1: RTCP packet support (RFC 3550) — DONE ✅**
+
+### What was implemented
+
+**1. `scapy/layers/rtp.py`** (extended the existing RTP layer, which is auto-loaded via `conf.load_layers`, so RTCP classes are available from `scapy.all`):
+
+- **`RTCPHeader`** — base class implementing the common RTCP header (RFC 3550 §6.1: version 2 bits, padding bit, 5-bit count, packet type, length in 32-bit words minus one). It provides:
+  - `dispatch_hook` on the packet type byte (200–204) with sanity validation on the declared length/count so truncated or malformed data degrades gracefully (falls back to the generic class with an opaque `body` field, or `Raw` for <4-byte input) instead of raising;
+  - compound-packet chaining (`guess_payload_class` continues dissection on the next RTCP packet, only when version==2);
+  - automatic `length` field computation, 32-bit word alignment, RFC padding generation when the P bit is set, and preservation of P-announced padding / alignment octets in a `paddingbytes` field so dissect→build is byte-exact;
+  - `match_subclass = True` so `pkt[RTCPHeader:n]` indexes the packets of a compound.
+- **`RTCPSenderReport`** (§6.4.2: SSRC, NTP timestamp, RTP timestamp, packet/octet counts) and **`RTCPReceiverReport`** (§6.4.2), both carrying **`RTCPReportBlock`**s (§6.4.1: SSRC, fraction lost, cumulative lost, extended highest sequence, jitter, LSR, DLSR) with auto-filled report counts.
+- **`RTCPSDES`** / **`RTCPSDESChunk`** / **`RTCPSDESItem`** (§6.5): chunk/item lists terminated by END items or null padding, aligned to 32-bit boundaries, with item types END/CNAME/NAME/EMAIL/PHONE/LOC/TOOL/NOTE/PRIV, auto-filled source count, and a custom `_RTCPItemListField` for the variable-length item list dissection.
+- **`RTCPBye`** (§6.6: source list + optional length-prefixed "reason for leaving", properly aligned).
+- **`RTCPApp`** (§6.7: subtype, SSRC, 4-octet ASCII name — named `appname` since `name` clashes with `Packet.name` — and application data bounded by the packet length).
+- Convenience aliases (`RTCP`, `RTCPSR`, `RTCPRR`, `RTCPSourceDescription`, …).
+
+**2. `scapy/contrib/rtcp.py`** (new) — a re-export of the RTCP classes with proper `scapy.contrib.*` metadata, so `load_contrib("rtcp")` also works (this also made the pre-existing `list_contrib` sanity test pass, since the new module carries the required description/status headers).
+
+### Verification
+- Reproduction, edge-case (21 scenarios: unknown types, garbage/truncated input, random fuzz, max counts, empty/max-length items, padding, trailing garbage, deep-copy/pickle/show/ls/fuzz/command, RTP regression) and compound-chaining (all pairwise type/padding combinations) scripts all passed.
+- 500/500 randomized fuzzed compound packets (with random padding) round-trip **byte-exactly**.
+- RTCP under IP/UDP encapsulation (via user `bind_layers`) round-trips.
+- Repo test suites: `test/scapy/layers/rtp.uts` (3/3), `test/imports.uts`, `test/fields.uts`, `test/scapy/layers/inet.uts`, `mgcp.uts`, `skinny.uts`, `l2.uts` and `test/regression.uts` show no new failures versus the pre-change baseline (the remaining failures — tcpdump/IPv6/manuf-dependent — are pre-existing environment issues; one contrib-metadata failure present at baseline now passes).
+- Both files compile (`python -m compileall`) and respect the repo's flake8 line-length/whitespace rules.
+
+**Final tally: 1 issue addressed, 1 DONE, 0 BLOCKED.**

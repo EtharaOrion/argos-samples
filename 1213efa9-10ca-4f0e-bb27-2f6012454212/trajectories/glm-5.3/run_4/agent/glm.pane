@@ -1,0 +1,200 @@
+    40	"""
+    41	
+    42	import struct
+    43	
+    44	from scapy.compat import Any, List, Optional, Tuple, Type, orb
+    45	
+Review the changes and make sure they are as expected. Edit the file again if necessary.
+$ cd /workspace/scapy && PYTHONPATH=/workspace/scapy python /workspace/repro_rtcp.py 2>&1 | tail -1; PYTHONPATH=/workspace/scapy python /workspace/edge_rtcp.py 2>&1 | tail -1
+ALL OK
+ALL EDGE CASES OK
+# file_editor: /workspace/scen_rtcp.py
+File created successfully at: /workspace/scen_rtcp.py
+$ cd /workspace/scapy && PYTHONPATH=/workspace/scapy python /workspace/scen_rtcp.py 2>&1 | tail -10
+ALL SCENARIOS OK
+$ cd /workspace/scapy && PYTHONPATH=/workspace/scapy python -m scapy.tools.UTscapy -t test/scapy/layers/rtp.uts -F 2>&1 | grep -E "PASSED|FAILED"; for f in repro edge scen; do echo -n "$f: "; PYTHONPATH=/workspace/scapy python /workspace/${f}_rtcp.py 2>&1 | tail -1; done
+PASSED=3 FAILED=0
+repro: ALL OK
+edge: ALL EDGE CASES OK
+scen: ALL SCENARIOS OK
+$ cd /workspace/scapy && git --no-pager diff | head -120
+diff --git a/scapy/layers/rtp.py b/scapy/layers/rtp.py
+index ee8f0b9c..d8f35c8b 100644
+--- a/scapy/layers/rtp.py
++++ b/scapy/layers/rtp.py
+@@ -11,11 +11,44 @@ Remember to use::
+     bind_layers(UDP, RTP, dport=XXX)
+
+ To register the port you are using
++
++RTCP (Real-time Transport Control Protocol) is supported through the
++``RTCP`` packet and the packet types described in RFC 3550 section 6:
++
++ * ``RTCPSenderReport`` (SR, 200)
++ * ``RTCPReceiverReport`` (RR, 201)
++ * ``RTCPSourceDescription`` (SDES, 202)
++ * ``RTCPGoodbye`` (BYE, 203)
++ * ``RTCPApplicationDefined`` (APP, 204)
++ * ``RTCPTransportLayerFeedback`` and ``RTCPPayloadSpecificFeedback``
++ * ``RTCPExtendedReport`` (XR, 207)
++
++The first RTCP packet of a compound RTCP packet is dissected as ``RTCP``,
++which dispatches to the right packet type according to the ``packettype``
++field. The packets which follow it in the compound packet are available as
++the payload of the previous one::
++
++    >>> pkt = RTCP(raw_rtcp_compound_packet)
++    >>> pkt[RTCPSenderReport].payload
++
++RTCP is bound to the UDP port reserved by RFC 3550 for the RTCP of the RTP
++audio and video profiles, but one should use ``bind_layers`` to register
++any other port in use::
++
++    bind_layers(UDP, RTP, dport=XXX)
++    bind_layers(UDP, RTCP, dport=XXX)
+ """
+
+-from scapy.packet import Packet, bind_layers
+-from scapy.fields import BitEnumField, BitField, BitFieldLenField, \
+-    FieldLenField, FieldListField, IntField, ShortField
++import struct
++
++from scapy.compat import Any, List, Optional, Tuple, Type, orb
++from scapy.fields import (AnyField, BitEnumField, BitField, BitFieldLenField,
++                          ByteEnumField, ByteField, ConditionalField,
++                          FieldLenField, FieldListField, IntField, LongField,
++                          PacketListField, ShortField, StrFixedLenField,
++                          StrLenField)
++from scapy.layers.inet import UDP
++from scapy.packet import Packet, bind_layers, bind_bottom_up
+
+ _rtp_payload_types = {
+     # http://www.iana.org/assignments/rtp-parameters
+@@ -55,3 +88,473 @@ class RTP(Packet):
+
+
+ bind_layers(RTP, RTPExtension, extension=1)
++
++
++###############################################################################
++# RTCP (Real-time Transport Control Protocol), RFC 3550 section 6
++###############################################################################
++
++_rtcp_packet_types = {
++    200: 'Sender Report',
++    201: 'Receiver Report',
++    202: 'Source Description',
++    203: 'Goodbye',
++    204: 'Application Defined',
++    205: 'Transport Layer Feedback',
++    206: 'Payload Specific Feedback',
++    207: 'Extended Report',
++}
++
++# SDES item types, RFC 3550 section 6.5
++_rtcp_sdes_item_types = {
++    0: 'END',
++    1: 'CNAME',
++    2: 'NAME',
++    3: 'EMAIL',
++    4: 'PHONE',
++    5: 'LOC',
++    6: 'TOOL',
++    7: 'NOTE',
++    8: 'PRIV',
++}
++
++
++def _rtcp_length_adjust(length):
++    # type: (Optional[int]) -> Optional[int]
++    """Convert an RTCP length field (in 32-bit words minus one) into bytes."""
++    if length is None:
++        return None
++    return (length + 1) * 4
++
++
++def _rtcp_padding_length(s):
++    # type: (bytes) -> int
++    """Length of the padding ending an RTCP packet, as counted by the last
++    octet of the packet (RFC 3550 section 6.1). Returns 0 when the packet
++    does not end with a valid padding."""
++    if len(s) < 4:
++        return 0
++    padlen = orb(s[-1])
++    if 0 < padlen <= len(s):
++        return padlen
++    return 0
++
++
++def _rtcp_packet_length(s, with_padding=True):
++    # type: (bytes, bool) -> int
++    """Number of bytes of the RTCP packet whose header starts ``s``, that is
++    the length held by its header, bounded by the number of available
++    bytes. The padding of the packet, if any, is excluded when
++    ``with_padding`` is False, as the trailing fields of a packet (reason
++    for leaving, application data, ...) are never padded."""
++    if len(s) < 4:
++        return len(s)
++    length = _rtcp_length_adjust((orb(s[2]) << 8) | orb(s[3])) or 0
++    length = min(length, len(s))
++    if not with_padding and orb(s[0]) & 0x20:  # padding bit
+$ cd /workspace && ls *.py; rm -f repro_rtcp.py edge_rtcp.py scen_rtcp.py; ls /workspace; cd /workspace/scapy && git --no-pager status --short
+edge_rtcp.py  repro_rtcp.py  scen_rtcp.py
+bash_events  conversations  project  scapy
+ M scapy/layers/rtp.py
+$ cd /workspace/scapy && PYTHONPATH=/workspace/scapy python -c "
+$ # final smoke test after cleanup
+$ from scapy.all import RTCP, RTCPSenderReport, RTCPReceiverReport, RTCPSourceDescription, RTCPGoodbye, RTCPApplicationDefined, RTCPUnknownType, RTCPExtendedReport, RTCPTransportLayerFeedback, RTCPPayloadSpecificFeedback, RTCPRRBlock, RTCPSDESChunk, RTCPSDESItem, RTCPExtendedReportBlock, UDP, IP, raw
+$ sr = bytes.fromhex('80c800062306c6ded9891997000002190000031b0000001a000004b0')
+$ p = RTCP(sr)
+$ assert isinstance(p, RTCPSenderReport) and p.sourcesync == 0x2306c6de
+$ d = IP(raw(IP(src='1.2.3.4', dst='5.6.7.8')/UDP(sport=5005, dport=5005)/RTCP(sr)))
+$ assert d.haslayer(RTCP)
+$ print('FINAL SMOKE OK')
+$ " && PYTHONPATH=/workspace/scapy python -m scapy.tools.UTscapy -t test/scapy/layers/rtp.uts -F 2>&1 | grep -E "PASSED|FAILED"
+FINAL SMOKE OK
+PASSED=3 FAILED=0
+# file_editor: /workspace/AGENTS.md
+File created successfully at: /workspace/AGENTS.md
+$ cd /workspace/scapy && git --no-pager status --short; echo "=== final file size ==="; wc -l scapy/layers/rtp.py; echo "=== python compile check ==="; python -m py_compile scapy/layers/rtp.py && echo "COMPILES CLEANLY"
+M scapy/layers/rtp.py
+=== final file size ===
+560 scapy/layers/rtp.py
+=== python compile check ===
+COMPILES CLEANLY
+# finish: RTCP support implemented and verified; all tests pass
+## Summary
+
+**Checklist: 1 issue found** (from the issue description):
+1. **Issue 1 (#3460): RTCP packet support** — **DONE**
+
+### What was implemented (`scapy/layers/rtp.py`, the only file changed)
+
+Full RTCP (RFC 3550 section 6) support alongside the existing RTP layer:
+
+**Packet classes** (all exported from `scapy.all`, all subclasses of `RTCP` so `pkt[RTCP]`/`RTCP in pkt` work):
+- `RTCP` — generic RTCP header; `dispatch_hook` selects the right class from the packet-type byte
+- `RTCPSenderReport` (SR, 200) — SSRC, 64-bit NTP timestamp, RTP timestamp, packet/octet counts, report blocks
+- `RTCPReceiverReport` (RR, 201) — SSRC + report blocks
+- `RTCPSourceDescription` (SDES, 202) + `RTCPSDESChunk` + `RTCPSDESItem` (all 9 item types: END/CNAME/NAME/EMAIL/PHONE/LOC/TOOL/NOTE/PRIV)
+- `RTCPGoodbye` (BYE, 203) — SSRC list + optional length-prefixed reason
+- `RTCPApplicationDefined` (APP, 204) — subtype, 4-char name, application data
+- `RTCPTransportLayerFeedback` (205), `RTCPPayloadSpecificFeedback` (206), `RTCPExtendedReport` (XR, 207) + `RTCPExtendedReportBlock`
+- `RTCPRRBlock` — reception report block (fraction/cumulative loss, ext. highest seq, jitter, LSR, DLSR)
+- `RTCPUnknownType` — fallback for unhandled packet types
+
+**Behavior:**
+- **Compound packets**: each RTCP packet dissects exactly its declared length; following packets become the payload, so `pkt[RTCPSenderReport].payload` yields the next packet
+- **Length field** auto-computed on build (in 32-bit words minus one, this packet only), with 32-bit alignment padding (counted in the last octet when the P bit is set)
+- **Count field** (`blockcount`) auto-filled from the report/chunk/SSRC/block lists; explicit values are honored
+- **SDES chunks** get their END item + alignment padding on build, and skip them correctly on dissection without eating the next chunk
+- **`answers()`** (SR/RR/SDES inter-answer), **`mysummary()`**, and a `length` field that displays as e.g. `28 bytes`
+- **UDP binding** on RTCP port 5005 (dissection only, so any port can still be registered with `bind_layers`)
+
+### Verification
+- Wrote and ran three test programs (reproduction, edge cases, real-world scenarios): all pass — covering build/dissection round-trips of every class, 31 report blocks, all SDES item types, padded and truncated packets, bogus padding counts, unknown types, IP/UDP encapsulation, copy/pickle, and a 2000-iteration fuzz smoke test
+- `test/scapy/layers/rtp.uts`: PASSED=3 FAILED=0
+- Full `test/configs/linux.utsc` campaign output is **byte-identical to the pre-change baseline** (the only diffs were timestamps and temp paths); the two failing campaigns (`dhcp.uts`, `cert.uts`) fail identically on the clean tree due to missing IPython/python-cryptography in this environment
+- File compiles cleanly, no unused imports, no new lines over 79 chars
+
+**Final tally: 1 issue addressed, 0 blocked.**

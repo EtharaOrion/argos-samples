@@ -1,0 +1,200 @@
+import { githubPlusExtension } from 'mo/extensions/github-plus-theme-master';
+import { monokaiExtension } from 'mo/extensions/theme-monokai';
+test('color utils', () => {
+    expect(colorLightOrDark('#FFF')).toBe('light');
+    expect(colorLightOrDark('#000')).toBe('dark');
+    expect(colorLightOrDark('#1E1E1E')).toBe('dark');
+    expect(colorLightOrDark('#ffffff00')).toBe('light');
+    expect(colorLightOrDark('rgb(255, 255, 255)')).toBe('light');
+    expect(colorLightOrDark('rgba(0, 0, 0, 0.5)')).toBe('dark');
+    expect(colorLightOrDark('unknown')).toBeUndefined();
+    expect(colorLightOrDark('')).toBeUndefined();
+    expect(colorLightOrDark('#12')).toBeUndefined();
+    expect(colorToRGB('#F0A')).toEqual([255, 0, 170]);
+});
+test('theme modes', () => {
+    expect(getColorThemeMode({ id: 'a', label: 'a' })).toBe(ColorThemeMode.dark);
+    expect(getColorThemeMode({ id: 'a', label: 'a', uiTheme: 'vs' })).toBe(ColorThemeMode.light);
+    expect(getColorThemeMode({ id: 'a', label: 'a', uiTheme: 'hc-black' })).toBe(ColorThemeMode.dark);
+    expect(getColorThemeMode({ id: 'a', label: 'a', type: ColorScheme.LIGHT })).toBe(ColorThemeMode.light);
+    expect(getColorThemeMode({ id: 'a', label: 'a', type: ColorScheme.HIGH_CONTRAST })).toBe(ColorThemeMode.dark);
+    expect(getColorThemeMode({ id: 'a', label: 'a', uiTheme: 'unknown-dark' })).toBe(ColorThemeMode.dark);
+    expect(getColorThemeMode({ id: 'a', label: 'a', uiTheme: 'x', colors: { 'editor.background': '#FFFFFF' } })).toBe(ColorThemeMode.light);
+    expect(getColorThemeMode({ id: 'a', label: 'a', uiTheme: 'vs-dark', colors: { 'editor.background': '#FFFFFF' } })).toBe(ColorThemeMode.light);
+});
+test('builtin extensions', () => {
+    const service = container.resolve(ColorThemeService);
+    const themes: any[] = [
+        ...(defaultColorThemeExtension.contributes?.themes || []),
+        ...(githubPlusExtension.contributes?.themes || []),
+        ...(monokaiExtension.contributes?.themes || []),
+    ];
+    service.addThemes(themes);
+    const changed: any[] = [];
+    service.onChange((prev, next, mode) => changed.push([prev.id, next.id, mode]));
+    themes.forEach((t) => {
+        service.setTheme(t.id);
+        console.log(t.id, '|', t.uiTheme, '|', t.type, '=>', service.getColorThemeMode());
+    });
+    expect(changed).toHaveLength(themes.length);
+});
+EOF
+
+
+npx jest --testMatch "**/repro.spec.ts" --no-coverage 2>&1 | grep -E "=>|Tests:|✕|●|Expected|Received" | head -40
+clear
+  ✕ builtin extensions (13 ms)
+  ● builtin extensions
+Tests:       1 failed, 2 passed, 3 total
+
+
+clear
+
+
+cd /workspace/molecule && npx jest --testMatch "**/repro.spec.ts" --no-coverage 2>&1 | grep -E "=>|Tests:|✕|●|Expected|Received|Cannot" | head -40
+  ✕ builtin extensions (13 ms)
+  ● builtin extensions
+    TypeError: Cannot read property 'contributes' of undefined
+Tests:       1 failed, 2 passed, 3 total
+$ cd /workspace/molecule && tail -3 src/extensions/theme-monokai/index.ts
+themes[0] = Object.assign({}, themeOne, themeOneColors);
+
+export { monokaiColorThemeExtension };
+$ cd /workspace/molecule && sed -i "s/monokaiExtension/monokaiColorThemeExtension/g" repro.spec.ts && npx jest --testMatch "**/repro.spec.ts" --no-coverage 2>&1 | grep -E "\| .* =>|Tests:|✕|Expected|Received" | head -30
+Default Dark+ | vs-dark | undefined => dark
+    Default Light+ | vs | undefined => light
+    Visual Studio Dark | vs-dark | undefined => dark
+    Visual Studio Light | vs | undefined => light
+    Default High Contrast | hc-black | undefined => dark
+    GitHub Plus | vs | light => light
+    Monokai | vs-dark | dark => dark
+Tests:       3 passed, 3 total
+$ cd /workspace/molecule && rm repro.spec.ts && npx prettier --write src/common/color.ts src/services/theme/helper.ts >/dev/null && npx tsc --noEmit -p tsconfig.json && npx eslint src/common/color.ts src/services/theme/helper.ts src/services/theme/colorThemeService.ts src/model/colorTheme.ts 2>&1 | tail -3 && npx jest --no-coverage 2>&1 | tail -6
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+Snapshots:   49 passed, 49 total
+Time:        4.009 s
+Ran all test suites.
+$ cd /workspace/molecule && git status --short && sed -n 55,105p src/services/theme/helper.ts
+M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M src/services/theme/helper.ts
+ M website/docs/guides/extend-color-theme.md
+ M website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+?? src/common/color.ts
+        if (!nextColors[inheritSourceColor] && nextColors[inheritTargetColor]) {
+            nextColors[inheritSourceColor] = nextColors[inheritTargetColor];
+        }
+    });
+    return nextColors;
+}
+
+/**
+ * Convert the light or dark color to the `ColorThemeMode`
+ * @param color
+ */
+function getModeByColor(color?: string): ColorThemeMode | undefined {
+    if (!color) return undefined;
+    const lightOrDark = colorLightOrDark(color);
+    if (!lightOrDark) return undefined;
+    return lightOrDark === 'light' ? ColorThemeMode.light : ColorThemeMode.dark;
+}
+
+/**
+ * Get the mode(`dark` or `light`) of the color theme.
+ *
+ * It's judged by the background color of the editor firstly,
+ * and then the `type` as well as the `uiTheme` of the theme,
+ * finally, it's judged by the built-in colors of the theme.
+ * The high contrast theme belongs to the `dark` mode.
+ * @param theme
+ */
+export function getColorThemeMode(theme: IColorTheme): ColorThemeMode {
+    const { type, uiTheme, colors } = theme;
+
+    const themeMode = getModeByColor(colors?.['editor.background']?.toString());
+    if (themeMode) return themeMode;
+
+    if (type === ColorScheme.LIGHT) return ColorThemeMode.light;
+    if (type === ColorScheme.DARK || type === ColorScheme.HIGH_CONTRAST) {
+        return ColorThemeMode.dark;
+    }
+
+    if (uiTheme === 'vs') return ColorThemeMode.light;
+    if (uiTheme === 'vs-dark' || uiTheme === 'hc-black') {
+        return ColorThemeMode.dark;
+    }
+
+    const builtInBackground = getBuiltInColors(theme)['editor.background'];
+
+    return getModeByColor(builtInBackground?.toString()) || ColorThemeMode.dark;
+}
+
+export function getThemeData(
+    theme: IColorTheme
+): MonacoEditor.IStandaloneThemeData {
+$ cd /workspace/molecule && git --no-pager diff --stat && echo "--- new file ---" && cat src/common/color.ts | head -20
+src/model/colorTheme.ts                                                                | 19 +++++++++++++++++++
+ src/services/theme/colorThemeService.ts                                                | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ src/services/theme/helper.ts                                                           | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ website/docs/guides/extend-color-theme.md                                              | 29 +++++++++++++++++++++++++++++
+ website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md | 29 +++++++++++++++++++++++++++++
+ 5 files changed, 175 insertions(+), 5 deletions(-)
+--- new file ---
+export type ColorLightOrDark = 'light' | 'dark';
+
+/**
+ * Convert a color string to the RGB values,
+ * it supports the `hex` and the `rgb/rgba` color, eg: `#FFF`, `rgba(255, 255, 255, .5)`
+ * @param color
+ * @returns [red, green, blue] or `undefined` if the color is unrecognized
+ */
+export function colorToRGB(
+    color: string
+): [number, number, number] | undefined {
+    if (typeof color !== 'string') return undefined;
+    const value = color.trim();
+
+    if (value.startsWith('#')) {
+        const hex = value.slice(1);
+        // Supports the #RGB, #RGBA, #RRGGBB and the #RRGGBBAA format
+        const isShorthand = hex.length === 3 || hex.length === 4;
+        if (!isShorthand && hex.length !== 6 && hex.length !== 8) {
+            return undefined;
+# finish: Implemented color theme mode API and change event
+**Checklist: 1 issue found** (the description contains a single `## Issue N` header).
+
+1. **Issue 1 (#627): How to get the current theme? — DONE**
+
+### What the issue asked for
+A consumer of Molecule needs to know the current color theme and, most importantly, whether it is a **dark** or **light** theme, so an external UI library (e.g. Ant Design) can be kept in sync. `getColorTheme()` already existed, but there was no way to know the theme *mode*, and no way to be notified when the theme changes.
+
+### Changes made (all in non-test files)
+
+**`src/model/colorTheme.ts`**
+- Added `ColorThemeMode` enum (`dark` / `light`; high-contrast belongs to `dark`).
+- Added `ColorThemeEvent` enum with `onChange = 'colorTheme.onChange'`.
+
+**`src/common/color.ts` (new)**
+- `colorToRGB(color)` — parses `#RGB`, `#RGBA`, `#RRGGBB`, `#RRGGBBAA`, `rgb()` and `rgba()` strings, returns `undefined` for unrecognized values.
+- `colorLightOrDark(color)` — returns `'light' | 'dark' | undefined` using the HSP color model.
+
+**`src/services/theme/helper.ts`**
+- Added `getColorThemeMode(theme)`: judged first by the theme's `colors['editor.background']`, then by the theme `type` (`ColorScheme`), then by `uiTheme` (`vs` → light, `vs-dark`/`hc-black` → dark), and finally by the built-in colors of the theme, defaulting to `dark`.
+
+**`src/services/theme/colorThemeService.ts`**
+- `ColorThemeService` now extends `GlobalEvent` (same pattern as `SettingsService`).
+- New public API `getColorThemeMode(): ColorThemeMode`.
+- New public API `onChange(callback(prev, next, themeMode))`; `setTheme()` now emits `ColorThemeEvent.onChange` with the previous theme, the new theme and the new theme mode (so `updateTheme`/`reload`/`reset` propagate too).
+- Both added to the `IColorThemeService` interface, so they are available on `molecule.colorTheme` (which is typed as `IColorThemeService`).
+- Fixed `getThemeById` interface signature (`void` → `IColorTheme | undefined`) so the public API returns the theme it actually returns.
+
+**Docs** (`website/docs/guides/extend-color-theme.md` + zh-CN current translation): documented `getColorTheme()`, `getColorThemeMode()` and `onChange()` with usage examples.
+
+### Verification
+- Reproduction script run through jest (temporary file, deleted afterwards): confirmed the mode for every built-in theme (`Default Dark+`→dark, `Default Light+`→light, `Visual Studio Dark`→dark, `Visual Studio Light`→light, `Default High Contrast`→dark, `GitHub Plus`→light, `Monokai`→dark), plus edge cases (no `uiTheme`/`colors`, unknown `uiTheme`, `type` overriding, rgb/rgba/short-hex/invalid colors) and that `onChange` fires once per `setTheme`.
+- `npx tsc --noEmit -p tsconfig.json` — clean.
+- `npx eslint` on all changed source files — clean.
+- Full suite: `96 test suites / 704 tests / 49 snapshots` all pass (no regressions).
+
+**Tally: 1 of 1 issue addressed (DONE), 0 BLOCKED.** No test files or repository plumbing were modified.

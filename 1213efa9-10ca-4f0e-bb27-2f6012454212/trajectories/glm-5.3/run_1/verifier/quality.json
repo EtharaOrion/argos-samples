@@ -1,0 +1,97 @@
+{
+  "version": {
+    "quality": "quality-v1",
+    "prompt_digest": "6169e82413340627",
+    "manifest_digest": "d55b59e374bfca48"
+  },
+  "task_uuid": "1213efa9-10ca-4f0e-bb27-2f6012454212",
+  "model": "glm-5.3",
+  "run_id": "run_1",
+  "status": "scored",
+  "calibrated": false,
+  "judge": {
+    "member": "gpt-5.6-sol",
+    "model": "openai/responses/gpt-5.6-sol"
+  },
+  "patch": {
+    "source": "git",
+    "sha256": "89fa9ee110f8cf9d50467d6491a0a21f0c04d63c0ccd43288a5cadc76a387b0b",
+    "bytes": 17279,
+    "truncated": false
+  },
+  "evidence_digest": "39eeb7e4cf027508",
+  "quality_fingerprint": "88f1fd2ad33ac2b8",
+  "score": 0.8571,
+  "counts": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "undecided": 0
+  },
+  "reasons": [],
+  "items": [
+    {
+      "id": "Q1",
+      "dimension": "conventions",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The RTCP implementation follows the surrounding Scapy style: standard-library imports are separated from ordered `scapy.*` imports, packet classes and fields use existing naming/formatting patterns, and warnings use `scapy.error.warning` rather than ad hoc output. Error handling is narrow and localized, such as catching only `TypeError` while processing an unset length.",
+      "evidence_ref": "`scapy/layers/rtp.py`, import hunk and `RTCPHeader.post_dissect`/`post_build` hunk: `from scapy.error import warning`, `except TypeError:`, and `warning(\"RTCP 'length' field ...\")`"
+    },
+    {
+      "id": "Q2",
+      "dimension": "minimal_diff",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "Every hunk directly supports RTCP packet support: the new contrib module exposes the implementation, while the RTP layer adds RTCP parsing, building, packet classes, and documentation. The diff shows no unrelated reformatting, renames, file moves, or edits outside these relevant files.",
+      "evidence_ref": "scapy/contrib/rtcp.py, new-file hunk @@ -0,0 +1,57 @@; scapy/layers/rtp.py, RTCP implementation hunk @@ -55,3 +65,413 @@"
+    },
+    {
+      "id": "Q3",
+      "dimension": "abstraction",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": false,
+      "rationale": "The RTCP packet classes duplicate nearly identical `post_build` logic to derive the five-bit count from a list before delegating to `RTCPHeader.post_build`, rather than sharing that behavior in a helper or base abstraction. This repetition appears in both sender/receiver reports and again in SDES/BYE.",
+      "evidence_ref": "scapy/layers/rtp.py, hunks defining `RTCPSenderReport`, `RTCPReceiverReport`, `RTCPSDES`, and `RTCPBye`: each implements the same `if not self.<count> and self.<list>: pkt = chb((pkt[0] & 0xe0) | len(self.<list>)) + pkt[1:]` pattern."
+    },
+    {
+      "id": "Q4",
+      "dimension": "readability",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The RTCP implementation is split into focused helpers and packet classes, with shallow control flow even in dispatch and parsing methods. Comments primarily document RFC semantics and explain non-obvious padding, compound-packet, and field-name behavior rather than merely repeating the code.",
+      "evidence_ref": "scapy/layers/rtp.py, hunk beginning \u201cRTCP (RTP Control Protocol) - RFC 3550\u201d, especially `_rtcp_padding_length`, `RTCPHeader.dispatch_hook`, and the individual RTCP packet classes."
+    },
+    {
+      "id": "Q5",
+      "dimension": "naming",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The new RTCP classes, helper functions, fields, and aliases use descriptive protocol vocabulary and follow the surrounding Scapy conventions, including standard callback parameters such as `pkt`, `s`, and `pay`. Abbreviations such as `ssrc`, `sdes`, `plen`, and `padlen` are either RFC terminology or clearly scoped length variables.",
+      "evidence_ref": "scapy/layers/rtp.py, RTCP implementation hunk (`_rtcp_padding_length`, `_rtcp_remaining_length`, `RTCPReportBlock`, `RTCPSenderReport`, `RTCPSDESChunk`, `RTCPBye`, and `RTCPApp`)"
+    },
+    {
+      "id": "Q6",
+      "dimension": "idiomaticity",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The implementation follows established Scapy idioms by defining `Packet` subclasses with `fields_desc`, using Scapy field types and hooks such as `dispatch_hook`, `post_build`, `post_dissect`, and `extract_padding`, and registering/re-exporting protocol classes through the existing layer/contrib structure.",
+      "evidence_ref": "`scapy/layers/rtp.py`, RTCP implementation hunk beginning `class RTCPHeader(Packet):`, and `scapy/contrib/rtcp.py`, re-export module hunk."
+    },
+    {
+      "id": "Q7",
+      "dimension": "dead_code",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added imports, helpers, packet classes, aliases, and guards all support RTCP construction, dissection, malformed-packet fallback, or public API exposure; the diff contains no unused imports, debugging leftovers, or commented-out implementation.",
+      "evidence_ref": "scapy/layers/rtp.py, hunk @@ -55,3 +65,413 @@; scapy/contrib/rtcp.py, hunk @@ -0,0 +1,57 @@"
+    }
+  ]
+}

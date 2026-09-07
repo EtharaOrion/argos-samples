@@ -1,0 +1,97 @@
+{
+  "version": {
+    "quality": "quality-v1",
+    "prompt_digest": "6169e82413340627",
+    "manifest_digest": "d55b59e374bfca48"
+  },
+  "task_uuid": "1213efa9-10ca-4f0e-bb27-2f6012454212",
+  "model": "opus-5",
+  "run_id": "run_6",
+  "status": "scored",
+  "calibrated": false,
+  "judge": {
+    "member": "gpt-5.6-sol",
+    "model": "openai/responses/gpt-5.6-sol"
+  },
+  "patch": {
+    "source": "git",
+    "sha256": "53f2ea781c84b5df19f1be763d57d565221e95e59610c2f66a162a64a9e98ade",
+    "bytes": 8931,
+    "truncated": false
+  },
+  "evidence_digest": "48cd136782300baa",
+  "quality_fingerprint": "d4ab85c996fbf7cc",
+  "score": 0.8571,
+  "counts": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "undecided": 0
+  },
+  "reasons": [],
+  "items": [
+    {
+      "id": "Q1",
+      "dimension": "conventions",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The additions preserve the module\u2019s existing import grouping, Scapy field-declaration style, CamelCase packet classes, lowercase helper functions, and four-space formatting; no inconsistent logging or error-handling pattern is introduced.",
+      "evidence_ref": "scapy/layers/rtp.py, hunks @@ -4,18 +4,24 @@ and @@ -55,3 +80,184 @@, including `import struct`, grouped `from scapy...` imports, and the `SenderInfo`, `ReceptionReport`, `SDESItem`, `SDESChunk`, and `RTCP` packet declarations."
+    },
+    {
+      "id": "Q2",
+      "dimension": "minimal_diff",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "Every hunk in `scapy/layers/rtp.py` directly supports adding RTCP packet support: documentation, required imports and protocol mappings, RTCP structures and fields, serialization/dissection logic, and compound-packet handling. No unrelated files, renames, reformatting, or code churn are shown.",
+      "evidence_ref": "`scapy/layers/rtp.py`, hunks at `@@ -4,18 +4,24 @@`, `@@ -32,6 +38,25 @@`, and `@@ -55,3 +80,184 @@` add only RTCP-related documentation and implementation."
+    },
+    {
+      "id": "Q3",
+      "dimension": "abstraction",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added classes map directly to distinct RTCP protocol structures, while shared conditional and length logic is centralized in helpers such as `_rtcp_bye_has_reason` and `_rtcp_app_data_length` rather than duplicated across fields. The callback and custom-field abstractions are required by Scapy\u2019s declarative field model and are tied to stated RTCP parsing/building needs.",
+      "evidence_ref": "scapy/layers/rtp.py, hunk adding `SenderInfo` through `RTCP`, especially the shared helpers and their use in `RTCP.fields_desc`"
+    },
+    {
+      "id": "Q4",
+      "dimension": "readability",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The RTCP implementation is organized into small packet classes and focused helper functions with shallow control flow; comments primarily explain RFC-specific semantics such as word-based lengths, compound packets, and alignment rather than merely restating operations.",
+      "evidence_ref": "scapy/layers/rtp.py, hunk adding SenderInfo through RTCP, especially `_rtcp_bye_has_reason`, `_rtcp_app_data_length`, and `RTCP.post_build`/`guess_payload_class`"
+    },
+    {
+      "id": "Q5",
+      "dimension": "naming",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": false,
+      "rationale": "The new `ReceptionReport` fields `last_SR_timestamp` and `delay_since_last_SR` use uppercase `SR` within otherwise lowercase snake_case identifiers, conflicting with nearby names such as `interarrival_jitter` and `rtp_timestamp`.",
+      "evidence_ref": "scapy/layers/rtp.py, `ReceptionReport` hunk: `IntField('last_SR_timestamp', 0)` and `IntField('delay_since_last_SR', 0)`"
+    },
+    {
+      "id": "Q6",
+      "dimension": "idiomaticity",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added implementation consistently uses Scapy\u2019s native packet-definition idioms\u2014`Packet` subclasses, `fields_desc`, `ConditionalField`, `PacketListField`, field callbacks, and `post_build`/`extract_padding` hooks\u2014along with standard Python constructs rather than introducing foreign patterns.",
+      "evidence_ref": "scapy/layers/rtp.py, hunk adding `SenderInfo` through `RTCP`, especially `class RTCP(Packet)` and its `fields_desc`/`post_build` definitions."
+    },
+    {
+      "id": "Q7",
+      "dimension": "dead_code",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The RTCP additions are all referenced by packet fields, callbacks, serialization/dissection methods, or compound-packet dispatch, and every newly added import is used. The guards handle reachable cases such as malformed/short input, optional BYE reasons, SDES termination, and packet construction versus dissection.",
+      "evidence_ref": "scapy/layers/rtp.py, hunk adding SenderInfo through RTCP.guess_payload_class"
+    }
+  ]
+}

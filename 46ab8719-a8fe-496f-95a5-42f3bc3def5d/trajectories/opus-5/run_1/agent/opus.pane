@@ -1,0 +1,200 @@
+M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M src/services/theme/helper.ts
+ M website/docs/guides/extend-color-theme.md
+ M website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+?? src/common/color.ts
+
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+Snapshots:   49 passed, 49 total
+Time:        3.885 s, estimated 4 s
+Ran all test suites.
+$ mkdir -p /workspace/molecule/scratch
+# file_editor: /workspace/molecule/scratch/builtinThemes.test.ts
+File created successfully at: /workspace/molecule/scratch/builtinThemes.test.ts
+$ cd /workspace/molecule && cat src/extensions/index.ts 2>/dev/null | head -30 && ls src/extensions
+import { ExtendsFolderTree } from './folderTree';
+import { ExtendsActivityBar } from './activityBar';
+import { ExtendsPanel } from './panel';
+import { ExtendsExplorer } from './explorer';
+import { ExtendsEditorTree } from './editorTree';
+import { ExtendsLocales } from './locales-defaults';
+
+import { defaultColorThemeExtension } from './theme-defaults';
+import { monokaiColorThemeExtension } from './theme-monokai';
+import { paleNightColorThemeExtension } from './vscode-palenight-theme';
+import { webStormIntelliJExtension } from './vscode-intellij-darcula-theme-master';
+import { githubPlusExtension } from './github-plus-theme-master';
+
+/**
+ * Default extensions
+ */
+export const defaultExtensions = [
+    ExtendsPanel,
+    ExtendsActivityBar,
+    ExtendsExplorer,
+    ExtendsEditorTree,
+    ExtendsLocales,
+    defaultColorThemeExtension,
+    monokaiColorThemeExtension,
+    paleNightColorThemeExtension,
+    webStormIntelliJExtension,
+    githubPlusExtension,
+    ExtendsFolderTree,
+];
+activityBar  editorTree  explorer  folderTree  github-plus-theme-master  index.ts  locales-defaults  panel  theme-defaults  theme-monokai  vscode-intellij-darcula-theme-master  vscode-palenight-theme
+$ cd /workspace/molecule && rm scratch/builtinThemes.test.ts && cat > scratch/builtinThemes.test.ts << 'ZZEOF'
+$ import 'reflect-metadata';
+$ import { container } from 'tsyringe';
+$ import { ColorThemeService } from 'mo/services/theme/colorThemeService';
+$ import { IColorTheme } from 'mo/model/colorTheme';
+$ import { defaultColorThemeExtension } from 'mo/extensions/theme-defaults';
+$ import { monokaiColorThemeExtension } from 'mo/extensions/theme-monokai';
+$ import { paleNightColorThemeExtension } from 'mo/extensions/vscode-palenight-theme';
+$ import { webStormIntelliJExtension } from 'mo/extensions/vscode-intellij-darcula-theme-master';
+$ import { githubPlusExtension } from 'mo/extensions/github-plus-theme-master';
+$ 
+$ const extensions = [
+$     defaultColorThemeExtension,
+$     monokaiColorThemeExtension,
+$     paleNightColorThemeExtension,
+$     webStormIntelliJExtension,
+$     githubPlusExtension,
+$ ];
+$ 
+$ describe('The built-in themes mode', () => {
+$     const colorThemeService = container.resolve(ColorThemeService);
+$ 
+$     test('Print the mode of every built-in theme', () => {
+$         extensions.forEach((extension: any) => {
+$             const themes: IColorTheme[] = extension.contributes?.themes || [];
+$             themes.forEach((theme) => {
+$                 if (!theme.id) {
+$                     theme.id = theme.label;
+$                 }
+$                 colorThemeService.addThemes(theme);
+$                 colorThemeService.setTheme(theme.id);
+$                 console.log(
+$                     `${theme.label} (uiTheme: ${theme.uiTheme}, type: ${theme.type}) => ${colorThemeService.getColorThemeMode()}`
+$                 );
+$             });
+$         });
+$     });
+$ });
+$ ZZEOF
+$ echo created
+cd /workspace/molecule && rm scratch/builtinThemes.test.ts && cat > scratch/builtinThemes.test.ts << 'ZZEOF'
+import 'reflect-metadata';
+import { container } from 'tsyringe';
+import { ColorThemeService } from 'mo/services/theme/colorThemeService';
+import { IColorTheme } from 'mo/model/colorTheme';
+import { defaultColorThemeExtension } from 'mo/extensions/theme-defaults';
+import { monokaiColorThemeExtension } from 'mo/extensions/theme-monokai';
+import { paleNightColorThemeExtension } from 'mo/extensions/vscode-palenight-theme';
+import { webStormIntelliJExtension } from 'mo/extensions/vscode-intellij-darcula-theme-master';
+import { githubPlusExtension } from 'mo/extensions/github-plus-theme-master';
+const extensions = [
+    defaultColorThemeExtension,
+    monokaiColorThemeExtension,
+    paleNightColorThemeExtension,
+    webStormIntelliJExtension,
+    githubPlusExtension,
+];
+describe('The built-in themes mode', () => {
+    const colorThemeService = container.resolve(ColorThemeService);
+    test('Print the mode of every built-in theme', () => {
+        extensions.forEach((extension: any) => {
+            const themes: IColorTheme[] = extension.contributes?.themes || [];
+            themes.forEach((theme) => {
+                if (!theme.id) {
+                    theme.id = theme.label;
+                }
+                colorThemeService.addThemes(theme);
+                colorThemeService.setTheme(theme.id);
+                console.log(
+                    `${theme.label} (uiTheme: ${theme.uiTheme}, type: ${theme.type}) => ${colorThemeService.getColorThemeMode()}`
+                );
+            });
+        });
+    });
+});
+ZZEOF
+
+
+echo created
+created
+$ cd /workspace/molecule && npx jest --testMatch='**/scratch/**/*.test.ts' --testPathIgnorePatterns='/node_modules/' 2>&1 | grep -E "console.log|=>|Tests:|Suites:|●" -A1 | head -60
+console.log
+    Dark+ (default dark) (uiTheme: vs-dark, type: undefined) => dark
+
+--
+  console.log
+    Light+ (default light) (uiTheme: vs, type: undefined) => light
+
+--
+  console.log
+    Dark (Visual Studio) (uiTheme: vs-dark, type: undefined) => dark
+
+--
+  console.log
+    Light (Visual Studio) (uiTheme: vs, type: undefined) => light
+
+--
+  console.log
+    High Contrast (uiTheme: hc-black, type: undefined) => dark
+
+--
+  console.log
+    Monokai (uiTheme: vs-dark, type: dark) => dark
+
+--
+  console.log
+    Palenight (Mild Contrast) (uiTheme: vs-dark, type: dark) => dark
+
+--
+  console.log
+    Webstorm IntelliJ Darcula Theme (uiTheme: vs-dark, type: dark) => dark
+
+--
+  console.log
+    GitHub Plus (uiTheme: vs, type: light) => light
+
+--
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+$ cd /workspace/molecule && rm -rf scratch && npx tsc --noEmit -p tsconfig.json && npx jest 2>&1 | tail -6 && git status --short
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+Snapshots:   49 passed, 49 total
+Time:        3.922 s
+Ran all test suites.
+ M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M src/services/theme/helper.ts
+ M website/docs/guides/extend-color-theme.md
+ M website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+?? src/common/color.ts
+## Checklist: 1 issue found in the description — 1 DONE, 0 BLOCKED.
+
+### Issue 1 (#627): "How to get current theme?" — **DONE**
+
+**Problem:** `molecule.colorTheme` exposed no way to learn whether the active theme is *dark* or *light*, and no way to be notified when the theme changes, so consumers couldn't sync a third‑party UI library (e.g. Ant Design) with Molecule's theme.
+
+**Implementation (non‑test files only):**
+
+| File | Change |
+|---|---|
+| `src/model/colorTheme.ts` | Added `ColorThemeMode` enum (`dark`/`light`) and `ColorThemeEvent` enum (`onChange = 'colorTheme.onChange'`), matching the existing `SettingsEvent`/`LocalizationEvent` conventions. |
+| `src/common/color.ts` *(new)* | `convertToRGB(color)` parses HEX (`#FFF`, `#FFFFFF`, `#FFFFFFFF`) and `rgb()/rgba()` strings — both formats appear in the color registry and in monaco `Color.toString()` output; `colorLightOrDark(color)` returns `'light' \| 'dark'` using the HSP brightness model, defaulting to `'dark'` for unparseable input. |
+| `src/services/theme/colorThemeService.ts` | `ColorThemeService` now extends `GlobalEvent`; added **`getColorThemeMode(): ColorThemeMode`** (derived from the resolved `editor.background` via `getThemeData`, so built‑in `vs`/`vs-dark`/`hc` defaults apply even for themes that declare no colors) and **`onChange((prev, next, themeMode) => void)`**; `setTheme` now emits `ColorThemeEvent.onChange` with the previous theme, the new theme and the new mode (covers command‑palette selection, `settings.applySettings`, `updateTheme`/`reload`). Both methods added to the public `IColorThemeService`, and the interface's `getThemeById` return type was corrected from `void` to `IColorTheme \| undefined`. `ColorThemeMode`/`ColorThemeEvent` are re‑exported so they're reachable from `mo/model`, `mo/services`, the service module and `molecule.*`. |
+| `src/services/theme/helper.ts` | Re‑exports `colorLightOrDark` next to the other theme helpers. |
+| `website/docs/guides/extend-color-theme.md` + zh‑CN counterpart | Documented `getColorTheme()`, `getColorThemeMode()` and `onChange()` with the exact scenario from the issue. |
+
+**Verification (temporary scratch specs, run with jest since `ts-node` isn't installed; all deleted afterwards):**
+- Reproduced the bug first: `getColorThemeMode`/`onChange` were `undefined`.
+- After the fix: default theme → `dark`; theme overriding `editor.background: #FFFFFF` → `light`; `uiTheme: 'vs'` theme → `light`; `onChange` fired once with `(prevTheme, nextTheme, 'dark')`; colour‑parsing edge cases (shorthand hex, 8‑digit hex, `rgb`, `rgba`, empty string, `undefined`).
+- Sanity‑checked every built‑in theme extension in the repo: Dark+ → dark, Light+ → light, VS Dark → dark, VS Light → light, High Contrast → dark, Monokai → dark, Palenight → dark, Darcula → dark, GitHub Plus → light — all match each theme's declared `type`/`uiTheme`.
+
+**Build/quality gates:** `tsc --noEmit` passes for both `tsconfig.json` and `tsconfig.build.json`; eslint and prettier are clean on all changed files; the full suite passes (96 suites / 704 tests / 49 snapshots) with **no test file, fixture, or CI/plumbing file modified**.

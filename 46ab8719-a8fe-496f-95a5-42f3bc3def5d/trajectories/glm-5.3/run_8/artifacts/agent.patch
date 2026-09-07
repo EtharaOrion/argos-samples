@@ -1,0 +1,261 @@
+diff --git a/src/services/theme/colorThemeService.ts b/src/services/theme/colorThemeService.ts
+index 95225b2..4d68d0c 100644
+--- a/src/services/theme/colorThemeService.ts
++++ b/src/services/theme/colorThemeService.ts
+@@ -4,14 +4,25 @@
+  */
+ 
+ import 'reflect-metadata';
+-import { IColorTheme } from 'mo/model/colorTheme';
++import { ColorScheme, IColorTheme } from 'mo/model/colorTheme';
+ import { singleton } from 'tsyringe';
+ import { editor as monacoEditor } from 'mo/monaco';
+ import { applyStyleSheetRules } from 'mo/common/css';
+-import { getThemeData, convertToCSSVars } from './helper';
++import { getThemeData, convertToCSSVars, getThemeScheme } from './helper';
+ import logger from 'mo/common/logger';
+ import { prefixClaName } from 'mo/common/className';
+ import { searchById } from 'mo/common/utils';
++import { EventBus } from 'mo/common/event';
++
++/**
++ * The ColorTheme configuration event definition
++ */
++export enum ColorThemeEvent {
++    /**
++     * The current ColorTheme changed
++     */
++    OnChange = 'colorTheme.onChange',
++}
+ 
+ export interface IColorThemeService {
+     /**
+@@ -40,11 +51,35 @@ export interface IColorThemeService {
+      * Get specific theme via id
+      * @param id
+      */
+-    getThemeById(id: string): void;
++    getThemeById(id: string): IColorTheme | undefined;
+     /**
+      * Get the current Color Theme
+      */
+     getColorTheme(): IColorTheme;
++    /**
++     * Get the current Color Theme, it's an alias of the `getColorTheme`
++     */
++    getCurrentTheme(): IColorTheme;
++    /**
++     * Get the color scheme of the current Color Theme,
++     * and it's used to distinguish the `dark` mode from the `light` mode:
++     *
++     * ```ts
++     * if (molecule.colorTheme.getColorScheme() === ColorScheme.DARK) {
++     *     // change the theme of the ant design or others
++     * }
++     * ```
++     */
++    getColorScheme(): ColorScheme;
++    /**
++     * Listen to the current ColorTheme changed event, it's helpful
++     * to synchronize the theme of the other UI libraries(e.g. ant design)
++     * with the Molecule theme
++     * @param callback
++     */
++    onChangeTheme(
++        callback: (prevTheme: IColorTheme, nextTheme: IColorTheme) => void
++    ): void;
+     /**
+      * Reload current theme
+      */
+@@ -63,6 +98,7 @@ export const BuiltInColorTheme: IColorTheme = {
+     name: 'Default Dark+',
+     label: 'Default Dark+',
+     uiTheme: 'vs-dark',
++    type: ColorScheme.DARK,
+ };
+ /**
+  * @ignore
+@@ -125,10 +161,31 @@ export class ColorThemeService implements IColorThemeService {
+         return Object.assign({}, this.colorTheme);
+     }
+ 
++    public getCurrentTheme(): IColorTheme {
++        return this.getColorTheme();
++    }
++
++    public getColorScheme(): ColorScheme {
++        return getThemeScheme(this.colorTheme);
++    }
++
++    public onChangeTheme(
++        callback: (prevTheme: IColorTheme, nextTheme: IColorTheme) => void
++    ): void {
++        EventBus.subscribe(ColorThemeEvent.OnChange, callback);
++    }
++
+     public setTheme(id: string) {
+         const theme = this.getThemeById(id);
+         if (theme) {
+-            this.colorTheme = { ...theme };
++            const prevTheme = this.getColorTheme();
++            this.colorTheme = {
++                ...theme,
++                // Ensure the current theme always holds a color scheme,
++                // so that the developers are able to distinguish the
++                // dark mode from the light mode
++                type: getThemeScheme(theme),
++            };
+             const themeData = getThemeData(theme);
+             const styleSheetContent = convertToCSSVars(themeData.colors);
+             applyStyleSheetRules(styleSheetContent, DEFAULT_THEME_CLASS_NAME);
+@@ -136,12 +193,20 @@ export class ColorThemeService implements IColorThemeService {
+             // Update monaco-editor theme
+             monacoEditor.defineTheme(DEFAULT_THEME_CLASS_NAME, themeData);
+             monacoEditor.setTheme(DEFAULT_THEME_CLASS_NAME);
++
++            if (prevTheme.id !== id) {
++                EventBus.emit(
++                    ColorThemeEvent.OnChange,
++                    prevTheme,
++                    this.getColorTheme()
++                );
++            }
+         } else {
+             logger.error(`Can't get the theme by id:` + id);
+         }
+     }
+ 
+-    public getThemes() {
++    public getThemes(): IColorTheme[] {
+         return this.colorThemes;
+     }
+ 
+diff --git a/src/services/theme/helper.ts b/src/services/theme/helper.ts
+index cb52c15..17db307 100644
+--- a/src/services/theme/helper.ts
++++ b/src/services/theme/helper.ts
+@@ -1,8 +1,39 @@
+ import { cloneDeep } from 'lodash';
+-import { IColors, IColorTheme } from 'mo/model/colorTheme';
++import { ColorScheme, IColors, IColorTheme } from 'mo/model/colorTheme';
+ import { getBuiltInColors } from 'mo/services/theme/colorRegistry';
+ import { editor as MonacoEditor } from 'monaco-editor';
+ 
++/**
++ * Get the color scheme(`dark`, `light`, `hc`) of the theme.
++ *
++ * The theme extension, which is compatible with the VSCode, may not
++ * declare the `type` of the theme, so there we infer the color scheme
++ * from the `uiTheme` field:
++ * - `vs` means a `light` theme
++ * - `vs-dark` means a `dark` theme
++ * - `hc-black`/`hc-light` means a `high contrast` theme
++ *
++ * And the dark color scheme is used by default, because Molecule
++ * is designed with the dark theme as the default theme.
++ * @param theme
++ */
++export function getThemeScheme(theme: IColorTheme): ColorScheme {
++    if (theme.type) {
++        return theme.type;
++    }
++    switch (theme.uiTheme) {
++        case 'vs':
++            return ColorScheme.LIGHT;
++        case 'vs-dark':
++            return ColorScheme.DARK;
++        case 'hc-black':
++        case 'hc-light':
++            return ColorScheme.HIGH_CONTRAST;
++        default:
++            return ColorScheme.DARK;
++    }
++}
++
+ /**
+  * This function convert colors object to CSS variables, and add it to the :root {}.
+  * The default color id default contains dot punctuation, so there we convert the `.` to `-`.
+diff --git a/website/docs/guides/extend-color-theme.md b/website/docs/guides/extend-color-theme.md
+index c0bd335..7dbb861 100644
+--- a/website/docs/guides/extend-color-theme.md
++++ b/website/docs/guides/extend-color-theme.md
+@@ -244,3 +244,37 @@ molecule.colorTheme.getThemes();
+ ```
+ 
+ For more information about [ColorTheme](../api/classes/molecule.ColorThemeService) operations, please refer to [API](../api/classes/molecule.ColorThemeService).
++
++### Get the current theme
++
++We can get the current Color Theme via the [getCurrentTheme](../api/classes/molecule.ColorThemeService#getcurrenttheme) (or [getColorTheme](../api/classes/molecule.ColorThemeService#getcolortheme)) method:
++
++```ts
++const currentTheme = molecule.colorTheme.getCurrentTheme();
++```
++
++If you want to distinguish the `dark` mode from the `light` mode, for example, to change the theme of the [Ant Design](https://ant.design/) alongside Molecule, then use the [getColorScheme](../api/classes/molecule.ColorThemeService#getcolorscheme) method or the `type` property of the current theme, the value is one of the [ColorScheme](../api/enums/molecule.model.ColorScheme) (`dark`, `light`, `hc`):
++
++```ts
++import { ColorScheme } from '@dtinsight/molecule/esm/model';
++
++const currentTheme = molecule.colorTheme.getCurrentTheme();
++if (currentTheme.type === ColorScheme.DARK) {
++    // Same as `molecule.colorTheme.getColorScheme() === ColorScheme.DARK`
++    changeAntDesignTheme();
++}
++```
++
++:::tip
++The color scheme is inferred from the `uiTheme` (`vs` means `light`, `vs-dark` means `dark`) of the theme when the theme doesn't declare the `type` field, which is common in the VSCode theme extensions.
++:::
++
++Also, the current Color Theme could be changed by the user at runtime (e.g. via the **Color Theme Panel** opened by the shortcut key `Command/Ctrl + K`), so to keep the other UI libraries' theme synchronized with Molecule, listen to the [onChangeTheme](../api/classes/molecule.ColorThemeService#onchangetheme) event:
++
++```ts
++molecule.colorTheme.onChangeTheme((prevTheme, nextTheme) => {
++    if (nextTheme.type === ColorScheme.DARK) {
++        changeAntDesignTheme();
++    }
++});
++```
+diff --git a/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md b/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+index ccd09a3..d715ddc 100644
+--- a/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
++++ b/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+@@ -245,3 +245,37 @@ molecule.colorTheme.getThemes();
+ ```
+ 
+ 更多有关 [ColorTheme](../api/classes/molecule.ColorThemeService) 的操作，请参考[API](../api/classes/molecule.ColorThemeService)。
++
++### 获取当前的主题
++
++我们可以通过 [getCurrentTheme](../api/classes/molecule.ColorThemeService#getcurrenttheme)（或者 [getColorTheme](../api/classes/molecule.ColorThemeService#getcolortheme)）方法获取当前的颜色主题：
++
++```ts
++const currentTheme = molecule.colorTheme.getCurrentTheme();
++```
++
++如果要区分 `dark`（暗黑）模式与 `light`（明亮）模式，例如随之切换 [Ant Design](https://ant.design/) 的主题，则可以使用 [getColorScheme](../api/classes/molecule.ColorThemeService#getcolorscheme) 方法或者当前主题的 `type` 属性，它的值是 [ColorScheme](../api/enums/molecule.model.ColorScheme)（`dark`、`light`、`hc`）之一：
++
++```ts
++import { ColorScheme } from '@dtinsight/molecule/esm/model';
++
++const currentTheme = molecule.colorTheme.getCurrentTheme();
++if (currentTheme.type === ColorScheme.DARK) {
++    // 等同于 `molecule.colorTheme.getColorScheme() === ColorScheme.DARK`
++    changeAntDesignTheme();
++}
++```
++
++:::tip
++当主题没有声明 `type` 字段时（这在 VSCode 的主题扩展中很常见），Molecule 会根据主题的 `uiTheme`（`vs` 表示 `light`，`vs-dark` 表示 `dark`）推断出主题的颜色模式。
++:::
++
++另外，当前的颜色主题可能会在运行时被用户改变（例如通过快捷键 `Command/Ctrl + K` 打开的**颜色主题面板**），因此如果要让其它 UI 组件库的主题与 Molecule 保持同步，可以监听 [onChangeTheme](../api/classes/molecule.ColorThemeService#onchangetheme) 事件：
++
++```ts
++molecule.colorTheme.onChangeTheme((prevTheme, nextTheme) => {
++    if (nextTheme.type === ColorScheme.DARK) {
++        changeAntDesignTheme();
++    }
++});
++```

@@ -1,0 +1,200 @@
+test/scapy/layers/dns.uts
+test/scapy/layers/dns_dnssec.uts
+test/scapy/layers/dns_edns0.uts
+test/scapy/layers/dot11.uts
+test/scapy/layers/dot15d4.uts
+test/scapy/layers/eap.uts
+test/scapy/layers/hsrp.uts
+test/scapy/layers/http.uts
+test/scapy/layers/inet.uts
+test/scapy/layers/inet6.uts
+test/scapy/layers/ipsec.uts
+test/scapy/layers/isakmp.uts
+test/scapy/layers/l2.uts
+test/scapy/layers/l2tp.uts
+test/scapy/layers/ldap.uts
+test/scapy/layers/llmnr.uts
+test/scapy/layers/lltd.uts
+test/scapy/layers/mgcp.uts
+test/scapy/layers/mobileip.uts
+test/scapy/layers/netbios.uts
+test/scapy/layers/netflow.uts
+test/scapy/layers/ntp.uts
+test/scapy/layers/pflog.uts
+test/scapy/layers/ppp.uts
+test/scapy/layers/pptp.uts
+test/scapy/layers/radius.uts
+test/scapy/layers/rip.uts
+test/scapy/layers/rtp.uts
+test/scapy/layers/sctp.uts
+test/scapy/layers/skinny.uts
+test/scapy/layers/smb.uts
+test/scapy/layers/smb2.uts
+test/scapy/layers/snmp.uts
+test/scapy/layers/tftp.uts
+test/scapy/layers/usb.uts
+test/scapy/layers/vrrp.uts
+test/scapy/layers/vxlan.uts
+test/scapy/layers/x509.uts
+test/answering_machines.uts
+test/bpf.uts
+test/cert.uts
+test/fields.uts
+test/imports.uts
+test/linux.uts
+test/nmap.uts
+test/p0f.uts
+test/p0fv2.uts
+test/pipetool.uts
+test/random.uts
+test/regression.uts
+test/sendsniff.uts
+test/sslv2.uts
+test/tftp.uts
+test/tls.uts
+test/tls13.uts
+test/tuntap.uts
+test/windows.uts
+
+
+^C
+$ cd /workspace/scapy && head -40 test/random.uts; echo ====; grep -c "" test/random.uts
+% Regression tests for Scapy random objects
+
+############
+############
++ Random objects
+
+= RandomEnumeration
+
+ren = RandomEnumeration(0, 7, seed=0x2807, forever=False)
+[x for x in ren] == ([3, 4, 2, 5, 1, 6, 0, 7] if six.PY2 else [5, 0, 2, 7, 6, 3, 1, 4])
+
+= RandIP6
+
+random.seed(0x2807)
+r6 = RandIP6()
+assert(r6 == ("d279:1205:e445:5a9f:db28:efc9:afd7:f594" if six.PY2 else
+              "240b:238f:b53f:b727:d0f9:bfc4:2007:e265"))
+assert(r6.command() == "RandIP6()")
+
+random.seed(0x2807)
+r6 = RandIP6("2001:db8::-")
+assert(r6 == ("2001:0db8::e445" if six.PY2 else "2001:0db8::b53f"))
+assert(r6.command() == "RandIP6(ip6template='2001:db8::-')")
+
+r6 = RandIP6("2001:db8::*")
+assert(r6 == ("2001:0db8::efc9" if six.PY2 else "2001:0db8::bfc4"))
+assert(r6.command() == "RandIP6(ip6template='2001:db8::*')")
+
+= RandMAC
+
+random.seed(0x2807)
+rm = RandMAC()
+assert(rm == ("d2:12:e4:5a:db:ef" if six.PY2 else "24:23:b5:b7:d0:bf"))
+assert(rm.command() == "RandMAC()")
+
+rm = RandMAC("00:01:02:03:04:0-7")
+assert(rm == ("00:01:02:03:04:05" if six.PY2 else "00:01:02:03:04:01"))
+assert(rm.command() == "RandMAC(template='00:01:02:03:04:0-7')")
+
+
+====
+136
+# think: Running focused final test suites
+Your thought has been logged.
+$ cd /workspace/scapy && timeout 600 python -m scapy.tools.UTscapy -t "test/scapy/layers/rtp.uts" -t "test/fields.uts" -t "test/random.uts" -t "test/scapy/layers/skinny.uts" -t "test/scapy/layers/mgcp.uts" -F -K tcpdump -K needs_root -K manufdb 2>&1 | grep -E "PASSED=|FAILED=|^failed" | tail -8
+PASSED=3 FAILED=0
+PASSED=128 FAILED=0
+PASSED=11 FAILED=0
+PASSED=1 FAILED=0
+PASSED=2 FAILED=0
+$ cd /workspace/scapy && timeout 900 python -m scapy.tools.UTscapy -t "test/regression.uts" -t "test/imports.uts" -F -K tcpdump -K needs_root -K ipv6 -K manufdb 2>&1 | grep -E "PASSED=|FAILED=|^failed" | tail -6
+PASSED=257 FAILED=0
+PASSED=4 FAILED=0
+$ cd /workspace/scapy && python -m py_compile scapy/layers/rtp.py && echo "compiles OK" && git status --short && git --no-pager diff --stat
+compiles OK
+ M scapy/layers/rtp.py
+?? nmap-os-fingerprintsRJ5P7b
+ scapy/layers/rtp.py | 426 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 425 insertions(+), 1 deletion(-)
+$ cd /workspace/scapy && rm -f nmap-os-fingerprintsRJ5P7b && git status --short && find . -name "__pycache__" -path "./scapy/layers/*" | head -3; rm -rf scapy/layers/__pycache__ 2>/dev/null; git status --short
+M scapy/layers/rtp.py
+./scapy/layers/tls/crypto/__pycache__
+./scapy/layers/tls/__pycache__
+./scapy/layers/__pycache__
+ M scapy/layers/rtp.py
+$ cd /workspace/scapy && python -c "
+$ from scapy.all import RTCP, RTCPSenderReport, RTCPReceiverReport, RTCPSourceDescription, RTCPGoodbye, RTCPApplicationDefined, RTCPReportBlock, RTCPSdesChunk, RTCPSdesItem
+$ from scapy.compat import raw
+$ p = RTCP()/RTCPSenderReport(ssrc=1)/RTCPSourceDescription(chunks=[RTCPSdesChunk(ssrc=1, items=[RTCPSdesItem(type='CNAME', value=b'scapy')])])/RTCPGoodbye(srcs=[1])
+$ d = raw(p)
+$ q = RTCP(d)
+$ assert raw(q) == d
+$ q.show()
+$ print('FINAL SMOKE TEST OK')
+$ "
+###[ RTCP Sender Report ]###
+  version   = 2
+  padding   = 0
+  report_count= 0
+  packet_type= Sender Report
+  length    = 6
+  ssrc      = 1
+  ntp_timestamp= 0
+  rtp_timestamp= 0
+  packet_count= 0
+  octet_count= 0
+  \report_blocks\
+###[ RTCP Source Description ]###
+     version   = 2
+     padding   = 0
+     report_count= 1
+     packet_type= Source Description
+     length    = 3
+     \chunks    \
+      |###[ RTCP SDES Chunk ]###
+      |  ssrc      = 1
+      |  \items     \
+      |   |###[ RTCP SDES Item ]###
+      |   |  type      = CNAME
+      |   |  length    = 5
+      |   |  value     = 'scapy'
+      |   |###[ RTCP SDES Item ]###
+      |   |  type      = END
+###[ RTCP Goodbye ]###
+        version   = 2
+        padding   = 0
+        report_count= 1
+        packet_type= Goodbye
+        length    = 1
+        srcs      = [1]
+        reason    = None
+
+FINAL SMOKE TEST OK
+# finish: Implemented RTCP support in scapy/layers/rtp.py
+## Final Report
+
+**Checklist: 1 issue found → 1 issue DONE, 0 BLOCKED.**
+
+### Issue 1 (#3460): RTCP packet support — ✅ DONE
+
+All changes are confined to **`scapy/layers/rtp.py`** (non-test source only; no test files, CI, templates or lockfiles touched).
+
+**Added RTCP layers (RFC 3550 §6):**
+- `RTCP` — the common RTCP header (version/padding/report_count/packet_type/length) with:
+  - `dispatch_hook` on the PT byte → dispatches to the right subclass on dissection, `match_subclass = True` so `RTCP in pkt` / `pkt[RTCP]` work on sub-classes
+  - auto-computed `length` (32-bit words − 1, never counting the RTCP packets stacked after it)
+  - RFC-compliant padding (P bit + octet count in the last octet) on build, padding dropped on dissection but faithfully restored on rebuild
+  - `guess_payload_class` chaining, so compound RTCP datagrams (SR/SDES/BYE/APP stacked in one UDP datagram) dissect as a stack; `RTCP()` can also be used as a compound-packet marker
+- `RTCPSenderReport` (SR, PT 200), `RTCPReceiverReport` (RR, PT 201), `RTCPSourceDescription` (SDES, PT 202) + `RTCPSdesChunk` + `RTCPSdesItem` (all 8 SDES item types, null-terminator & 32-bit chunk alignment), `RTCPGoodbye` (BYE, PT 203, multiple SSRCs + optional reason that round-trips exactly), `RTCPApplicationDefined` (APP, PT 204, subtype + 4-byte name + data)
+- `RTCPReportBlock` (fraction lost, 24-bit cumulative lost, extended highest seqnum, jitter, LSR, DLSR)
+- Helpers/enums: `rtcp_packet_types`, `rtcp_sdes_item_types`, `rtcp_packet_classes`, `rtcp_packet_type()` and aliases `RTCPSR/RTCPRR/RTCPSDES/RTCPBYE/RTCPAPP`; module docstring documents the optional `bind_layers(UDP, RTCP, dport=XXX)` (consistent with RTP, which is also unbound by design)
+
+### Verification
+- 105-assertion reproduction script (build/dissect/round-trip for all 5 types, report blocks, multi-chunk SDES, BYE reason absence/presence, all padding permutations incl. padded packet followed by another packet, unknown PT, IP/UDP encapsulation, fuzz, summaries): **105/105 passed**; a second realistic 5-packet compound datagram script passed all checks. Scratch scripts removed afterwards.
+- Robustness: 400 fuzz iterations + 5000 random mutations → no unexpected exceptions (only scapy's standard `struct.error` for top-level truncated input, identical to `IP(b"\x45\x00")`).
+- Repo tests after the change: `rtp.uts` 3/3, `fields.uts` 128/128, `random.uts` 11/11, `skinny.uts` 1/1, `mgcp.uts` 2/2, `imports.uts` 4/4, `inet.uts` 44/44, `regression.uts` 257/257 (with `-K manufdb`; the single manuf-DB/network failure is **pre-existing** — verified identical on the unmodified tree via `git stash`).
+- `python -m py_compile` clean; no new flake8 line-length/trailing-whitespace issues; Python 2.7-safe syntax (this scapy release still supports py2).
+
+**Blocked issues: none.**

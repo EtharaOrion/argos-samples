@@ -1,0 +1,200 @@
+All SVG signature checks passed for 63 tags
+......................................................................   [100%]
+70 passed, 1 deselected in 0.31s
+FAILED tests/test_forms.py::test_form_sync_check - AssertionError: assert [{'type': 'in...'Hello', ...}] == [{'type': 'in...'H...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 7 passed in 0.27s
+# file_editor: /tmp/differential.py
+File created successfully at: /tmp/differential.py
+$ cd /tmp && python /tmp/differential.py > /tmp/out_pristine.txt 2>&1; PYTHONPATH=/workspace/air/src python /tmp/differential.py > /tmp/out_new.txt 2>&1; diff /tmp/out_pristine.txt /tmp/out_new.txt && echo "IDENTICAL OUTPUT"
+IDENTICAL OUTPUT
+$ cd /tmp && cat >> /tmp/differential.py <<'EOF'
+$ 
+$ print(air.A("x", href="/", type="text/html", referrerpolicy="no-referrer").render())
+$ print(air.Label("Name", for_="name").render())
+$ print(air.Img(src="a.png", height=10, srcset="b.png 2x", usemap="#m").render())
+$ print(air.Embed(src="a.swf", type="app", width=10, height=20).render())
+$ print(air.Bdo("txt", dir="rtl").render())
+$ print(air.Form(air.Input(name="n"), action="/", accept_charset="utf-8").render())
+$ EOF
+$ python /tmp/differential.py 2>&1 | tail -6; echo "--- new ---"; PYTHONPATH=/workspace/air/src python /tmp/differential.py 2>&1 | tail -6
+cd /tmp && cat >> /tmp/differential.py <<'EOF'
+print(air.A("x", href="/", type="text/html", referrerpolicy="no-referrer").render())
+print(air.Label("Name", for_="name").render())
+print(air.Img(src="a.png", height=10, srcset="b.png 2x", usemap="#m").render())
+print(air.Embed(src="a.swf", type="app", width=10, height=20).render())
+print(air.Bdo("txt", dir="rtl").render())
+print(air.Form(air.Input(name="n"), action="/", accept_charset="utf-8").render())
+EOF
+
+
+
+python /tmp/differential.py 2>&1 | tail -6; echo "--- new ---"; PYTHONPATH=/workspace/air/src python /tmp/differential.py 2>&1 | tail -6
+$ cd /tmp && python /tmp/differential.py 2>&1 | tail -6; echo "--- new ---"; PYTHONPATH=/workspace/air/src python /tmp/differential.py 2>&1 | tail -6
+<a href="/">x</a>
+<label>Name</label>
+<img src="a.png" />
+<embed src="a.swf" />
+<bdo>txt</bdo>
+<form action="/"><input name="n" /></form>
+--- new ---
+<a href="/" type="text/html" referrerpolicy="no-referrer">x</a>
+<label for="name">Name</label>
+<img src="a.png" height="10" srcset="b.png 2x" usemap="#m" />
+<embed src="a.swf" type="app" width="10" height="20" />
+<bdo dir="rtl">txt</bdo>
+<form action="/" accept-charset="utf-8"><input name="n" /></form>
+$ cd /workspace/air && rm -f /tmp/differential.py /tmp/out_pristine.txt /tmp/out_new.txt /tmp/verify_svg.py && git add -A && git status --short && git -c user.name=openhands -c user.email=openhands@all-hands.dev commit -q -m "Add function signatures to all Air SVG tags
+$ 
+$ Every SVG tag now has a documented, typed keyword-only signature covering the
+$ attributes that element supports (issue #55).
+$ 
+$ Because tag attributes were previously filtered through the HTML_ATTRIBUTES
+$ table in air/tags/config.py, which is keyed by class name, SVG tags could not
+$ use it: A, Script, and Style exist in both the HTML and SVG namespaces, and any
+$ attribute missing from the table was silently dropped. locals_cleanup now
+$ derives attributes directly from the signature, and the table is removed.
+$ 
+$ Co-authored-by: openhands <openhands@all-hands.dev>" && git --no-pager log --oneline -2 && git --no-pager show --stat --oneline HEAD | tail -6
+cd /workspace/air && rm -f /tmp/differential.py /tmp/out_pristine.txt /tmp/out_new.txt /tmp/verify_svg.py && git add -A && git status --short && git -c user.name=openhands -c user.email=openhands@all-hands.dev commit -q -m "Add function signatures to all Air SVG tags
+Every SVG tag now has a documented, typed keyword-only signature covering the
+attributes that element supports (issue #55).
+Because tag attributes were previously filtered through the HTML_ATTRIBUTES
+table in air/tags/config.py, which is keyed by class name, SVG tags could not
+use it: A, Script, and Style exist in both the HTML and SVG namespaces, and any
+attribute missing from the table was silently dropped. locals_cleanup now
+derives attributes directly from the signature, and the table is removed.
+Co-authored-by: openhands <openhands@all-hands.dev>" && git --no-pager log --oneline -2 && git --no-pager show --stat --oneline HEAD | tail -6
+A  AGENTS.md
+D  src/air/tags/config.py
+M  src/air/tags/models/stock.py
+M  src/air/tags/models/svg.py
+M  src/air/tags/utils.py
+738a761 (HEAD) Add function signatures to all Air SVG tags
+ded401a Update changelog for 0.22.1
+ AGENTS.md                    |   68 ++
+ src/air/tags/config.py       |  366 -------
+ src/air/tags/models/stock.py |    4 +-
+ src/air/tags/models/svg.py   | 2226 ++++++++++++++++++++++++++++++++++++++----
+ src/air/tags/utils.py        |   45 +-
+ 5 files changed, 2139 insertions(+), 570 deletions(-)
+$ cd /workspace/air && python -m pytest tests -q -p no:randomly --deselect tests/test_forms.py::test_form_sync_check 2>&1 | tail -3 && git --no-pager show --stat HEAD | grep -c "tests/" ; echo "test files touched: $?"
+......................................................................   [100%]
+70 passed, 1 deselected in 0.31s
+0
+test files touched: 1
+$ cd /workspace/air && git --no-pager show --stat HEAD | head -12 && sed -n 1,60p src/air/tags/utils.py
+commit 738a7610ed6aacad188d254c8a2405a8e25c0ea9
+Author: openhands <openhands@all-hands.dev>
+Date:   Sat Sep 5 12:38:00 2026 +0000
+
+    Add function signatures to all Air SVG tags
+
+    Every SVG tag now has a documented, typed keyword-only signature covering the
+    attributes that element supports (issue #55).
+
+    Because tag attributes were previously filtered through the HTML_ATTRIBUTES
+    table in air/tags/config.py, which is keyed by class name, SVG tags could not
+    use it: A, Script, and Style exist in both the HTML and SVG namespaces, and any
+from typing import Any
+
+
+def clean_html_attr_key(key: str) -> str:
+    """Clean up HTML attribute keys to match the standard W3C HTML spec.
+
+    Args:
+        key: An uncleaned HTML attribute key
+
+    Returns:
+
+        Cleaned HTML attribute key
+    """
+    # If a "_"-suffixed proxy for a Python keyword or builtin is used,
+    # convert it to its normal HTML/SVG equivalent.
+    key = dict(
+        class_="class",
+        for_="for",
+        id_="id",
+        as_="as",
+        in_="in",
+        from_="from",
+    ).get(key, key)
+    # Remove leading underscores and replace underscores with dashes
+    return key.lstrip("_").replace("_", "-")
+
+
+class SafeStr(str):
+    """A string subclass that doesn't trigger html.escape() when called by Tag.render()
+
+    Example:
+        sample = SafeStr('Hello, world')
+    """
+
+    def __new__(cls, value):
+        obj = super().__new__(cls, value)
+        return obj
+
+    def __repr__(self):
+        return super().__repr__()
+
+
+def locals_cleanup(local_data: dict[str, Any], obj: Any = None) -> dict[str, Any]:
+    """Converts the named arguments of a tag's signature into tag attributes.
+
+    Every named argument of a tag's `__init__` that has been set to something
+    other than `None` becomes an attribute of the rendered tag. Machinery
+    arguments (`self`, `children`, `kwargs`, and the `__class__` cell added by
+    zero-argument `super()` calls) are dropped.
+
+    Args:
+        local_data: The result of calling `locals()` inside a tag's `__init__`.
+        obj: The tag instance. Unused, kept for backwards compatibility.
+
+    Returns:
+
+        Dictionary of attribute names and their values
+    """
+    return {
+        key: value
+$ cd /workspace/air && python -m pytest tests -q -p no:randomly --deselect tests/test_forms.py::test_form_sync_check 2>&1 | tail -2 && PYTHONPATH=src python -c "
+$ import inspect, air
+$ n = sum(1 for k,v in vars(air.svg).items() if inspect.isclass(v) and issubclass(v, air.svg.CaseTag) and v is not air.svg.CaseTag and [p for p in inspect.signature(v.__init__).parameters if p not in ('self','children','kwargs')])
+$ print('SVG tags with signatures:', n)
+$ print(air.svg.A('Docs', href='/docs', target='_blank').render())
+$ print(air.svg.Rect(x=1, y=2, width=3, height=4, rx=1).render())
+$ " && git status --short && echo CLEAN
+......................................................................   [100%]
+70 passed, 1 deselected in 0.31s
+SVG tags with signatures: 63
+<a href="/docs" target="_blank">Docs</a>
+<rect x="1" y="2" width="3" height="4" rx="1"></rect>
+CLEAN
+## Final tally
+
+**Checklist: 1 issue found** — Issue 1 (#55): "Add function signatures to Air SVG Tags", containing 63 tag sub-items (A … View).
+
+- **Addressed: 1 of 1 issue (all 63 tag sub-items DONE).**
+- **BLOCKED: 0.**
+
+## What was wrong
+
+All 63 classes in `src/air/tags/models/svg.py` were bare `class X(CaseTag): pass` declarations — no signatures, no attribute documentation (confirmed with a reproduction script: "63 svg tags without signatures").
+
+Adding signatures was blocked by the existing plumbing: `locals_cleanup()` decided which named arguments became rendered attributes by looking the class name up in the `HTML_ATTRIBUTES` table in `src/air/tags/config.py`. Consequences:
+- any parameter absent from the table was **silently dropped** (so `svg.Circle(cx=1)` would have rendered `<circle></circle>`);
+- the table is keyed by bare class name, and `A`, `Script`, and `Style` exist in *both* the HTML and SVG namespaces, so SVG could never have its own entries;
+- it was already dropping legitimate HTML attributes: `A.type`, `A.referrerpolicy`, `Label.for_`, `Img.height/srcset/sizes/usemap`, `Embed.type/width/height`, `Bdo.dir`, `Form.accept_charset`, `Object.classid/codebase`, `U.compact/type`.
+
+## Changes (no test-tree paths touched)
+
+1. **`src/air/tags/models/svg.py`** — all 63 SVG tags now have typed, keyword-only signatures with Google-style `Args:` docstrings, built from each element's MDN attribute set (e.g. `Circle(cx, cy, r, pathLength)`, `FeComposite(in_, in2, operator, k1–k4, x, y, width, height, result)`, `Marker(markerWidth, markerHeight, markerUnits, orient, refX, refY, preserveAspectRatio, viewBox)`, `Animate(attributeName, …, from_, to, by, additive, accumulate)`), each ending with `class_`, `id`, `style`, `**kwargs`. Class names and their original one-line summaries are unchanged; global/presentation attributes (`fill`, `stroke`, `transform`, …) continue to flow through `**kwargs`.
+2. **`src/air/tags/utils.py`** — `locals_cleanup()` now derives attributes from the signature itself (all non-`None` named args, minus `self`/`children`/`kwargs`/`__class__`), so nothing is silently dropped and duplicate class names are a non-issue. `clean_html_attr_key()` gained `in_ → in` and `from_ → from` so SVG filter/animation attributes that clash with Python keywords render correctly.
+3. **`src/air/tags/config.py`** — deleted; the table had no remaining consumers and could not represent duplicate tag names (leaving it would also have broken the repo's `fail_under = 100` coverage gate).
+4. **`src/air/tags/models/stock.py`** — moved `Input`'s `name` parameter (signature + docstring line) so rendered attribute order is byte-identical to before (`<input type="text" name="name" id="name" />`), which existing form tests assert.
+5. **`AGENTS.md`** — new persistent notes: tag-signature conventions, the attribute-ordering rule (kwargs first, then signature order), the trailing-underscore key mapping, why `config.py` was removed, and the pre-existing pydantic-URL test failure.
+
+## Verification
+
+- Generated check over all 63 tags (temp script; `tests/` is off-limits): signature present, every parameter documented, `class_`/`id`/`style` present, every parameter actually rendered in signature order, correct key mapping (`in_`→`in`, `from_`→`from`, `stop_color`→`stop-color`, camelCase such as `viewBox`/`stdDeviation` preserved), and empty renders unchanged (`<circle></circle>`, `<a></a>`, `<animateMotion>…`).
+- Differential render of ~30 HTML/SVG expressions against the pristine installed copy: **byte-identical output**, except the previously-dropped HTML attributes, which now render correctly.
+- `pytest tests`: **70 passed**, exactly matching the baseline. The single failure, `tests/test_forms.py::test_form_sync_check`, fails identically before my changes (it pins an older pydantic error URL) and is unrelated to tags.

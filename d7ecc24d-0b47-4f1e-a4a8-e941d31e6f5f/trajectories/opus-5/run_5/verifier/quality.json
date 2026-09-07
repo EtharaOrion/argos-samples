@@ -1,0 +1,97 @@
+{
+  "version": {
+    "quality": "quality-v1",
+    "prompt_digest": "6169e82413340627",
+    "manifest_digest": "d55b59e374bfca48"
+  },
+  "task_uuid": "d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f",
+  "model": "opus-5",
+  "run_id": "run_5",
+  "status": "scored",
+  "calibrated": false,
+  "judge": {
+    "member": "gpt-5.6-sol",
+    "model": "openai/responses/gpt-5.6-sol"
+  },
+  "patch": {
+    "source": "git",
+    "sha256": "e8843aeac09d2bff2ad0e127a707f69a315869b5efea3c75073cbaa5edafebb0",
+    "bytes": 130269,
+    "truncated": false
+  },
+  "evidence_digest": "b45f970e357db86b",
+  "quality_fingerprint": "2c562ae3b575b8c2",
+  "score": 0.8571,
+  "counts": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "undecided": 0
+  },
+  "reasons": [],
+  "items": [
+    {
+      "id": "Q1",
+      "dimension": "conventions",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The SVG constructors follow the existing tag-model pattern of typed keyword attributes, `*children`, `**kwargs`, and delegation to `super().__init__`, while imports are ordered with standard-library imports before relative imports. The updated `locals_cleanup` call convention is applied consistently throughout the existing stock tags and all new SVG tags.",
+      "evidence_ref": "`src/air/tags/models/svg.py`, hunk `@@ -1,3 +1,6 @@` and class `A`: `from typing import Any`, then relative imports, and `super().__init__(*children, **kwargs | locals_cleanup(locals()))`; `src/air/tags/models/stock.py`, repeated constructor hunks use the same helper pattern."
+    },
+    {
+      "id": "Q2",
+      "dimension": "minimal_diff",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": false,
+      "rationale": "The diff includes unrelated edits in the HTML stock tags, notably reordering `Input` parameters/docstrings and correcting the `Object` docstring, neither of which is required to add SVG tag signatures.",
+      "evidence_ref": "`src/air/tags/models/stock.py`, hunks around `class Input` (`name` reordered after `type`/`value`) and `class Object` (`classidcodebase` documentation split into `classid` and `codebase`)."
+    },
+    {
+      "id": "Q3",
+      "dimension": "abstraction",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The change reuses and generalizes the existing `locals_cleanup` helper for both stock and SVG tag constructors rather than duplicating argument-filtering logic, and it adds no new abstraction layer beyond that established helper.",
+      "evidence_ref": "`src/air/tags/utils.py`, hunk `@@ -33,12 +40,22 @@`, and `src/air/tags/models/svg.py`, hunk `@@ -10,378 +13,2224 @@`: constructors consistently delegate with `super().__init__(*children, **kwargs | locals_cleanup(locals()))`."
+    },
+    {
+      "id": "Q4",
+      "dimension": "readability",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added SVG constructors follow a uniform, shallow pattern of explicit parameters followed by a single delegation call, while `locals_cleanup` uses a concise comprehension and a comment that explains the non-obvious `__class__` exclusion. No changed function introduces nested control flow or combines multiple responsibilities.",
+      "evidence_ref": "`src/air/tags/models/svg.py` hunk at `class A` and subsequent tag classes; `src/air/tags/utils.py` hunk at `locals_cleanup`, especially `skipped = (\"self\", \"children\", \"kwargs\", \"__class__\")` and the filtering comprehension."
+    },
+    {
+      "id": "Q5",
+      "dimension": "naming",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added SVG constructor parameters use the official SVG attribute vocabulary and casing (for example, `preserveAspectRatio`, `viewBox`, and `keyTimes`), while Python-keyword proxies such as `in_` and `from_` are named consistently with existing proxies. The revised utility also uses descriptive names such as `local_data` and `skipped`.",
+      "evidence_ref": "`src/air/tags/models/svg.py`, hunk `@@ -10,378 +13,2224 @@`; `src/air/tags/utils.py`, hunk `@@ -33,12 +40,22 @@`"
+    },
+    {
+      "id": "Q6",
+      "dimension": "idiomaticity",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The SVG constructors follow the repository\u2019s existing tag pattern: typed keyword-only attributes are collected with `locals_cleanup(locals())`, merged with `**kwargs`, and passed to `super().__init__`; Python-reserved SVG names use the established trailing-underscore proxy convention.",
+      "evidence_ref": "`src/air/tags/models/svg.py`, `class A` hunk: `super().__init__(*children, **kwargs | locals_cleanup(locals()))`; `src/air/tags/utils.py`, `clean_html_attr_key` hunk maps `in_`/`from_` to SVG attribute names."
+    },
+    {
+      "id": "Q7",
+      "dimension": "dead_code",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added SVG constructors and imports are used, and the revised `locals_cleanup` implementation is called by those constructors and explicitly excludes entries that `locals()` actually contains. The diff adds no unused declarations, unreachable branches, commented-out implementation, debugging leftovers, or speculative guards.",
+      "evidence_ref": "src/air/tags/utils.py, `locals_cleanup` hunk: `skipped = (\"self\", \"children\", \"kwargs\", \"__class__\")` followed by the filtering comprehension; src/air/tags/models/svg.py, import/constructor hunks: `from typing import Any`, `from ..utils import locals_cleanup`, and `super().__init__(*children, **kwargs | locals_cleanup(locals()))`"
+    }
+  ]
+}

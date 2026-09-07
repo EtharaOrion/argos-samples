@@ -1,0 +1,200 @@
+ }
+
++/**
++ * Get the type of the specific color theme, the type is used to
++ * distinguish the dark theme, the light theme and the high contrast theme.
++ *
++ * The `uiTheme` property has a higher priority than the `type` property,
++ * because the `uiTheme` decides the colors that Molecule applied really.
++ * If both of them are invalid, then the theme is in dark mode by default.
++ * @param theme The color theme object
++ * @returns The type of the color theme
++ */
++export function getThemeType(theme: IColorTheme): ColorThemeType {
++    const uiTheme = (theme.uiTheme || '').toLowerCase();
++    if (uiTheme) {
++        if (/^hc/.test(uiTheme)) {
++            return ColorScheme.HIGH_CONTRAST;
++        } else if (uiTheme.indexOf('dark') > -1) {
++            return ColorScheme.DARK;
++        } else if (uiTheme.indexOf('light') > -1 || /^vs/.test(uiTheme)) {
++            return ColorScheme.LIGHT;
++        }
++    }
++
++    const type = (theme.type || '').toLowerCase();
++    if (type) {
++        if (/^hc/.test(type)) {
++            return ColorScheme.HIGH_CONTRAST;
++        } else if (type.indexOf('light') > -1) {
++            return ColorScheme.LIGHT;
++        }
++        return ColorScheme.DARK;
++    }
++
++    // Molecule is in dark mode by default
++    return ColorScheme.DARK;
++}
++
+ export function getThemeData(
+     theme: IColorTheme
+ ): MonacoEditor.IStandaloneThemeData {
+# file_editor: /workspace/molecule/src/services/theme/colorThemeService.ts
+NOTE: We only show up to 223 since there're only 223 lines in this file.
+Here's the result of running `cat -n` on /workspace/molecule/src/services/theme/colorThemeService.ts:
+   100	    label: 'Default Dark+',
+   101	    uiTheme: 'vs-dark',
+   102	    type: ColorScheme.DARK,
+   103	};
+   104	/**
+   105	 * @ignore
+   106	 */
+   107	export const DEFAULT_THEME_CLASS_NAME = prefixClaName('customize-theme');
+   108	
+   109	@singleton()
+   110	export class ColorThemeService
+   111	    extends GlobalEvent
+   112	    implements IColorThemeService
+   113	{
+   114	    private colorThemes: IColorTheme[] = [BuiltInColorTheme];
+   115	    private colorTheme: IColorTheme = BuiltInColorTheme;
+   116	
+   117	    constructor() {
+   118	        super();
+   119	        if (this.colorTheme) {
+   120	            this.setTheme(this.colorTheme.id);
+   121	        }
+   122	    }
+   123	
+   124	    public addThemes(themes: IColorTheme | IColorTheme[]): void {
+   125	        const nextThemes = Array.isArray(themes) ? themes : [themes];
+   126	        nextThemes.forEach((theme) => {
+   127	            const targetTheme = this.getThemeById(theme.id);
+   128	            if (targetTheme) {
+   129	                logger.warn(
+   130	                    `There has ${theme.name} already in theme, it'll update this theme otherwise please don't add the duplicated theme`
+   131	                );
+   132	                this.updateTheme(theme);
+   133	            } else {
+   134	                this.colorThemes.push(Object.assign({}, theme));
+   135	            }
+   136	        });
+   137	    }
+   138	
+   139	    public updateTheme(theme: IColorTheme) {
+   140	        if (!theme.id) {
+   141	            logger.error(
+   142	                "Update the theme failed!  The 'id' is required in the theme data."
+   143	            );
+   144	        }
+   145	        const index = this.colorThemes.findIndex(searchById(theme.id));
+   146	        if (index > -1) {
+   147	            Object.assign(this.colorThemes[index], theme);
+   148	
+   149	            // If current theme be updated, then reload it
+   150	            if (this.colorThemes[index].id === this.getColorTheme().id) {
+   151	                this.reload();
+   152	            }
+   153	        } else {
+   154	            logger.error(
+   155	                `Update the theme failed! There is no theme found via '${theme.id}'`
+   156	            );
+   157	        }
+   158	    }
+   159	
+   160	    public getThemeById(id: string): IColorTheme | undefined {
+   161	        const target = this.colorThemes.find(searchById(id));
+   162	        return target ? Object.assign({}, target) : undefined;
+   163	    }
+   164	
+   165	    public getColorTheme(): IColorTheme {
+   166	        return Object.assign({}, this.colorTheme);
+   167	    }
+   168	
+   169	    /**
+   170	     * Get the current Color Theme, the returned theme contains
+   171	     * the `type` property, which is used to distinguish the dark
+   172	     * theme, the light theme and the high contrast theme.
+   173	     */
+   174	    public getCurrentTheme(): IColorTheme {
+   175	        return this.getColorTheme();
+   176	    }
+   177	
+   178	    /**
+   179	     * Get the type of the current Color Theme,
+   180	     * e.g. `ColorScheme.DARK`, `ColorScheme.LIGHT`, `ColorScheme.HIGH_CONTRAST`
+   181	     */
+   182	    public getThemeType(): ColorThemeType {
+   183	        return getThemeType(this.colorTheme);
+   184	    }
+   185	
+   186	    /**
+   187	     * Listen to the Color Theme change event
+   188	     */
+   189	    public onChangeTheme(callback: (theme: IColorTheme) => void): void {
+   190	        this.subscribe(ColorThemeEvent.OnChange, callback);
+   191	    }
+   192	
+   193	    public setTheme(id: string) {
+   194	        const theme = this.getThemeById(id);
+   195	        if (theme) {
+   196	            this.colorTheme = { ...theme, type: getThemeType(theme) };
+   197	            const themeData = getThemeData(theme);
+   198	            const styleSheetContent = convertToCSSVars(themeData.colors);
+   199	            applyStyleSheetRules(styleSheetContent, DEFAULT_THEME_CLASS_NAME);
+   200	
+   201	            // Update monaco-editor theme
+   202	            monacoEditor.defineTheme(DEFAULT_THEME_CLASS_NAME, themeData);
+   203	            monacoEditor.setTheme(DEFAULT_THEME_CLASS_NAME);
+   204	
+   205	            this.emit(ColorThemeEvent.OnChange, this.getColorTheme());
+   206	        } else {
+   207	            logger.error(`Can't get the theme by id:` + id);
+   208	        }
+   209	    }
+   210	
+   211	    public getThemes() {
+   212	        return this.colorThemes;
+   213	    }
+   214	
+   215	    public reload() {
+   216	        this.setTheme(this.getColorTheme().id);
+   217	    }
+   218	
+   219	    public reset() {
+   220	        this.colorThemes = [BuiltInColorTheme];
+   221	        this.setTheme(BuiltInColorTheme.id);
+   222	    }
+   223	}
+$ cd /workspace/molecule && git status --short && echo "--- untracked new file:" && ls -la src/services/theme/ && echo "--- confirm no test files modified:" && git --no-pager diff --name-only | grep -i "test\|__tests__\|stories" || echo "none"
+M src/model/colorTheme.ts
+ M src/molecule.api.ts
+ M src/services/index.ts
+ M src/services/theme/colorThemeService.ts
+ M src/services/theme/helper.ts
+ M website/docs/guides/extend-color-theme.md
+?? src/services/theme/themeService.ts
+--- untracked new file:
+total 44
+drwxr-xr-x. 2 openhands openhands    98 Sep  5 23:16 .
+drwxr-xr-x. 6 openhands openhands 16384 Sep  5 23:09 ..
+-rw-r--r--. 1 openhands openhands  7810 Sep  5 23:09 colorRegistry.ts
+-rw-r--r--. 1 openhands openhands  6772 Sep  5 23:20 colorThemeService.ts
+-rw-r--r--. 1 openhands openhands  4628 Sep  5 23:19 helper.ts
+-rw-r--r--. 1 openhands openhands  3954 Sep  5 23:17 themeService.ts
+--- confirm no test files modified:
+none
+# finish: Implemented current-theme/theme-type API for issue 627
+Addressed the single issue in the issue_description (#627: "How to get current theme?").
+
+Checklist: 1 issue found — 1 DONE, 0 BLOCKED.
+
+Implementation summary:
+- `src/services/theme/helper.ts`: new `getThemeType(theme)` helper resolving dark/light/high-contrast from `uiTheme` (priority) then `type`, defaulting to dark.
+- `src/model/colorTheme.ts`: new `ColorThemeType` string-literal union so `IColorTheme.type` accepts both the `ColorScheme` enum and raw VSCode theme JSON strings.
+- `src/services/theme/colorThemeService.ts`: added `getCurrentTheme()` (the exact API requested in the issue), `getThemeType()`, theme-type normalization in `setTheme()`, `ColorThemeEvent.OnChange` emission + `onChangeTheme()` (class now extends `GlobalEvent`), corrected the `getThemeById(): void` interface signature, and declared `type` on `BuiltInColorTheme`.
+- `src/services/theme/themeService.ts` (new): `IThemeService`/`ThemeService` facade exposing `getCurrentTheme`, `getThemeType`, `setColorTheme`, `onUpdateTheme`, theme CRUD and `isDarkTheme()`.
+- `src/services/index.ts` + `src/molecule.api.ts`: exported the service and exposed it as `molecule.theme`.
+- `website/docs/guides/extend-color-theme.md`: documented getting the current theme, distinguishing dark/light/hc, and subscribing to theme changes (the antd use case).
+
+Verification: temporary jest reproduction (created before the fix, confirmed failing, then passing — including edge cases for high-contrast, type-only, unknown and updated themes, built-in themes, and the `molecule.theme` public entry point) was run and then removed. Full repo suite: 96 suites / 704 tests passing; `tsc` clean for both tsconfig.json and tsconfig.build.json; eslint and prettier clean. No test files, stories, CI definitions, or lockfiles were modified.

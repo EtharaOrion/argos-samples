@@ -1,0 +1,97 @@
+{
+  "version": {
+    "quality": "quality-v1",
+    "prompt_digest": "6169e82413340627",
+    "manifest_digest": "d55b59e374bfca48"
+  },
+  "task_uuid": "46ab8719-a8fe-496f-95a5-42f3bc3def5d",
+  "model": "opus-5",
+  "run_id": "run_1",
+  "status": "scored",
+  "calibrated": false,
+  "judge": {
+    "member": "gpt-5.6-sol",
+    "model": "openai/responses/gpt-5.6-sol"
+  },
+  "patch": {
+    "source": "git",
+    "sha256": "0571d5d4e20798ca3537429839ac1a586c5b9f72bc9e126ffb30ee79c12b3a56",
+    "bytes": 11482,
+    "truncated": false
+  },
+  "evidence_digest": "60a2652a2302e0db",
+  "quality_fingerprint": "525ed6ee72e19deb",
+  "score": 0.8571,
+  "counts": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "undecided": 0
+  },
+  "reasons": [],
+  "items": [
+    {
+      "id": "Q1",
+      "dimension": "conventions",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": false,
+      "rationale": "The newly added enums use lowercase/camelCase member names, while the adjacent existing `ColorScheme` enum uses uppercase member names, so the naming style does not match the surrounding code.",
+      "evidence_ref": "src/model/colorTheme.ts hunk: existing `LIGHT`, `DARK`, and `HIGH_CONTRAST` contrast with added `ColorThemeMode.dark`, `ColorThemeMode.light`, and `ColorThemeEvent.onChange`."
+    },
+    {
+      "id": "Q2",
+      "dimension": "minimal_diff",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "Every hunk supports exposing or documenting the current color theme and its light/dark mode, including mode detection, service APIs, change notifications, and usage guidance; no unrelated files or formatting-only edits are shown.",
+      "evidence_ref": "src/services/theme/colorThemeService.ts hunks adding getColorThemeMode/onChange; src/common/color.ts adding color brightness detection; website/docs/guides/extend-color-theme.md documenting the new APIs"
+    },
+    {
+      "id": "Q3",
+      "dimension": "abstraction",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The diff centralizes color parsing and brightness detection in `src/common/color.ts` and reuses the existing `GlobalEvent` abstraction for theme-change notifications, rather than duplicating either concern or creating a new event layer. These abstractions directly support determining and reacting to the current theme mode.",
+      "evidence_ref": "`src/services/theme/colorThemeService.ts` hunk imports `colorLightOrDark` and extends `GlobalEvent`; `src/common/color.ts` contains the shared `convertToRGB` and `colorLightOrDark` logic."
+    },
+    {
+      "id": "Q4",
+      "dimension": "readability",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The new color conversion and theme-mode methods use short, shallow control flow with descriptive names, while comments primarily document supported formats, algorithm choice, and API intent rather than obscuring the implementation. The event emission and listener registration are also direct and easy to follow.",
+      "evidence_ref": "src/common/color.ts, new-file hunk (`convertToRGB` and `colorLightOrDark`); src/services/theme/colorThemeService.ts, hunks adding `getColorThemeMode`, `setTheme` event emission, and `onChange`"
+    },
+    {
+      "id": "Q5",
+      "dimension": "naming",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added APIs and supporting identifiers use descriptive theme/color vocabulary and consistent casing, such as `getColorThemeMode`, `ColorThemeMode`, `previousTheme`, `backgroundColor`, and `colorLightOrDark`; conventional `r`, `g`, and `b` names accurately identify RGB channels.",
+      "evidence_ref": "`src/services/theme/colorThemeService.ts` hunks adding `getColorThemeMode`, `setTheme` event emission, and `onChange`; `src/common/color.ts` hunk adding `IRGB`, `convertToRGB`, and `colorLightOrDark`."
+    },
+    {
+      "id": "Q6",
+      "dimension": "idiomaticity",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added TypeScript uses existing repository abstractions and conventions, notably extending `GlobalEvent` and calling its `emit`/`subscribe` methods rather than introducing a foreign event mechanism. It also uses standard TypeScript interfaces, enums, union types, and object spread consistently.",
+      "evidence_ref": "`src/services/theme/colorThemeService.ts`, hunks adding `ColorThemeService extends GlobalEvent`, `this.emit(...)`, and `this.subscribe(ColorThemeEvent.onChange, callback)`"
+    },
+    {
+      "id": "Q7",
+      "dimension": "dead_code",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "All added utilities, enums, imports, methods, and event plumbing are used by the theme-mode lookup or change notification paths; the color parsing guards implement the documented handling of unrecognized color values rather than leaving dead or speculative code.",
+      "evidence_ref": "src/common/color.ts, new-file hunk (convertToRGB and colorLightOrDark); src/services/theme/colorThemeService.ts, hunks adding getColorThemeMode, setTheme emission, and onChange subscription."
+    }
+  ]
+}

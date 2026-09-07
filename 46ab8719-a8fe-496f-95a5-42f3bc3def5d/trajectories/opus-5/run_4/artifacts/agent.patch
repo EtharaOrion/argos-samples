@@ -1,0 +1,333 @@
+diff --git a/src/common/color.ts b/src/common/color.ts
+new file mode 100644
+index 0000000..cfcfab2
+--- /dev/null
++++ b/src/common/color.ts
+@@ -0,0 +1,66 @@
++import { ColorThemeMode } from 'mo/model/colorTheme';
++
++const HEX_REG = /^#?([0-9a-f]{3,8})$/i;
++const RGB_REG = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i;
++
++/**
++ * Convert a color string to the RGB values,
++ * it supports the `HEX`(#fff, #ffffff, #ffffffff) and the `RGB`(rgb(0,0,0), rgba(0,0,0,.5)) format
++ * @param color
++ * @returns The RGB values, it returns `undefined` if the color is invalid
++ */
++export function colorToRGB(
++    color: string
++): { r: number; g: number; b: number } | undefined {
++    if (!color || typeof color !== 'string') return undefined;
++    const value = color.trim();
++
++    const rgbMatched = value.match(RGB_REG);
++    if (rgbMatched) {
++        return {
++            r: Number(rgbMatched[1]),
++            g: Number(rgbMatched[2]),
++            b: Number(rgbMatched[3]),
++        };
++    }
++
++    const hexMatched = value.match(HEX_REG);
++    if (hexMatched) {
++        let hex = hexMatched[1];
++        // Convert the shorthand hex(#fff or #ffff) to the full hex
++        if (hex.length === 3 || hex.length === 4) {
++            hex = hex
++                .split('')
++                .map((char) => char + char)
++                .join('');
++        }
++        if (hex.length !== 6 && hex.length !== 8) return undefined;
++
++        const rgb = parseInt(hex.slice(0, 6), 16);
++        return {
++            r: (rgb >> 16) & 255,
++            g: (rgb >> 8) & 255,
++            b: rgb & 255,
++        };
++    }
++
++    return undefined;
++}
++
++/**
++ * Detect a color whether is a light or dark color,
++ * it uses the HSP(Highly Sensitive Poo) color model,
++ * more info about it, please visit: http://alienryderflex.com/hsp.html
++ * @param color The `HEX` or `RGB` color string
++ * @returns `ColorThemeMode.light` or `ColorThemeMode.dark`,
++ * it returns the `ColorThemeMode.dark` if the color is invalid
++ */
++export function colorLightOrDark(color: string): ColorThemeMode {
++    const rgb = colorToRGB(color);
++    if (!rgb) return ColorThemeMode.dark;
++
++    const { r, g, b } = rgb;
++    const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
++
++    return hsp > 127.5 ? ColorThemeMode.light : ColorThemeMode.dark;
++}
+diff --git a/src/model/colorTheme.ts b/src/model/colorTheme.ts
+index c05f78c..33bbca0 100644
+--- a/src/model/colorTheme.ts
++++ b/src/model/colorTheme.ts
+@@ -16,6 +16,25 @@ export enum ColorScheme {
+     HIGH_CONTRAST = 'hc',
+ }
+ 
++/**
++ * The mode of the Color Theme, it's calculated by the colors of the theme.
++ * There only has two modes, `dark` and `light`.
++ */
++export enum ColorThemeMode {
++    dark = 'dark',
++    light = 'light',
++}
++
++/**
++ * The Color Theme event definition
++ */
++export enum ColorThemeEvent {
++    /**
++     * The current Color Theme changed
++     */
++    onChange = 'colorTheme.onChange',
++}
++
+ export interface IColorTheme {
+     /**
+      * The id of component, theme will be applied by this ID
+diff --git a/src/services/theme/colorThemeService.ts b/src/services/theme/colorThemeService.ts
+index 95225b2..4d151dc 100644
+--- a/src/services/theme/colorThemeService.ts
++++ b/src/services/theme/colorThemeService.ts
+@@ -4,14 +4,19 @@
+  */
+ 
+ import 'reflect-metadata';
+-import { IColorTheme } from 'mo/model/colorTheme';
++import {
++    ColorThemeEvent,
++    ColorThemeMode,
++    IColorTheme,
++} from 'mo/model/colorTheme';
+ import { singleton } from 'tsyringe';
+ import { editor as monacoEditor } from 'mo/monaco';
+ import { applyStyleSheetRules } from 'mo/common/css';
+-import { getThemeData, convertToCSSVars } from './helper';
++import { getThemeData, convertToCSSVars, getColorThemeMode } from './helper';
+ import logger from 'mo/common/logger';
+ import { prefixClaName } from 'mo/common/className';
+ import { searchById } from 'mo/common/utils';
++import { GlobalEvent } from 'mo/common/event';
+ 
+ export interface IColorThemeService {
+     /**
+@@ -40,11 +45,15 @@ export interface IColorThemeService {
+      * Get specific theme via id
+      * @param id
+      */
+-    getThemeById(id: string): void;
++    getThemeById(id: string): IColorTheme | undefined;
+     /**
+      * Get the current Color Theme
+      */
+     getColorTheme(): IColorTheme;
++    /**
++     * Get the mode('dark' or 'light') of the current Color Theme
++     */
++    getColorThemeMode(): ColorThemeMode;
+     /**
+      * Reload current theme
+      */
+@@ -53,6 +62,17 @@ export interface IColorThemeService {
+      * Reset theme
+      */
+     reset(): void;
++    /**
++     * Listen to the Color Theme changed event
++     * @param callback
++     */
++    onChange(
++        callback: (
++            prev: IColorTheme,
++            next: IColorTheme,
++            themeMode: ColorThemeMode
++        ) => void
++    ): void;
+ }
+ 
+ /**
+@@ -70,11 +90,15 @@ export const BuiltInColorTheme: IColorTheme = {
+ export const DEFAULT_THEME_CLASS_NAME = prefixClaName('customize-theme');
+ 
+ @singleton()
+-export class ColorThemeService implements IColorThemeService {
++export class ColorThemeService
++    extends GlobalEvent
++    implements IColorThemeService
++{
+     private colorThemes: IColorTheme[] = [BuiltInColorTheme];
+     private colorTheme: IColorTheme = BuiltInColorTheme;
+ 
+     constructor() {
++        super();
+         if (this.colorTheme) {
+             this.setTheme(this.colorTheme.id);
+         }
+@@ -125,9 +149,14 @@ export class ColorThemeService implements IColorThemeService {
+         return Object.assign({}, this.colorTheme);
+     }
+ 
++    public getColorThemeMode(): ColorThemeMode {
++        return getColorThemeMode(this.colorTheme);
++    }
++
+     public setTheme(id: string) {
+         const theme = this.getThemeById(id);
+         if (theme) {
++            const prevTheme = this.getColorTheme();
+             this.colorTheme = { ...theme };
+             const themeData = getThemeData(theme);
+             const styleSheetContent = convertToCSSVars(themeData.colors);
+@@ -136,11 +165,28 @@ export class ColorThemeService implements IColorThemeService {
+             // Update monaco-editor theme
+             monacoEditor.defineTheme(DEFAULT_THEME_CLASS_NAME, themeData);
+             monacoEditor.setTheme(DEFAULT_THEME_CLASS_NAME);
++
++            this.emit(
++                ColorThemeEvent.onChange,
++                prevTheme,
++                this.getColorTheme(),
++                this.getColorThemeMode()
++            );
+         } else {
+             logger.error(`Can't get the theme by id:` + id);
+         }
+     }
+ 
++    public onChange(
++        callback: (
++            prev: IColorTheme,
++            next: IColorTheme,
++            themeMode: ColorThemeMode
++        ) => void
++    ): void {
++        this.subscribe(ColorThemeEvent.onChange, callback);
++    }
++
+     public getThemes() {
+         return this.colorThemes;
+     }
+diff --git a/src/services/theme/helper.ts b/src/services/theme/helper.ts
+index cb52c15..d246aa7 100644
+--- a/src/services/theme/helper.ts
++++ b/src/services/theme/helper.ts
+@@ -1,6 +1,12 @@
+ import { cloneDeep } from 'lodash';
+-import { IColors, IColorTheme } from 'mo/model/colorTheme';
++import {
++    ColorScheme,
++    ColorThemeMode,
++    IColors,
++    IColorTheme,
++} from 'mo/model/colorTheme';
+ import { getBuiltInColors } from 'mo/services/theme/colorRegistry';
++import { colorLightOrDark } from 'mo/common/color';
+ import { editor as MonacoEditor } from 'monaco-editor';
+ 
+ /**
+@@ -105,3 +111,26 @@ export function getThemeData(
+         colors: convertColors,
+     };
+ }
++
++/**
++ * Get the mode('dark' or 'light') of the Color Theme,
++ * it detects the mode via the `editor.background` color of the theme first,
++ * then respects the `type` of the theme,
++ * finally, it detects the mode via the built-in colors of the theme
++ * @param theme
++ */
++export function getColorThemeMode(theme: IColorTheme): ColorThemeMode {
++    const backgroundColor = theme.colors?.['editor.background'];
++    if (backgroundColor) {
++        return colorLightOrDark(backgroundColor);
++    }
++
++    if (theme.type) {
++        return theme.type === ColorScheme.LIGHT
++            ? ColorThemeMode.light
++            : ColorThemeMode.dark;
++    }
++
++    const themeData = getThemeData(theme);
++    return colorLightOrDark(themeData.colors['editor.background']);
++}
+diff --git a/website/docs/guides/extend-color-theme.md b/website/docs/guides/extend-color-theme.md
+index c0bd335..9a71136 100644
+--- a/website/docs/guides/extend-color-theme.md
++++ b/website/docs/guides/extend-color-theme.md
+@@ -241,6 +241,27 @@ Molecule provides the [ColorTheme](../api/classes/molecule.ColorThemeService) se
+ molecule.colorTheme.setTheme(themeId);
+ // Get Themes
+ molecule.colorTheme.getThemes();
++// Get the current Color Theme
++molecule.colorTheme.getColorTheme();
++// Get the mode('dark' or 'light') of the current Color Theme
++molecule.colorTheme.getColorThemeMode();
++```
++
++If you need to synchronize the Molecule theme to other UI libraries, you can get the mode of the current Color Theme, and listen to the Color Theme changed event:
++
++```ts
++import molecule from '@dtinsight/molecule';
++import { ColorThemeMode } from '@dtinsight/molecule/esm/model';
++
++if (molecule.colorTheme.getColorThemeMode() === ColorThemeMode.dark) {
++    // Do something for the dark mode
++}
++
++molecule.colorTheme.onChange((prev, next, themeMode) => {
++    if (themeMode === ColorThemeMode.dark) {
++        // Do something for the dark mode
++    }
++});
+ ```
+ 
+ For more information about [ColorTheme](../api/classes/molecule.ColorThemeService) operations, please refer to [API](../api/classes/molecule.ColorThemeService).
+diff --git a/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md b/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+index ccd09a3..cf4645a 100644
+--- a/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
++++ b/website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+@@ -242,6 +242,27 @@ Molecule 提供了 [ColorTheme](../api/classes/molecule.ColorThemeService) 服
+ molecule.colorTheme.setTheme(themeId);
+ // Get Themes
+ molecule.colorTheme.getThemes();
++// Get the current Color Theme
++molecule.colorTheme.getColorTheme();
++// Get the mode('dark' or 'light') of the current Color Theme
++molecule.colorTheme.getColorThemeMode();
++```
++
++如果需要把 Molecule 的主题同步到其他的 UI 组件库，可以获取当前颜色主题的模式（`dark` 或者 `light`），也可以监听颜色主题的变更事件：
++
++```ts
++import molecule from '@dtinsight/molecule';
++import { ColorThemeMode } from '@dtinsight/molecule/esm/model';
++
++if (molecule.colorTheme.getColorThemeMode() === ColorThemeMode.dark) {
++    // 处理暗色模式的逻辑
++}
++
++molecule.colorTheme.onChange((prev, next, themeMode) => {
++    if (themeMode === ColorThemeMode.dark) {
++        // 处理暗色模式的逻辑
++    }
++});
+ ```
+ 
+ 更多有关 [ColorTheme](../api/classes/molecule.ColorThemeService) 的操作，请参考[API](../api/classes/molecule.ColorThemeService)。

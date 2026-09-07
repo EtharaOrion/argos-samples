@@ -1,0 +1,200 @@
+$ for n in range(0, 40):
+$     value = b'x' * n
+$     chunk = SDESChunk(sourcesync=0x01020304, items=[SDESItem(chunk_type=1, value=value)])
+$     p = RTCP(packet_type=202, sdes_chunks=[chunk])
+$     data = raw(p)
+$     assert len(data) % 4 == 0, (n, len(data))
+$     assert (p.length + 1) * 4 if p.length else True
+$     q = RTCP(data)
+$     assert q.count == 1, (n, q.count)
+$     assert (q.length + 1) * 4 == len(data), (n, q.length, len(data))
+$     assert q.sdes_chunks[0].sourcesync == 0x01020304
+$     assert q.sdes_chunks[0].items[0].value == value, (n, q.sdes_chunks[0].items[0].value)
+$     assert q.sdes_chunks[0].items[-1].chunk_type == 0, n
+$     assert raw(q) == data, (n, raw(q), data)
+$     # two identical chunks, checking the chunk boundaries are respected
+$     p2 = RTCP(packet_type=202, sdes_chunks=[
+$         SDESChunk(sourcesync=1, items=[SDESItem(chunk_type=1, value=value)]),
+$         SDESChunk(sourcesync=2, items=[SDESItem(chunk_type=6, value=value),
+$                                        SDESItem(chunk_type=2, value=b'ab')])])
+$     d2 = raw(p2)
+$     q2 = RTCP(d2)
+$     assert q2.count == 2, (n, q2.count)
+$     assert len(q2.sdes_chunks) == 2, (n, len(q2.sdes_chunks))
+$     assert q2.sdes_chunks[0].sourcesync == 1 and q2.sdes_chunks[1].sourcesync == 2, n
+$     assert q2.sdes_chunks[0].items[0].value == value, n
+$     assert q2.sdes_chunks[1].items[0].chunk_type == 6, n
+$     assert q2.sdes_chunks[1].items[1].value == b'ab', n
+$     assert raw(q2) == d2, n
+$     assert not q2.payload, (n, q2.payload)
+$ 
+$ # exhaustive: BYE reasons of every length
+$ for n in range(0, 30):
+$     reason = b'r' * n
+$     p = RTCP(packet_type=203, sources=[1, 2, 3], reason=reason)
+$     data = raw(p)
+$     assert len(data) % 4 == 0, n
+$     q = RTCP(data)
+$     assert q.count == 3 and q.sources == [1, 2, 3], (n, q.count, q.sources)
+$     if n:
+$         assert q.reason == reason, (n, q.reason)
+$     assert raw(q) == data, n
+$ 
+$ # exhaustive: APP data of every 4-byte multiple length
+$ for n in range(0, 10):
+$     p = RTCP(packet_type=204, sourcesync=9, app_name=b'PING', app_data=b'd' * (4 * n))
+$     data = raw(p)
+$     q = RTCP(data)
+$     assert q.app_name == b'PING' and q.app_data == b'd' * (4 * n), (n, q.app_data)
+$     assert raw(q) == data
+$ 
+$ # exhaustive: SR/RR with 0..31 report blocks
+$ rb = ReceptionReport(sourcesync=1, fraction_lost=2, cumulative_lost=3,
+$                      highest_seq_recvd=4, interarrival_jitter=5,
+$                      last_SR_timestamp=6, delay_since_last_SR=7)
+$ for n in range(0, 32):
+$     for ptype in (200, 201):
+$         p = RTCP(packet_type=ptype, sourcesync=0xaabbccdd,
+$                  report_blocks=[ReceptionReport(raw(rb)) for _ in range(n)])
+$         data = raw(p)
+$         q = RTCP(data)
+$         assert q.count == n, (n, q.count)
+$         assert len(q.report_blocks) == n
+$         assert (q.length + 1) * 4 == len(data)
+$         assert q.report_blocks == [] or q.report_blocks[0].cumulative_lost == 3
+$         assert raw(q) == data
+$         assert not q.payload, (n, ptype, q.payload)
+$ 
+$ print("ROUND-TRIP OK")
+$ EOF
+$ python /tmp/rtcp_rt.py
+cd /workspace/scapy && cat > /tmp/rtcp_rt.py <<'EOF'
+import sys
+sys.path.insert(0, '/workspace/scapy')
+from scapy.layers.rtp import *
+from scapy.compat import raw
+from scapy.config import conf
+conf.debug_dissector = True
+# exhaustive: every possible alignment of a SDES chunk
+for n in range(0, 40):
+    value = b'x' * n
+    chunk = SDESChunk(sourcesync=0x01020304, items=[SDESItem(chunk_type=1, value=value)])
+    p = RTCP(packet_type=202, sdes_chunks=[chunk])
+    data = raw(p)
+    assert len(data) % 4 == 0, (n, len(data))
+    assert (p.length + 1) * 4 if p.length else True
+    q = RTCP(data)
+    assert q.count == 1, (n, q.count)
+    assert (q.length + 1) * 4 == len(data), (n, q.length, len(data))
+    assert q.sdes_chunks[0].sourcesync == 0x01020304
+    assert q.sdes_chunks[0].items[0].value == value, (n, q.sdes_chunks[0].items[0].value)
+    assert q.sdes_chunks[0].items[-1].chunk_type == 0, n
+    assert raw(q) == data, (n, raw(q), data)
+    # two identical chunks, checking the chunk boundaries are respected
+    p2 = RTCP(packet_type=202, sdes_chunks=[
+        SDESChunk(sourcesync=1, items=[SDESItem(chunk_type=1, value=value)]),
+        SDESChunk(sourcesync=2, items=[SDESItem(chunk_type=6, value=value),
+                                       SDESItem(chunk_type=2, value=b'ab')])])
+    d2 = raw(p2)
+    q2 = RTCP(d2)
+    assert q2.count == 2, (n, q2.count)
+    assert len(q2.sdes_chunks) == 2, (n, len(q2.sdes_chunks))
+    assert q2.sdes_chunks[0].sourcesync == 1 and q2.sdes_chunks[1].sourcesync == 2, n
+    assert q2.sdes_chunks[0].items[0].value == value, n
+    assert q2.sdes_chunks[1].items[0].chunk_type == 6, n
+    assert q2.sdes_chunks[1].items[1].value == b'ab', n
+    assert raw(q2) == d2, n
+    assert not q2.payload, (n, q2.payload)
+# exhaustive: BYE reasons of every length
+for n in range(0, 30):
+    reason = b'r' * n
+    p = RTCP(packet_type=203, sources=[1, 2, 3], reason=reason)
+    data = raw(p)
+    assert len(data) % 4 == 0, n
+    q = RTCP(data)
+    assert q.count == 3 and q.sources == [1, 2, 3], (n, q.count, q.sources)
+    if n:
+        assert q.reason == reason, (n, q.reason)
+    assert raw(q) == data, n
+# exhaustive: APP data of every 4-byte multiple length
+for n in range(0, 10):
+    p = RTCP(packet_type=204, sourcesync=9, app_name=b'PING', app_data=b'd' * (4 * n))
+    data = raw(p)
+    q = RTCP(data)
+    assert q.app_name == b'PING' and q.app_data == b'd' * (4 * n), (n, q.app_data)
+    assert raw(q) == data
+# exhaustive: SR/RR with 0..31 report blocks
+rb = ReceptionReport(sourcesync=1, fraction_lost=2, cumulative_lost=3,
+                     highest_seq_recvd=4, interarrival_jitter=5,
+                     last_SR_timestamp=6, delay_since_last_SR=7)
+for n in range(0, 32):
+    for ptype in (200, 201):
+        p = RTCP(packet_type=ptype, sourcesync=0xaabbccdd,
+                 report_blocks=[ReceptionReport(raw(rb)) for _ in range(n)])
+        data = raw(p)
+        q = RTCP(data)
+        assert q.count == n, (n, q.count)
+        assert len(q.report_blocks) == n
+        assert (q.length + 1) * 4 == len(data)
+        assert q.report_blocks == [] or q.report_blocks[0].cumulative_lost == 3
+        assert raw(q) == data
+        assert not q.payload, (n, ptype, q.payload)
+print("ROUND-TRIP OK")
+EOF
+
+
+python /tmp/rtcp_rt.py
+ROUND-TRIP OK
+$ cd /workspace/scapy && grep -rni "sdes\|reception report\|sender report" --include="*.py" --include="*.uts" . | grep -v "layers/rtp.py" | head
+./scapy/contrib/automotive/obd/pid/pids_40_5F.py:325:    name = "PID_5F_EmissionRequirementsToWhichVehicleIsDesigned"
+./scapy/contrib/ltp.py:144:        # For segments that are checkpoints or reception reports.
+./scapy/contrib/ltp.py:161:        # Reception reports have the following fields,
+./scapy/layers/sixlowpan.py:304:        packet.dst = self.decompressDestAddr()
+./scapy/layers/sixlowpan.py:333:    def decompressDestAddr(self):
+./scapy/layers/sixlowpan.py:643:        packet.dst = self.decompressDestAddr(packet)
+./scapy/layers/sixlowpan.py:653:    def decompressDestAddr(self, packet):
+./scapy/layers/sixlowpan.py:734:    def compressDestAddr(self, ipv6):
+./scapy/layers/sixlowpan.py:859:        self.compressDestAddr(ipv6)
+./scapy/layers/x509.py:613:class X509_AccessDescription(ASN1_Packet):
+$ cd /workspace/scapy && rm -f /tmp/rtcp_rt.py && git status --short && python -m scapy.tools.UTscapy -t test/scapy/layers/rtp.uts -f text 2>&1 | grep -E "ended successfully|failed"
+M scapy/layers/rtp.py
+UTscapy ended successfully
+## Checklist
+
+The issue description contained exactly one `## Issue N` header — **Checklist: 1 issue found.**
+
+1. **Issue 1 (#3460): RTCP packet support (RFC 3550)** — **DONE**
+
+## Work performed (Issue 1 of 1)
+
+All changes are confined to `scapy/layers/rtp.py` (the single non-test file responsible); no test file, fixture, or repository plumbing was touched.
+
+### New classes (RFC 3550 §6)
+| Class | Purpose |
+|---|---|
+| `RTCP` | RTCP header (`version`, `padding`, `count`, `packet_type`, `length`) + type-specific body |
+| `SenderInfo` | Sender info block of a Sender Report (§6.4.1): NTP/RTP timestamps, sender packet & octet counts |
+| `ReceptionReport` | Reception report block (§6.4.1/6.4.2): SSRC, fraction/cumulative lost, highest seq, jitter, LSR, DLSR |
+| `SDESItem` | One SDES item; an `END` item is correctly encoded/decoded as a single octet |
+| `SDESChunk` | SSRC + item list, with RFC-mandated null terminator and 32-bit padding handled on both dissect and build |
+
+Also added the enums `_rtcp_packet_types` (200 SR, 201 RR, 202 SDES, 203 BYE, 204 APP) and `_rtcp_sdes_types` (END/CNAME/NAME/EMAIL/PHONE/LOC/TOOL/NOTE/PRIV).
+
+### Behaviour implemented
+- **SR (200)**: `sourcesync`, `sender_info`, `report_blocks` (driven by `count`).
+- **RR (201)**: `sourcesync`, `report_blocks`.
+- **SDES (202)**: `sdes_chunks`; each chunk parses items until the `END` item and then skips the null padding, so multiple chunks in one packet are dissected at the right boundaries.
+- **BYE (203)**: `sources` list plus optional `reason_length`/`reason` (presence derived from the `length` field when dissecting, from the field value when building).
+- **APP (204)**: `sourcesync`, `app_name` (4 bytes), `app_data` (sized from `length`).
+- **Any other type** (feedback 205/206, XR 207, …): body preserved in `data`, sized from `length`, so such packets round-trip and don't derail compound parsing.
+- **Automatic build-time computation**: `RTCP.post_build` pads to the 32-bit boundary and fills `count` and `length` (`len // 4 - 1`); `SDESChunk.post_build` appends the null terminator and pads the chunk.
+- **Compound packets** (§6.1): `RTCP.guess_payload_class` chains a following `RTCP` layer when the remaining bytes carry a plausible RTCP header (version 2, type 192–223, declared length available), so real-world `SR / SDES / BYE` datagrams dissect as stacked RTCP layers; non-RTCP trailers still fall back to `Raw`.
+- Module docstring updated to mention binding RTCP to a UDP port.
+
+### Verification
+- Temporary scripts (created, run, then deleted) covered: SR with 0/2 report blocks, RR, SDES with 1/2 chunks, BYE with and without reason, APP, unknown type, compound packets (`SR+SDES`, `SR+RTPFB+SDES`, `RR+BYE`), padded packets, truncated/empty input, `fuzz()`, per-instance default isolation, and byte-exact round-trips plus build-from-scratch equality.
+- Exhaustive round-trip sweeps all passed with `conf.debug_dissector = True`: SDES item values of length 0–39 (every padding alignment, single and double chunks), BYE reasons of length 0–29, APP data 0–36 bytes, SR/RR with 0–31 report blocks.
+- `test/scapy/layers/rtp.uts` passes (3/3); all `test/scapy/layers/*.uts` and `test/regression.uts` produce **identical** results before and after the change (remaining failures are pre-existing environment gaps: missing IPython, cryptography, brotli, zstandard, tcpdump, manuf DB).
+- File compiles cleanly, no unused imports, no new lines > 79 chars (flake8-compatible), and `rtp.py` is not in `.config/mypy/mypy_enabled.txt` so no type annotations were required.
+
+**Final tally: 1 issue addressed (DONE), 0 BLOCKED.**

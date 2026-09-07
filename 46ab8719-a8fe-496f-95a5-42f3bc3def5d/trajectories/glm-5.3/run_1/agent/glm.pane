@@ -1,0 +1,200 @@
+   283	import molecule from '@dtinsight/molecule';
+   284	import { ColorScheme } from '@dtinsight/molecule/model/colorTheme';
+   285	
+   286	molecule.colorTheme.onChange((prevTheme, nextTheme) => {
+   287	    if (nextTheme.type === ColorScheme.DARK) {
+   288	        // Change the UI library to the dark theme
+   289	    } else {
+   290	        // Change the UI library to the light theme
+   291	
+Review the changes and make sure they are as expected. Edit the file again if necessary.
+$ cd /workspace/molecule && npx jest --rootDir . --testMatch '**/repro-627*.test.ts' 2>&1 | grep -E "Tests:|Suites:" && npx jest --rootDir . --testPathIgnorePatterns '/node_modules/','esm','umd','stories','repro' 2>&1 | grep -E "Tests:|Suites:" && npx tsc --noEmit -p tsconfig.build.json && echo "TSC BUILD OK" && npx tsc --noEmit -p tsconfig.json && echo "TSC CHECK OK" && npx eslint src/services/theme src/model/colorTheme.ts && echo "ESLINT OK"
+Test Suites: 2 passed, 2 total
+Tests:       13 passed, 13 total
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+TSC BUILD OK
+TSC CHECK OK
+
+Oops! Something went wrong! :(
+
+ESLint: 7.32.0
+
+No files matching the pattern "src/services/theme" were found.
+Please check for typing mistakes in the pattern.
+$ cd /workspace/molecule && npx eslint 'src/services/theme/**/*.ts' src/model/colorTheme.ts && echo "ESLINT OK"
+=============
+
+WARNING: You are currently running a version of TypeScript which is not officially supported by @typescript-eslint/typescript-estree.
+
+You may find that it works just fine, or you may not.
+
+SUPPORTED TYPESCRIPT VERSIONS: >=3.3.1 <4.1.0
+
+YOUR TYPESCRIPT VERSION: 4.5.5
+
+Please only submit bug reports when using the officially supported version.
+
+=============
+ESLINT OK
+$ cd /workspace/molecule && npx prettier --check src/services/theme/colorThemeService.ts src/services/theme/helper.ts src/model/colorTheme.ts 2>&1 | tail -5
+Checking formatting...
+[warn] src/services/theme/colorThemeService.ts
+[warn] Code style issues found in the above file(s). Forgot to run Prettier?
+$ cd /workspace/molecule && git stash && npx prettier --check src/services/theme/colorThemeService.ts 2>&1 | tail -3; git stash pop
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.
+
+fatal: unable to auto-detect email address (got 'openhands@a5b7962cb2d4.(none)')
+Cannot save the current index state
+No stash entries found.
+$ cd /workspace/molecule && git show HEAD:src/services/theme/colorThemeService.ts > /tmp/orig_colorThemeService.ts && npx prettier --check /tmp/orig_colorThemeService.ts 2>&1 | tail -3
+Checking formatting...
+[warn] ../../tmp/orig_colorThemeService.ts
+[warn] Code style issues found in the above file(s). Forgot to run Prettier?
+$ cd /workspace/molecule && npx prettier src/services/theme/colorThemeService.ts > /tmp/pretty.ts && diff /tmp/pretty.ts src/services/theme/colorThemeService.ts
+74,77c74
+<         callback: (
+<             prevTheme: IColorTheme | null,
+<             nextTheme: IColorTheme
+<         ) => void
+---
+>         callback: (prevTheme: IColorTheme | null, nextTheme: IColorTheme) => void
+203,206c200
+<         callback: (
+<             prevTheme: IColorTheme | null,
+<             nextTheme: IColorTheme
+<         ) => void
+---
+>         callback: (prevTheme: IColorTheme | null, nextTheme: IColorTheme) => void
+$ cd /workspace/molecule && npx prettier --write src/services/theme/colorThemeService.ts && npx prettier --check src/services/theme/colorThemeService.ts && diff /tmp/pretty.ts src/services/theme/colorThemeService.ts && echo "PRETTIER CLEAN"
+src/services/theme/colorThemeService.ts 63ms
+Checking formatting...
+All matched files use Prettier code style!
+PRETTIER CLEAN
+$ cd /workspace/molecule && git --no-pager diff --stat && npx jest --rootDir . --testMatch '**/repro-627*.test.ts' 2>&1 | grep -E "Tests:|Suites:" && npx jest --rootDir . --testPathIgnorePatterns '/node_modules/','esm','umd','stories','repro' 2>&1 | grep -E "Tests:|Suites:" && npx tsc --noEmit -p tsconfig.build.json && echo "TSC BUILD OK"
+src/model/colorTheme.ts                   | 17 +++++++++++++++++
+ src/services/theme/colorThemeService.ts   | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ src/services/theme/helper.ts              | 39 ++++++++++++++++++++++++++++++++++++++-
+ website/docs/guides/extend-color-theme.md | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 174 insertions(+), 6 deletions(-)
+Test Suites: 2 passed, 2 total
+Tests:       13 passed, 13 total
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+TSC BUILD OK
+$ cd /workspace/molecule && rm -f repro-627.test.ts repro-627-ext.test.ts /tmp/orig_colorThemeService.ts /tmp/pretty.ts && git status --short
+M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M src/services/theme/helper.ts
+ M website/docs/guides/extend-color-theme.md
+$ cd /workspace/molecule && npx jest --rootDir . --testPathIgnorePatterns '/node_modules/','esm','umd','stories' 2>&1 | grep -E "Tests:|Suites:" && cat src/services/theme/colorThemeService.ts | sed -n 150,215p
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+                `Update the theme failed! There is no theme found via '${theme.id}'`
+            );
+        }
+    }
+
+    public getThemeById(id: string): IColorTheme | undefined {
+        const target = this.colorThemes.find(searchById(id));
+        return target ? Object.assign({}, target) : undefined;
+    }
+
+    public getCurrentTheme(): IColorTheme | null {
+        return this.colorTheme ? Object.assign({}, this.colorTheme) : null;
+    }
+
+    public getThemeType(): ColorScheme {
+        const currentTheme = this.getCurrentTheme();
+        return currentTheme ? getThemeType(currentTheme) : ColorScheme.DARK;
+    }
+
+    public getColorTheme(): IColorTheme {
+        return Object.assign({}, this.colorTheme);
+    }
+
+    public setTheme(id: string) {
+        const theme = this.getThemeById(id);
+        if (theme) {
+            // Perfect the theme, ensure the current theme
+            // has the complete theme information, such as
+            // the dark/light theme type
+            const nextTheme = { ...theme, type: getThemeType(theme) };
+            const prevTheme = this.getCurrentTheme();
+            this.colorTheme = nextTheme;
+            const themeData = getThemeData(theme);
+            const styleSheetContent = convertToCSSVars(themeData.colors);
+            applyStyleSheetRules(styleSheetContent, DEFAULT_THEME_CLASS_NAME);
+
+            // Update monaco-editor theme
+            monacoEditor.defineTheme(DEFAULT_THEME_CLASS_NAME, themeData);
+            monacoEditor.setTheme(DEFAULT_THEME_CLASS_NAME);
+
+            if (
+                !prevTheme ||
+                prevTheme.id !== nextTheme.id ||
+                prevTheme.type !== nextTheme.type
+            ) {
+                this.emit(ColorThemeEvent.OnChange, prevTheme, nextTheme);
+            }
+        } else {
+            logger.error(`Can't get the theme by id:` + id);
+        }
+    }
+
+    public onChange(
+        callback: (
+            prevTheme: IColorTheme | null,
+            nextTheme: IColorTheme
+        ) => void
+    ) {
+        this.subscribe(ColorThemeEvent.OnChange, callback);
+    }
+
+    public getThemes() {
+        return this.colorThemes;
+    }
+
+    public reload() {
+$ cd /workspace/molecule && git status --short && git --no-pager diff --name-only | grep -E "test|__tests__|stories" ; echo "NO TEST FILES TOUCHED: $?"
+M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M src/services/theme/helper.ts
+ M website/docs/guides/extend-color-theme.md
+NO TEST FILES TOUCHED: 1
+# task_tracker: Record single checklist item as done
+Task list has been updated with 1 item(s).
+# finish: Implemented theme-type API for issue #627; all tests pass
+## Final Report
+
+**Checklist: 1 issue found.** The `<issue_description>` contained a single `## Issue N` header (Issue 1 / #627: "How to get current theme?").
+
+### Issue 1 of 1: How to get current theme — **DONE**
+
+**The problem:** Users integrating Molecule with ant design had no way to distinguish the current dark/light mode. `IColorThemeService` only exposed `getColorTheme()` returning the raw theme object (id/label/colors…); the `ColorScheme` enum existed in `mo/model/colorTheme` but was never populated or exposed, and there was no notification when the theme switched.
+
+**Changes made (non-test files only):**
+
+1. `src/services/theme/helper.ts` — new exported `getThemeType(theme): ColorScheme`: prefers a valid `theme.type` (`dark`/`light`/`hc`), otherwise infers from `uiTheme` (`vs` → light, `hc-black` → high contrast, `vs-dark`/anything else → dark, Molecule's default).
+2. `src/services/theme/colorThemeService.ts`:
+   - `IColorThemeService` gains `getCurrentTheme(): IColorTheme | null`, `getThemeType(): ColorScheme` (with antd-sync usage example in JSDoc) and `onChange(callback)`; also fixed the incorrect `getThemeById(id: string): void` return type to `IColorTheme | undefined` (matches the existing implementation and all callers).
+   - `ColorThemeService` now extends `GlobalEvent`, `setTheme` perfects the current theme with the computed `type` and emits `ColorThemeEvent.OnChange` when the theme id or type actually changes; `onChange` subscribes via the event bus. `BuiltInColorTheme` is explicitly typed `ColorScheme.DARK`.
+3. `src/model/colorTheme.ts` — new `ColorThemeEvent` enum (`OnChange = 'colorTheme.onchange'`, mirroring `LocalizationEvent`/`SettingsEvent`) and documented `type?: ColorScheme`.
+4. `website/docs/guides/extend-color-theme.md` — new "Get the current Color Theme" and "Listen to the ColorTheme change" sections answering the question, including the antd synchronization example.
+
+The issue's requested usage `molecule.colorTheme.getCurrentTheme()` now works (plus the more precise `getThemeType()`), and everything is reachable through the existing `molecule.colorTheme` / `molecule.model.ColorScheme` exports.
+
+**Verification:**
+- Reproduction script (13 checks, since deleted) confirmed the failure before and success after: dark/light/hc inference from real repo theme extensions (theme-defaults, monokai, palenight), priority of explicit `type`, fallback for invalid types, update/reload/reset consistency, non-pollution of stored themes, the Settings `colorTheme` flow, molecule API surface, and change-event semantics.
+- Full repo suite: **96 suites / 704 tests passing** (same as baseline) — no regressions.
+- `tsc --noEmit` clean for both `tsconfig.json` and `tsconfig.build.json`; ESLint clean on all touched files; Prettier clean (only pre-existing warnings remain, verified against the original file).
+
+**Tally: 1 of 1 issues addressed; 0 marked BLOCKED.**

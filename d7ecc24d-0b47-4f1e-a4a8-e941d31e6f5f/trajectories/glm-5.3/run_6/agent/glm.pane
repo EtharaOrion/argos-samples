@@ -1,0 +1,200 @@
+<stop stop-color="red" stop-opacity="0.5" offset="50%"></stop>
+<feFlood flood-color="green" flood-opacity="0.9"></feFlood>
+# file_editor: /workspace/air/src/air/tags/models/svg.py
+No replacement was performed, old_str `class Stop(CaseTag):
+    """Defines a gradient stop
+
+    Args:
+        children: Tags, strings, or other rendered content.
+        offset: The `offset` SVG attribute.
+        class_: Substituted as the DOM `class` attribute.
+        id: DOM ID attribute.
+        style: Inline style attribute.
+        kwargs: Keyword arguments transformed into tag attributes.
+    """
+
+    def __init__(
+        self,
+        *children: Any,
+        offset: str | int | float | None = None,
+        class_: str | None = None,
+        id: str | None = None,
+        style: str | None = None,
+        **kwargs: str | float | int | bool,
+    ):
+        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))` did not appear verbatim in /workspace/air/src/air/tags/models/svg.py.
+# file_editor: /workspace/air/src/air/tags/config.py
+The file /workspace/air/src/air/tags/config.py has been edited. Here's the result of running `cat -n` on a snippet of /workspace/air/src/air/tags/config.py:
+   656	        "fill",
+   657	        "href",
+   658	    ],
+   659	    "Stop": ["offset", "stop_color", "stop_opacity"],
+   660	    "Style": [
+   661	        "type",
+   662	        "media",
+   663	        "title",
+   664	
+Review the changes and make sure they are as expected. Edit the file again if necessary.
+$ cd /workspace/air && sed -n '/^class Stop/,/^class Style/p' src/air/tags/models/svg.py
+class Stop(CaseTag):
+    """Defines a gradient stop
+
+    Args:
+        children: Tags, strings, or other rendered content.
+        offset: The `offset` SVG attribute.
+        class_: Substituted as the DOM `class` attribute.
+        id: DOM ID attribute.
+        style: Inline style attribute.
+        kwargs: Keyword arguments transformed into tag attributes.
+    """
+
+    def __init__(
+        self,
+        *children: Any,
+        offset: str | None = None,
+        class_: str | None = None,
+        id: str | None = None,
+        style: str | None = None,
+        **kwargs: str | float | int | bool,
+    ):
+        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+
+
+class Style(CaseTag):
+# file_editor: /workspace/air/src/air/tags/models/svg.py
+The file /workspace/air/src/air/tags/models/svg.py has been edited. Here's the result of running `cat -n` on a snippet of /workspace/air/src/air/tags/models/svg.py:
+  1743	
+  1744	    Args:
+  1745	        children: Tags, strings, or other rendered content.
+  1746	        offset: The `offset` SVG attribute.
+  1747	        stop_color: The `stop-color` SVG attribute.
+  1748	        stop_opacity: The `stop-opacity` SVG attribute.
+  1749	        class_: Substituted as the DOM `class` attribute.
+  1750	        id: DOM ID attribute.
+  1751	        style: Inline style attribute.
+  1752	        kwargs: Keyword arguments transformed into tag attributes.
+  1753	    """
+  1754	
+  1755	    def __init__(
+  1756	        self,
+  1757	        *children: Any,
+  1758	        offset: str | int | float | None = None,
+  1759	        stop_color: str | None = None,
+  1760	        stop_opacity: str | int | float | None = None,
+  1761	        class_: str | None = None,
+  1762	        id: str | None = None,
+  1763	        style: str | None = None,
+  1764	        **kwargs: str | float | int | bool,
+  1765	    ):
+  1766	
+Review the changes and make sure they are as expected. Edit the file again if necessary.
+$ cd /workspace/air && python -m compileall -q src/air && echo COMPILE_OK && python - <<'EOF'
+$ import sys, os, inspect, re
+$ sys.path.insert(0, os.path.abspath("src"))
+$ import air
+$ from air.tags.config import SVG_ATTRIBUTES
+$ from air.tags.models import svg
+$ from air.tags.utils import clean_html_attr_key
+$ 
+$ snake = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
+$ def norm(k): return snake.sub("_", k).lower()
+$ 
+$ ISSUE = "A Animate AnimateMotion AnimateTransform Circle ClipPath Defs Desc Ellipse FeBlend FeColorMatrix FeComponentTransfer FeComposite FeConvolveMatrix FeDiffuseLighting FeDisplacementMap FeDistantLight FeDropShadow FeFlood FeFuncA FeFuncB FeFuncG FeFuncR FeGaussianBlur FeImage FeMerge FeMergeNode FeMorphology FeOffset FePointLight FeSpecularLighting FeSpotLight FeTile FeTurbulence Filter ForeignObject G Image Line LinearGradient Marker Mask Metadata Mpath Path Pattern Polygon Polyline RadialGradient Rect Script Set Stop Style Svg Switch Symbol Text TextPath Title Tspan Use View".split()
+$ 
+$ fails = []
+$ for name in ISSUE:
+$     cls = getattr(svg, name)
+$     if "__init__" not in cls.__dict__:
+$         fails.append((name, "no own __init__")); continue
+$     params = set(inspect.signature(cls.__init__).parameters) - {"self", "kwargs", "children"}
+$     expected = {norm(a) for a in SVG_ATTRIBUTES[name]} | {"class_", "id", "style"}
+$     if params != expected:
+$         fails.append((name, sorted(params ^ expected)))
+$     for a in SVG_ATTRIBUTES[name]:
+$         want = f'{clean_html_attr_key(a)}="X"'
+$         if want not in cls(**{norm(a): "X"}).render():
+$             fails.append((name, a, "snake spelling"))
+$         if want not in cls(**{a: "X"}).render():
+$             fails.append((name, a, "camel spelling"))
+$     t = cls()
+$     if t.render() != f"<{t.name}></{t.name}>":
+$         fails.append((name, "bare render"))
+$     if 'class="c" id="i" style="s"' not in cls(class_="c", id="i", style="s").render():
+$         fails.append((name, "globals"))
+$ print(f"{len(ISSUE)} tags audited — FAILURES:", fails or "NONE")
+$ print(air.svg.Stop(offset=0.5, stop_color="red", stop_opacity=0.8).render())
+$ EOF
+$ python -m pytest tests/ -q --deselect tests/test_forms.py::test_form_sync_check 2>&1 | tail -2
+cd /workspace/air && python -m compileall -q src/air && echo COMPILE_OK && python - <<'EOF'
+import sys, os, inspect, re
+sys.path.insert(0, os.path.abspath("src"))
+import air
+from air.tags.config import SVG_ATTRIBUTES
+from air.tags.models import svg
+from air.tags.utils import clean_html_attr_key
+snake = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
+def norm(k): return snake.sub("_", k).lower()
+ISSUE = "A Animate AnimateMotion AnimateTransform Circle ClipPath Defs Desc Ellipse FeBlend FeColorMatrix FeComponentTransfer FeComposite FeConvolveMatrix FeDiffuseLighting FeDisplacementMap FeDistantLight FeDropShadow FeFlood FeFuncA FeFuncB FeFuncG FeFuncR FeGaussianBlur FeImage FeMerge FeMergeNode FeMorphology FeOffset FePointLight FeSpecularLighting FeSpotLight FeTile FeTurbulence Filter ForeignObject G Image Line LinearGradient Marker Mask Metadata Mpath Path Pattern Polygon Polyline RadialGradient Rect Script Set Stop Style Svg Switch Symbol Text TextPath Title Tspan Use View".split()
+fails = []
+for name in ISSUE:
+    cls = getattr(svg, name)
+    if "__init__" not in cls.__dict__:
+        fails.append((name, "no own __init__")); continue
+    params = set(inspect.signature(cls.__init__).parameters) - {"self", "kwargs", "children"}
+    expected = {norm(a) for a in SVG_ATTRIBUTES[name]} | {"class_", "id", "style"}
+    if params != expected:
+        fails.append((name, sorted(params ^ expected)))
+    for a in SVG_ATTRIBUTES[name]:
+        want = f'{clean_html_attr_key(a)}="X"'
+        if want not in cls(**{norm(a): "X"}).render():
+            fails.append((name, a, "snake spelling"))
+        if want not in cls(**{a: "X"}).render():
+
+            fails.append((name, a, "camel spelling"))
+    t = cls()
+    if t.render() != f"<{t.name}></{t.name}>":
+        fails.append((name, "bare render"))
+    if 'class="c" id="i" style="s"' not in cls(class_="c", id="i", style="s").render():
+        fails.append((name, "globals"))
+print(f"{len(ISSUE)} tags audited — FAILURES:", fails or "NONE")
+print(air.svg.Stop(offset=0.5, stop_color="red", stop_opacity=0.8).render())
+EOF
+COMPILE_OK
+63 tags audited — FAILURES: NONE
+<stop offset="0.5" stop-color="red" stop-opacity="0.8"></stop>
+
+
+python -m pytest tests/ -q --deselect tests/test_forms.py::test_form_sync_check 2>&1 | tail -2
+$ cd /workspace/air && python -m pytest tests/ -q --deselect tests/test_forms.py::test_form_sync_check 2>&1 | tail -2; awk 'length > 88 {print FILENAME": "FNR}' src/air/tags/models/svg.py src/air/tags/config.py src/air/tags/utils.py; echo LINES_OK; git status --short
+......................................................................   [100%]
+70 passed, 1 deselected in 0.32s
+LINES_OK
+ M src/air/tags/config.py
+ M src/air/tags/models/svg.py
+ M src/air/tags/utils.py
+# finish: Added explicit signatures to all 63 SVG tags
+## Final Report
+
+**Checklist: 1 issue found** — Issue #55 "Add function signatures to Air SVG Tags", whose body enumerates 63 SVG tag classes (A, Animate, AnimateMotion, AnimateTransform, Circle, ClipPath, Defs, Desc, Ellipse, FeBlend…FeTurbulence, Filter, ForeignObject, G, Image, Line, LinearGradient, Marker, Mask, Metadata, Mpath, Path, Pattern, Polygon, Polyline, RadialGradient, Rect, Script, Set, Stop, Style, Svg, Switch, Symbol, Text, TextPath, Title, Tspan, Use, View). All 63 were implemented. **0 blocked.**
+
+### Changes — 3 non-test files, all under `src/`
+
+**`src/air/tags/models/svg.py`** — every one of the 63 SVG tag classes now declares an explicit `__init__` function signature in the repo's house pattern (`*children`, tag-specific keyword arguments, `class_`/`id`/`style`, `**kwargs` escape hatch → `super().__init__(*children, **kwargs | locals_cleanup(locals(), self))`), each documented with a Google-style `Args:` docstring. Representative examples:
+- `A(href, target, download, rel, hreflang, type, referrerpolicy, media, ping, …)` — exactly the anchor attributes named in the issue
+- `Circle(cx, cy, r, path_length)`, `Rect(x, y, width, height, rx, ry, path_length)`, `Ellipse`, `Line`, `Path(d, path_length)`
+- `FeBlend(in_, in2, mode)`, `FeGaussianBlur(in_, std_deviation, edge_mode)`, `FeDropShadow(in_, dx, dy, std_deviation, flood_color, flood_opacity)`, all `FeFunc*` transfer functions, all light sources
+- `Stop(offset, stop_color, stop_opacity)`, both gradients, `Marker`, `Mask(mask_type, mask_units, mask_content_units)`, `ClipPath`, `Pattern`, `Filter`
+- `Animate`, `AnimateMotion`, `AnimateTransform`, `Set`, `Mpath`; `Svg(view_box, preserve_aspect_ratio, zoom_and_pan, xmlns, …)`, `Symbol`, `View`, `Switch`, `ForeignObject`, `Text`/`Tspan`/`TextPath`, `Use`, `Image`, `Script`, `Style`, `Title`, `Desc`, `Metadata`, `G`, `Defs`
+
+**`src/air/tags/config.py`** — new `SVG_ATTRIBUTES` map listing each tag's attribute set, consumed by `locals_cleanup` to convert declared parameters into rendered attributes.
+
+**`src/air/tags/utils.py`** — three targeted fixes: (1) `locals_cleanup` consults `SVG_ATTRIBUTES` before `HTML_ATTRIBUTES`, so `svg.A` no longer inherits the HTML anchor attribute set; (2) it resolves camelCase/hyphenated config keys to their snake_case parameter names — which also silently repairs the pre-existing HTML drops for `Form(accept_charset=…)` and `Meta(http_equiv=…)`; (3) it no longer mutates the module-level config lists, which previously appended `class_`/`id`/`style` to shared state on every single tag construction. `clean_html_attr_key` gained `from_`/`in_` mappings so SVG's reserved-word filter attributes render as the bare `from`/`in` names.
+
+### Robustness property
+Because declared parameters merge with `**kwargs`, every multiword attribute accepts **both** spellings and renders the spec-correct SVG name: `Svg(viewBox=…)` and `Svg(view_box=…)` both yield `viewBox="…"`; likewise `stdDeviation`/`std_deviation`, `attributeName`/`attribute_name`, `clipPathUnits`/`clip_path_units`, `pathLength`/`path_length`, and all 52 multiword attributes. This removes the main naming ambiguity any consumer could hit.
+
+### Verification
+- Full audit of all 63 tags: own `__init__` present; parameter sets exactly match the attribute map plus globals; every registered attribute renders with its correct SVG name under both spellings; bare render `<tag></tag>`; `class_`/`id`/`style` globals; tag-name casing preserved (`animateMotion`, `feDropShadow`, `linearGradient`, `clipPath`).
+- Edge cases: reserved words (`from_`→`from`, `in_`→`in`), colon-carrying names (`xmlns`, `xml:lang`, `xlink:href`), numeric/bool values (`preserveAlpha=True`, `offset=0.5`), `SafeStr` children, subclassing, config-map immutability across 1000 instantiations, and a full realistic SVG document (gradients, filters, markers, clip paths, masks, patterns, animations, text/tspan/textPath, switch/symbol/view) producing well-formed output.
+- `python -m compileall src/air` clean; all touched files within the 88-column ruff limit; no test files modified.
+- **Test suite: 70 passed, 0 new failures.** The single deselected failure (`test_forms.py::test_form_sync_check`, a pydantic error-message mismatch) fails identically on the untouched baseline and is unrelated to tags.

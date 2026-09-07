@@ -1,0 +1,97 @@
+{
+  "version": {
+    "quality": "quality-v1",
+    "prompt_digest": "6169e82413340627",
+    "manifest_digest": "d55b59e374bfca48"
+  },
+  "task_uuid": "d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f",
+  "model": "opus-5",
+  "run_id": "run_3",
+  "status": "scored",
+  "calibrated": false,
+  "judge": {
+    "member": "gpt-5.6-sol",
+    "model": "openai/responses/gpt-5.6-sol"
+  },
+  "patch": {
+    "source": "git",
+    "sha256": "4dc50da2488acd10d160c5335134d980a980a4ec880b5cff2be0a705534beee4",
+    "bytes": 96409,
+    "truncated": false
+  },
+  "evidence_digest": "19fc862cb55b8b54",
+  "quality_fingerprint": "15c784c109257cde",
+  "score": 1.0,
+  "counts": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "undecided": 0
+  },
+  "reasons": [],
+  "items": [
+    {
+      "id": "Q1",
+      "dimension": "conventions",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The implementation is consistently formatted and uses snake_case for Python helpers while preserving case-sensitive SVG attribute names; the new helper mirrors the existing `locals_cleanup` comprehension-and-docstring style, and no conflicting error-handling or logging pattern is introduced.",
+      "evidence_ref": "`src/air/tags/utils.py`, hunk adding `svg_locals_cleanup`; `src/air/tags/models/svg.py`, repeated constructor pattern `super().__init__(*children, **kwargs | svg_locals_cleanup(locals()))`"
+    },
+    {
+      "id": "Q2",
+      "dimension": "minimal_diff",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "All edits directly support adding explicit SVG tag signatures: `svg.py` adds the signatures and their attribute documentation, while `utils.py` adds the argument-to-attribute cleanup and reserved-name mappings needed by those signatures. No unrelated files, renames, moves, or reformatting are shown.",
+      "evidence_ref": "`src/air/tags/models/svg.py` hunk `@@ -10,378 +15,2268 @@` and `src/air/tags/utils.py` hunks `@@ -11,9 +11,16 @@` and `@@ -42,3 +49,28 @@`"
+    },
+    {
+      "id": "Q3",
+      "dimension": "abstraction",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The repeated conversion of explicit SVG constructor arguments into tag attributes is centralized in `svg_locals_cleanup` and reused across all tag constructors, while the individual signatures are directly required by the task rather than hidden behind unnecessary layers.",
+      "evidence_ref": "`src/air/tags/utils.py` hunk adding `svg_locals_cleanup`; `src/air/tags/models/svg.py` hunks consistently call `super().__init__(*children, **kwargs | svg_locals_cleanup(locals()))`."
+    },
+    {
+      "id": "Q4",
+      "dimension": "readability",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added SVG constructors follow a uniform, shallow pattern\u2014declare typed parameters and forward cleaned locals\u2014and `svg_locals_cleanup` is a concise comprehension with a clearly documented exclusion set. Comments and docstrings explain intent and attribute-name translation rather than obscuring the control flow.",
+      "evidence_ref": "src/air/tags/models/svg.py hunk @@ -10,378 +15,2268 @@, e.g. `super().__init__(*children, **kwargs | svg_locals_cleanup(locals()))`; src/air/tags/utils.py hunk @@ -42,3 +49,28 @@ defining `NON_ATTRIBUTE_LOCALS` and `svg_locals_cleanup`."
+    },
+    {
+      "id": "Q5",
+      "dimension": "naming",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The new helper and constant names (`svg_locals_cleanup` and `NON_ATTRIBUTE_LOCALS`) clearly describe their roles and follow nearby `locals_cleanup` terminology. Added constructor parameters consistently use SVG specification attribute names, with clear Python-safe aliases such as `in_`, `from_`, and `class_`.",
+      "evidence_ref": "`src/air/tags/utils.py`, hunk adding `NON_ATTRIBUTE_LOCALS` and `svg_locals_cleanup`; `src/air/tags/models/svg.py`, constructor-signature hunks such as `Animate.__init__` and `FeBlend.__init__`."
+    },
+    {
+      "id": "Q6",
+      "dimension": "idiomaticity",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The change follows existing Python/framework patterns by defining explicit `__init__` signatures, forwarding children and attributes through `super().__init__`, and extending the existing attribute-cleanup utilities with a dictionary comprehension and reserved-name mappings.",
+      "evidence_ref": "`src/air/tags/models/svg.py` hunk for `class A`: `super().__init__(*children, **kwargs | svg_locals_cleanup(locals()))`; `src/air/tags/utils.py` hunk adding `svg_locals_cleanup`."
+    },
+    {
+      "id": "Q7",
+      "dimension": "dead_code",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "All added imports, constants, and helpers are used: `Any` annotates child arguments, `svg_locals_cleanup` is called by each new initializer, and `NON_ATTRIBUTE_LOCALS` is consumed by that helper. The added comments and docstrings document active code rather than preserving disabled implementations or debugging leftovers.",
+      "evidence_ref": "src/air/tags/models/svg.py hunk at imports and `A.__init__` (`from typing import Any`, `from ..utils import svg_locals_cleanup`, and `svg_locals_cleanup(locals())`); src/air/tags/utils.py hunk adding `NON_ATTRIBUTE_LOCALS` and `svg_locals_cleanup`."
+    }
+  ]
+}

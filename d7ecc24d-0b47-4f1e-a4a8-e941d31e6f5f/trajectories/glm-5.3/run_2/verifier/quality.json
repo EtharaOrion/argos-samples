@@ -1,0 +1,97 @@
+{
+  "version": {
+    "quality": "quality-v1",
+    "prompt_digest": "6169e82413340627",
+    "manifest_digest": "d55b59e374bfca48"
+  },
+  "task_uuid": "d7ecc24d-0b47-4f1e-a4a8-e941d31e6f5f",
+  "model": "glm-5.3",
+  "run_id": "run_2",
+  "status": "scored",
+  "calibrated": false,
+  "judge": {
+    "member": "gpt-5.6-sol",
+    "model": "openai/responses/gpt-5.6-sol"
+  },
+  "patch": {
+    "source": "git",
+    "sha256": "f33282326715816df776673489e2228dee2ee067ad71dbb0b1786ee14e179304",
+    "bytes": 96830,
+    "truncated": false
+  },
+  "evidence_digest": "33e8328a4417c0b7",
+  "quality_fingerprint": "fe9a147ec1fe465d",
+  "score": 0.8571,
+  "counts": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "undecided": 0
+  },
+  "reasons": [],
+  "items": [
+    {
+      "id": "Q1",
+      "dimension": "conventions",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The additions use standard-library imports before relative imports, consistent type annotations and formatting, and reuse the existing `locals_cleanup` constructor pattern without introducing inconsistent error handling or logging. The utility changes also preserve the surrounding naming and docstring style.",
+      "evidence_ref": "`src/air/tags/models/svg.py` hunk at lines 1\u201313 and class `A` (`from typing import Any`, relative imports, and `super().__init__(*children, **kwargs | locals_cleanup(locals(), self))`); `src/air/tags/utils.py` hunk around `locals_cleanup`."
+    },
+    {
+      "id": "Q2",
+      "dimension": "minimal_diff",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "Every shown hunk supports adding and correctly processing SVG tag signatures: the SVG attribute map, explicit SVG constructors and documentation, and attribute-name normalization/cleanup logic. No unrelated files, renames, moves, or reformatting are shown.",
+      "evidence_ref": "src/air/tags/models/svg.py hunk @@ -1,3 +1,6 and @@ -10,378 +13,2076; src/air/tags/config.py hunk @@ -364,3 +364,475; src/air/tags/utils.py hunks @@ -1,4 +1,17 and @@ -33,12 +51,46"
+    },
+    {
+      "id": "Q3",
+      "dimension": "abstraction",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The SVG constructors consistently reuse the existing `locals_cleanup` path, while the added `_declared_attrs` helper centralizes the necessary HTML/SVG map selection and inheritance handling rather than duplicating it across each tag.",
+      "evidence_ref": "`src/air/tags/utils.py`, hunk adding `_declared_attrs` and updating `locals_cleanup`; `src/air/tags/models/svg.py`, constructors consistently call `super().__init__(*children, **kwargs | locals_cleanup(locals(), self))`."
+    },
+    {
+      "id": "Q4",
+      "dimension": "readability",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The changed behavior is organized into small, focused helpers with straightforward loops and shallow branching, while comments explain proxy normalization and map-selection intent rather than merely narrating syntax. The many SVG constructors are repetitive but consistently structured and easy to follow.",
+      "evidence_ref": "src/air/tags/utils.py, hunk around `_declared_attrs`, `normalize_attr_names`, and `locals_cleanup`; e.g. `for klass in type(obj).__mro__:` followed by direct map lookup and return."
+    },
+    {
+      "id": "Q5",
+      "dimension": "naming",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": false,
+      "rationale": "The new SVG parameter names generally follow SVG attribute casing, but `playbackorder` is inconsistently lowercased alongside camelCase names such as `baseProfile`, `snapshotTime`, and `timelineStart`; the SVG attribute is conventionally named `playbackOrder`.",
+      "evidence_ref": "src/air/tags/models/svg.py, `Svg.__init__` hunk: `playbackorder: str | None = None`"
+    },
+    {
+      "id": "Q6",
+      "dimension": "idiomaticity",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The SVG constructors follow the repository\u2019s existing tag pattern by accepting typed keyword arguments and forwarding them through the shared `locals_cleanup` utility, while the utility extension uses standard Python facilities such as `keyword.iskeyword`, dictionary lookup, and class MRO traversal.",
+      "evidence_ref": "src/air/tags/models/svg.py hunk at imports and `class A`, especially `super().__init__(*children, **kwargs | locals_cleanup(locals(), self))`; src/air/tags/utils.py hunk adding `_declared_attrs` and `normalize_attr_names`"
+    },
+    {
+      "id": "Q7",
+      "dimension": "dead_code",
+      "weight": 3,
+      "resolution": "unanimous",
+      "satisfied": true,
+      "rationale": "The added SVG attribute map, imports, proxy mapping, normalization helper, and MRO-based lookup are all referenced by `locals_cleanup`, while the added constructors invoke that cleanup path; no unused symbols, unreachable branches, commented-out code, or debugging leftovers are shown.",
+      "evidence_ref": "src/air/tags/utils.py, hunk around `_declared_attrs` and `locals_cleanup`: `for attr in _declared_attrs(obj):`; src/air/tags/models/svg.py constructors call `locals_cleanup(locals(), self)`."
+    }
+  ]
+}

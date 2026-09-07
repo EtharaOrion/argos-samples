@@ -1,0 +1,281 @@
+diff --git a/scapy/layers/rtp.py b/scapy/layers/rtp.py
+index ee8f0b9c..939709aa 100644
+--- a/scapy/layers/rtp.py
++++ b/scapy/layers/rtp.py
+@@ -13,9 +13,15 @@ Remember to use::
+ To register the port you are using
+ """
+ 
++import struct
++
++from scapy.compat import orb
+ from scapy.packet import Packet, bind_layers
+ from scapy.fields import BitEnumField, BitField, BitFieldLenField, \
+-    FieldLenField, FieldListField, IntField, ShortField
++    ByteEnumField, ByteField, ConditionalField, FieldLenField, \
++    FieldListField, IntField, LongField, PacketField, \
++    PacketListField, ShortField, StrField, StrFixedLenField, \
++    StrLenField
+ 
+ _rtp_payload_types = {
+     # http://www.iana.org/assignments/rtp-parameters
+@@ -32,6 +38,25 @@ _rtp_payload_types = {
+     31: 'H261', 32: 'MPV',
+     33: 'MP2T', 34: 'H263'}
+ 
++_rtcp_packet_types = {
++    # https://www.iana.org/assignments/rtp-parameters
++    200: 'Sender Report',
++    201: 'Receiver Report',
++    202: 'Source Description',
++    203: 'Goodbye',
++    204: 'Application-Defined'}
++
++_rtcp_sdes_types = {
++    0: 'END',
++    1: 'CNAME',
++    2: 'NAME',
++    3: 'EMAIL',
++    4: 'PHONE',
++    5: 'LOC',
++    6: 'TOOL',
++    7: 'NOTE',
++    8: 'PRIV'}
++
+ 
+ class RTPExtension(Packet):
+     name = "RTP extension"
+@@ -55,3 +80,233 @@ class RTP(Packet):
+ 
+ 
+ bind_layers(RTP, RTPExtension, extension=1)
++
++
++class SenderInfo(Packet):
++    """Sender information, as found in RTCP Sender Report packets."""
++    name = "Sender Info"
++    fields_desc = [LongField('ntp_timestamp', 0),
++                   IntField('rtp_timestamp', 0),
++                   IntField('sender_packet_count', 0),
++                   IntField('sender_octet_count', 0)]
++
++    def extract_padding(self, p):
++        return "", p
++
++
++class ReceptionReport(Packet):
++    """A single reception report block of a RTCP SR/RR packet."""
++    name = "Reception Report"
++    fields_desc = [IntField('sourcesync', 0),
++                   ByteField('fraction_lost', 0),
++                   BitField('cumulative_lost', 0, 24),
++                   IntField('highest_seqnum_recv', 0),
++                   IntField('jitter', 0),
++                   IntField('last_SR_timestamp', 0),
++                   IntField('delay_since_last_SR', 0)]
++
++    def extract_padding(self, p):
++        return "", p
++
++
++class SDESItem(Packet):
++    """A single item of a RTCP Source Description chunk."""
++    name = "SDES item"
++    fields_desc = [ByteEnumField('chunk_type', 1, _rtcp_sdes_types),
++                   ConditionalField(
++                       FieldLenField('length', None, length_of='value',
++                                     fmt='B'),
++                       lambda pkt: pkt.chunk_type != 0),
++                   ConditionalField(
++                       StrLenField('value', '',
++                                   length_from=lambda pkt: pkt.length),
++                       lambda pkt: pkt.chunk_type != 0)]
++
++    def extract_padding(self, p):
++        return "", p
++
++
++def _next_sdes_item(pkt, lst, cur, remain):
++    """Dissect SDES items until the END item or the end of the chunk"""
++    if cur is not None and cur.chunk_type == 0:
++        return None
++    if not remain:
++        return None
++    return SDESItem
++
++
++class SDESChunk(Packet):
++    """A source description chunk, as found in RTCP SDES packets.
++
++    A chunk holds the items describing a single source, and is padded with
++    null octets up to the next 32-bit boundary.
++    """
++    name = "SDES chunk"
++    fields_desc = [IntField('sourcesync', 0),
++                   PacketListField('items', None, SDESItem,
++                                   next_cls_cb=_next_sdes_item)]
++
++    def pre_dissect(self, s):
++        self._chunk_offset = len(s)
++        return s
++
++    def post_dissect(self, s):
++        # a chunk is padded with null octets up to the next 32-bit boundary
++        consumed = self._chunk_offset - len(s)
++        pad = (-consumed) % 4
++        if pad:
++            # the padding is not stored: it is added back in post_build
++            self.raw_packet_cache = None
++        return s[pad:]
++
++    def post_build(self, pkt, pay):
++        items = self.items or []
++        if not items or items[-1].chunk_type != 0:
++            # terminate the chunk with a null octet
++            pkt += b"\x00"
++        pkt += b"\x00" * (-len(pkt) % 4)
++        return pkt + pay
++
++    def extract_padding(self, p):
++        return "", p
++
++
++def _rtcp_bye_has_reason(pkt):
++    """Tell whether a RTCP BYE packet holds a 'reason for leaving'"""
++    if pkt.packet_type != 203:
++        return False
++    if pkt.length is None:
++        # building: the reason is present if it was provided
++        return bool(pkt.getfieldval('reason'))
++    # dissecting: the reason follows the SSRC/CSRC list
++    return pkt.length > len(pkt.getfieldval('sources') or [])
++
++
++def _rtcp_app_data_len(pkt):
++    """Length of the application-dependent data of a RTCP APP packet"""
++    if pkt.length is None:
++        return 0
++    # header (4) + SSRC (4) + name (4)
++    return max((pkt.length + 1) * 4 - 12, 0)
++
++
++def _rtcp_body_len(pkt):
++    """Length of the body of a RTCP packet whose type is not supported"""
++    if pkt.length is None:
++        return 0
++    # header (4)
++    return max((pkt.length + 1) * 4 - 4, 0)
++
++
++class _RTCPTrailerField(StrField):
++    """The bytes of a RTCP packet that were not dissected: null octets used
++    to align a field on a 32-bit boundary, padding octets (see the P bit) or
++    profile-specific extensions.
++
++    Keeping them in a field guarantees that the next packet of a compound
++    RTCP packet is dissected at the right offset.
++    """
++
++    def getfield(self, pkt, s):
++        offset = getattr(pkt, '_rtcp_offset', None)
++        if offset is None or pkt.length is None:
++            return s, b""
++        # bytes of this packet that are left once its fields are dissected
++        remain = (pkt.length + 1) * 4 - (offset - len(s))
++        remain = max(0, min(remain, len(s)))
++        return s[remain:], s[:remain]
++
++
++class RTCP(Packet):
++    """RTP Control Protocol (RFC 3550).
++
++    Compound RTCP packets are dissected as several stacked RTCP layers.
++    """
++    name = "RTCP"
++    fields_desc = [
++        # HEADER
++        BitField('version', 2, 2),
++        BitField('padding', 0, 1),
++        BitFieldLenField('count', None, 5, count_of='report_blocks'),
++        ByteEnumField('packet_type', 200, _rtcp_packet_types),
++        # length in 32-bit words minus one, computed in post_build
++        ShortField('length', None),
++        # SR/RR/APP
++        ConditionalField(
++            IntField('sourcesync', 0),
++            lambda pkt: pkt.packet_type in (200, 201, 204)),
++        # SR
++        ConditionalField(
++            PacketField('sender_info', SenderInfo(), SenderInfo),
++            lambda pkt: pkt.packet_type == 200),
++        # SR/RR
++        ConditionalField(
++            PacketListField('report_blocks', None, ReceptionReport,
++                            count_from=lambda pkt: pkt.count),
++            lambda pkt: pkt.packet_type in (200, 201)),
++        # SDES
++        ConditionalField(
++            PacketListField('sdes_chunks', None, SDESChunk,
++                            count_from=lambda pkt: pkt.count),
++            lambda pkt: pkt.packet_type == 202),
++        # BYE
++        ConditionalField(
++            FieldListField('sources', [], IntField('', 0),
++                           count_from=lambda pkt: pkt.count),
++            lambda pkt: pkt.packet_type == 203),
++        ConditionalField(
++            FieldLenField('reason_length', None, length_of='reason', fmt='B'),
++            _rtcp_bye_has_reason),
++        ConditionalField(
++            StrLenField('reason', '',
++                        length_from=lambda pkt: pkt.reason_length),
++            _rtcp_bye_has_reason),
++        # APP
++        ConditionalField(
++            StrFixedLenField('app_name', '', 4),
++            lambda pkt: pkt.packet_type == 204),
++        ConditionalField(
++            StrLenField('app_data', '', length_from=_rtcp_app_data_len),
++            lambda pkt: pkt.packet_type == 204),
++        # any other (unsupported) packet type
++        ConditionalField(
++            StrLenField('data', '', length_from=_rtcp_body_len),
++            lambda pkt: pkt.packet_type not in _rtcp_packet_types),
++        # padding and/or profile-specific extensions
++        _RTCPTrailerField('trailer', ''),
++    ]
++
++    def pre_dissect(self, s):
++        self._rtcp_offset = len(s)
++        return s
++
++    def _reception_count(self):
++        """Number of items counted by the 'count' header field"""
++        if self.packet_type in (200, 201):
++            return len(self.report_blocks or [])
++        elif self.packet_type == 202:
++            return len(self.sdes_chunks or [])
++        elif self.packet_type == 203:
++            return len(self.sources or [])
++        return 0
++
++    def post_build(self, pkt, pay):
++        if self.length is None:
++            # a RTCP packet must end on a 32-bit boundary
++            pkt += b"\x00" * (-len(pkt) % 4)
++        if self.count is None:
++            count = self._reception_count()
++            pkt = struct.pack("!B",
++                              (orb(pkt[0]) & 0xe0) | (count & 0x1f)) + pkt[1:]
++        if self.length is None:
++            # the length is expressed in 32-bit words minus one, and
++            # includes the header
++            pkt = pkt[:2] + struct.pack("!H", len(pkt) // 4 - 1) + pkt[4:]
++        return pkt + pay
++
++    def guess_payload_class(self, payload):
++        # a compound RTCP packet is made of several RTCP packets
++        if len(payload) >= 4 and orb(payload[0]) >> 6 == 2 and \
++                192 <= orb(payload[1]) <= 223:
++            return RTCP
++        return Packet.guess_payload_class(self, payload)

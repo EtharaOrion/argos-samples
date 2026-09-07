@@ -1,0 +1,200 @@
+$ cd /workspace/molecule && npx jest --no-coverage --testMatch "**/repro.test.ts" 2>&1 | grep -E "✓|✕|Tests:|Suites:|●" | head -30
+✓ get the current theme and its mode (15 ms)
+    ✓ the mode should be updated when updating the current theme (5 ms)
+    ✓ onChange event (7 ms)
+    ✓ should not emit the changed event when the theme not found (13 ms)
+    ✓ color utils (3 ms)
+    ✓ theme mode detection (3 ms)
+Test Suites: 1 passed, 1 total
+Tests:       6 passed, 6 total
+$ cd /workspace/molecule && rm repro.test.ts && npx prettier --check src/common/color.ts && npx tsc --noEmit && npx jest --no-coverage 2>&1 | tail -7 && git status --short
+Checking formatting...
+All matched files use Prettier code style!
+
+
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+Snapshots:   49 passed, 49 total
+Time:        3.999 s
+Ran all test suites.
+ M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M src/services/theme/helper.ts
+ M website/docs/guides/extend-color-theme.md
+ M website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+?? src/common/color.ts
+$ cd /workspace/molecule && cat .gitignore | head -20 && sed -n 1,60p build/gulpfile.js
+.history
+node_modules
+umd
+esm
+coverage
+.DS_Store
+storybook-static
+.yarn-error.log
+lib
+docs/api
+
+# Website
+
+# Dependencies
+website/node_modules
+
+# Production
+website/build
+
+# Generated files
+const path = require('path');
+const gulp = require('gulp');
+const ts = require('gulp-typescript');
+const through = require('through2');
+const rimraf = require('rimraf');
+const sass = require('gulp-sass')(require('sass'));
+const aliasImporter = require('node-sass-alias-importer');
+const varables = require('./variables');
+const tsProject = ts.createProject('../tsconfig.build.json');
+const output = '../esm';
+
+function replacePath(code, filePath, importOptions) {
+    const sourcePath = path.dirname(filePath);
+    const targetPath = path.resolve(output);
+    const relativePath = path.relative(sourcePath, targetPath);
+    const finalPath = relativePath ? './' + relativePath + '/' : './';
+    return code.replace(/([from|import]\s+)'(mo\/|\bmo\b)/g, "$1'" + finalPath);
+}
+
+function relativeImport(compilerOptions) {
+    return through.obj(function (file, encoding, cb) {
+        if (!file.contents) {
+            return;
+        }
+        let content = file.contents.toString('utf-8');
+        content = replacePath(
+            content,
+            file.history.toString(),
+            compilerOptions
+        );
+        file.contents = Buffer.from(content);
+        this.push(file);
+        cb();
+    });
+}
+
+function removeDevelopmentVariables() {
+    return through.obj(function (file, encoding, cb) {
+        if (!file.contents) return;
+        let content = file.contents.toString('utf-8');
+        // 后续不行的话 用 babel 来基于 AST 来清除指定代码块
+        const reg = new RegExp(Object.keys(varables).join('|'));
+        if (reg.test(content)) {
+            content = content.replace(reg, 'false');
+        }
+        file.contents = Buffer.from(content);
+        this.push(file);
+        cb();
+    });
+}
+
+gulp.task('clean', function (cb) {
+    rimraf(output, cb);
+});
+
+gulp.task('build:esm', function () {
+    return tsProject
+        .src()
+        .pipe(tsProject())
+        .pipe(relativeImport(tsProject.config.compilerOptions))
+$ cd /workspace/molecule && timeout 600 npx gulp --gulpfile ./build/gulpfile.js 2>&1 | tail -25
+[12:13:33] Working directory changed to /workspace/molecule/build
+[12:13:33] Using gulpfile /workspace/molecule/build/gulpfile.js
+[12:13:33] Starting 'default'...
+[12:13:33] Starting 'clean'...
+[12:13:33] Finished 'clean' after 1.35 ms
+[12:13:33] Starting 'build:esm'...
+[12:13:37] Finished 'build:esm' after 4.27 s
+[12:13:37] Starting 'build:sass'...
+[12:13:38] Finished 'build:sass' after 569 ms
+[12:13:38] Starting 'build:extensions'...
+[12:13:38] Finished 'build:extensions' after 26 ms
+[12:13:38] Starting 'build:i18n'...
+[12:13:38] Finished 'build:i18n' after 1.72 ms
+[12:13:38] Finished 'default' after 4.87 s
+$ cd /workspace/molecule && ls esm/common/color.* && head -8 esm/common/color.js && grep -n "getColorThemeMode\|ColorThemeMode" esm/services/theme/colorThemeService.d.ts | head -10 && grep -n "ColorThemeMode" esm/model/colorTheme.d.ts
+esm/common/color.d.ts  esm/common/color.js
+import { ColorThemeMode } from './../model/colorTheme';
+const RGB_REGEX = /^rgba?\(([^)]+)\)$/i;
+const HEX_REGEX = /^#([0-9a-f]{3,8})$/i;
+/**
+ * Convert a color string to the RGB values,
+ * it supports the HEX(#000, #000f, #000000, #000000ff)
+ * and the RGB/RGBA(rgb(0, 0, 0), rgba(0, 0, 0, 0.5)) color formats.
+ * @param color The color string
+6:import { ColorThemeEvent, ColorThemeMode, IColorTheme } from './../../model/colorTheme';
+8:export { ColorThemeEvent, ColorThemeMode };
+44:    getColorThemeMode(): ColorThemeMode;
+51:    onChange(callback: (prev: IColorTheme, next: IColorTheme, themeMode: ColorThemeMode) => void): void;
+77:    getColorThemeMode(): ColorThemeMode;
+78:    onChange(callback: (prev: IColorTheme, next: IColorTheme, themeMode: ColorThemeMode) => void): void;
+21:export declare enum ColorThemeMode {
+$ cd /workspace/molecule && rm -rf esm && git status --short && git --no-pager diff --stat && npx jest --no-coverage 2>&1 | tail -6
+M src/model/colorTheme.ts
+ M src/services/theme/colorThemeService.ts
+ M src/services/theme/helper.ts
+ M website/docs/guides/extend-color-theme.md
+ M website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md
+?? src/common/color.ts
+ src/model/colorTheme.ts                                                                | 19 +++++++++++++++++++
+ src/services/theme/colorThemeService.ts                                                | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ src/services/theme/helper.ts                                                           | 35 ++++++++++++++++++++++++++++++++++-
+ website/docs/guides/extend-color-theme.md                                              | 26 ++++++++++++++++++++++++++
+ website/i18n/zh-CN/docusaurus-plugin-content-docs/current/guides/extend-color-theme.md | 25 +++++++++++++++++++++++++
+ 5 files changed, 158 insertions(+), 5 deletions(-)
+
+Test Suites: 96 passed, 96 total
+Tests:       704 passed, 704 total
+Snapshots:   49 passed, 49 total
+Time:        3.957 s
+Ran all test suites.
+# finish: Completed issue 627: added color theme mode API
+**Checklist: 1 issue found in the description. Final tally: 1 DONE, 0 BLOCKED.**
+
+### Issue 1 (#627) — "How to get current theme?" — DONE
+
+**Problem:** `ColorThemeService` only exposed `getColorTheme()` (the raw theme object). There was no way for an application to determine whether the active theme is *dark* or *light* (what the reporter needed to sync an Ant Design theme), and no way to be notified when the theme changes.
+
+**Implementation (non-test code only):**
+
+1. `src/model/colorTheme.ts`
+   - Added `ColorThemeMode` enum (`dark` / `light`).
+   - Added `ColorThemeEvent` enum (`onChange = 'colorTheme.onChange'`), following the existing `SettingsEvent` / `LocalizationEvent` conventions.
+
+2. `src/common/color.ts` (new)
+   - `colorToRGB(color)` — parses `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb(...)`, `rgba(...)`; returns `undefined` on invalid input.
+   - `colorLightOrDark(color)` — HSP brightness model, returns `ColorThemeMode.light | dark` (defaults to `dark` for invalid colors). Written ES5-safe (`parseInt`/`isNaN`) to match `target: es5`.
+
+3. `src/services/theme/helper.ts`
+   - New `getColorThemeMode(theme)` — resolves the mode from the theme's own `editor.background` / `workbenchBackground`, then the declared `type` (`ColorScheme`), then from the built-in colors selected by `uiTheme` (`vs` → light, `vs-dark`/unknown → dark).
+   - Re-exports `colorLightOrDark` / `colorToRGB` so the theme helpers remain a single entry point.
+
+4. `src/services/theme/colorThemeService.ts`
+   - `ColorThemeService` now extends `GlobalEvent`.
+   - New public API: `getColorThemeMode(): ColorThemeMode` and `onChange((prev, next, themeMode) => void)`.
+   - `setTheme()` emits `ColorThemeEvent.onChange` with the previous theme, the new theme and its mode; nothing is emitted when the id can't be resolved (`updateTheme()` → `reload()` therefore also notifies subscribers).
+   - Fixed the incorrect interface signature `getThemeById(id: string): void` → `IColorTheme | undefined`, which previously made themes unusable through the public `IColorThemeService` type.
+   - Re-exports `ColorThemeMode` / `ColorThemeEvent` so they're reachable via `mo/services` as well as `mo/model`.
+
+5. Docs — `website/docs/guides/extend-color-theme.md` and the zh-CN "current" translation now document `getColorTheme()`, `getColorThemeMode()` and `onChange()` with the issue's exact use case. Versioned doc snapshots were left untouched.
+
+Consumers can now write exactly what the issue asked for:
+```ts
+if (molecule.colorTheme.getColorThemeMode() === ColorThemeMode.dark) changeAntDesignTheme();
+molecule.colorTheme.onChange((prev, next, themeMode) => { /* react to theme switches */ });
+```
+
+**Verification:**
+- A temporary reproduction suite (mode detection via colors / `type` / `uiTheme`, `updateTheme` reload, event payload `(prev, next, mode)`, no event for unknown ids, hex/rgba/invalid-color edge cases) passed, then was deleted — no files were created or modified anywhere under a test tree.
+- `npx tsc --noEmit` clean; `eslint` and `prettier --check` clean on all touched files.
+- Real package build (`gulp --gulpfile ./build/gulpfile.js`) succeeds; the emitted `esm/common/color.js`, `esm/model/colorTheme.d.ts` and `esm/services/theme/colorThemeService.d.ts` contain the new API with correctly rewritten relative imports (build output removed afterwards).
+- Full jest suite: **96 suites / 704 tests passing**, no regressions.
+
+No issues were blocked. No CI, template, chart, lockfile or test-tree paths were touched.
