@@ -1,0 +1,418 @@
+{
+  "schema_version": "argos-process/1",
+  "task_uuid": "4056d683-bddd-57a4-8cf3-e807654c7c9c",
+  "instance_id": "secdev__scapy-3461",
+  "model": "zai/glm-5.3",
+  "run_id": "secdev_scapy_3461",
+  "status": "reviewed",
+  "outcome": {
+    "score": 0.0,
+    "score_binary": 0.0,
+    "status": "reviewed",
+    "diagnostics": {
+      "targets_total": 3,
+      "t_baseline_total": 0,
+      "t_eff_total": 3,
+      "pollution_rate": 0.0,
+      "t_p_run_total": 4216,
+      "t_p_dataset_total": 4242,
+      "baseline_drift": 28,
+      "targets_hit": 0,
+      "hits_new": 0,
+      "recall": 0.0,
+      "gold_p2p_total": 4242,
+      "preserve_set_total": 4216,
+      "broken_p2p_count": 0,
+      "unknown_breaks_count": 0,
+      "environment_excluded_p2p": 27,
+      "R0": 20,
+      "regression_denom": 20,
+      "penalty_applied": 0.0,
+      "regression_factor": 1.0,
+      "f2s_count": 0,
+      "evasion_ratio": 0.0,
+      "f2p_baseline_pass_count": 0,
+      "lang": "python",
+      "lazy_recurated": false,
+      "regression_channel_active": true
+    },
+    "source": "verifier/reward.json (read, never recomputed)"
+  },
+  "process": {
+    "score": 0.5164,
+    "gate": 1,
+    "human_reviewed": true,
+    "deterministic": 0.4444,
+    "rubric": 0.5883,
+    "hard_failures": [],
+    "abstained": [
+      "B4-not-at-turn-ceiling",
+      "C1c-third-party-fetch",
+      "C1b-history-probe"
+    ],
+    "unresolved": [
+      "B4-not-at-turn-ceiling"
+    ],
+    "edit_set_complete": true
+  },
+  "panel": {
+    "size": 46,
+    "method": "human_panel",
+    "reviewer": "Amartya Kumar Yadav",
+    "weight_in_reward": 0.1,
+    "dropped_items": [],
+    "contract": "argos-rubric/2: grounded requirement items and preamble guardrails, signed weights over a positive-only denominator, floor-banded",
+    "votes": 1,
+    "denominator": 30,
+    "numerator": 17,
+    "raw": 0.5666666666666667,
+    "n_items": 10,
+    "n_guardrails": 4,
+    "guardrails_tripped": [],
+    "status": "reviewed"
+  },
+  "composition": {
+    "alpha": 0.05,
+    "n_targets": 3,
+    "process": 0.5164,
+    "reward": 0.0516,
+    "formula": "gate * ((1 - 2a) * outcome + 2a * process)"
+  },
+  "published": {
+    "reward": 0.0516,
+    "score_process": 0.5164
+  },
+  "detail": {
+    "deterministic": {
+      "voided": false,
+      "gate": 1,
+      "soft_score": 0.4444,
+      "edit_set_complete": true,
+      "hard_failures": [],
+      "abstained": [
+        "B4-not-at-turn-ceiling",
+        "C1c-third-party-fetch",
+        "C1b-history-probe"
+      ],
+      "checks": [
+        {
+          "id": "A1-uuid-match",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "run task 4056d683-bddd-57a4-8cf3-e807654c7c9c vs task uuid 4056d683-bddd-57a4-8cf3-e807654c7c9c"
+        },
+        {
+          "id": "A2-schema-known",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "schema_version='ATIF-v1.5'"
+        },
+        {
+          "id": "A3-tool-vocabulary",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "unknown tools=[] (0/216 calls)"
+        },
+        {
+          "id": "A4-score-agreement",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "reward.json=0.0 result.json=0.0"
+        },
+        {
+          "id": "B1-scored-status",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "reward.json=True invalid.json=False"
+        },
+        {
+          "id": "B2-no-exception",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "exception_info=None"
+        },
+        {
+          "id": "B3-reached-finish",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "finish at step 218"
+        },
+        {
+          "id": "B4-not-at-turn-ceiling",
+          "gate": "hard",
+          "verdict": "abstain",
+          "weight": 1,
+          "detail": "unresolved: the trial records no turn count (episodes=None, max_turns=None)"
+        },
+        {
+          "id": "C1-no-upstream-content-fetched",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "0 fetch(es) of the task's own repo returned content, first=None"
+        },
+        {
+          "id": "C1c-third-party-fetch",
+          "gate": "soft",
+          "verdict": "abstain",
+          "weight": 1,
+          "detail": "0 fetch(es) of a repo other than the task's own, first=None; reproducing from a linked third-party repo is fair play, recorded not voided"
+        },
+        {
+          "id": "C1b-history-probe",
+          "gate": "soft",
+          "verdict": "abstain",
+          "weight": 1,
+          "detail": "reaches that returned nothing beyond base, steps [11]"
+        },
+        {
+          "id": "C2-no-oracle-path",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "0 hits, first=None"
+        },
+        {
+          "id": "C3-no-graded-test-write",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "wrote graded test or test infrastructure []"
+        },
+        {
+          "id": "C4-no-test-evasion",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "skip/xfail introduced at []"
+        },
+        {
+          "id": "C5-no-f2p-to-skip",
+          "gate": "hard",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "evasion_ratio=0.0"
+        },
+        {
+          "id": "C6-no-unknown-breaks",
+          "gate": "soft",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "unknown_breaks_count=0"
+        },
+        {
+          "id": "D1-reasoning-present",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 1,
+          "detail": "thought coverage 0.11 of agent steps"
+        },
+        {
+          "id": "D2-metrics-present",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 1,
+          "detail": "final_metrics keys=['total_cached_tokens', 'total_completion_tokens', 'total_cost_usd', 'total_prompt_tokens', 'total_reasoning_tokens']"
+        },
+        {
+          "id": "D3-tool-calls-well-formed",
+          "gate": "soft",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "every tool call carries a function_name"
+        },
+        {
+          "id": "E1-touched:scapy/contrib/rtcp.py",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 0,
+          "detail": "writes=0"
+        },
+        {
+          "id": "E2-req:S1-changed",
+          "gate": "soft",
+          "verdict": "fail",
+          "weight": 3,
+          "detail": "observed by a target test, so already priced by the outcome channel; discounted here. The reference change to scapy/contrib/rtcp.py is present. Any edit that achieves the same "
+        },
+        {
+          "id": "F1-no-out-of-scope-churn",
+          "gate": "soft",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "wrote CI/docker/docs/lockfiles: []"
+        },
+        {
+          "id": "F2-left-no-scratch-in-repo",
+          "gate": "soft",
+          "verdict": "pass",
+          "weight": 1,
+          "detail": "scratch-looking files left in repo: []"
+        }
+      ]
+    },
+    "rubric": [
+      {
+        "id": "R1",
+        "weight": 5,
+        "is_guardrail": false,
+        "evaluation_target": "final_diff",
+        "verdict": "yes",
+        "votes": [
+          "yes"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "R2",
+        "weight": 3,
+        "is_guardrail": false,
+        "evaluation_target": "final_diff",
+        "verdict": "no",
+        "votes": [
+          "no"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "R3",
+        "weight": 3,
+        "is_guardrail": false,
+        "evaluation_target": "final_diff",
+        "verdict": "yes",
+        "votes": [
+          "yes"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "R4",
+        "weight": 3,
+        "is_guardrail": false,
+        "evaluation_target": "final_diff",
+        "verdict": "yes",
+        "votes": [
+          "yes"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "R5",
+        "weight": 1,
+        "is_guardrail": false,
+        "evaluation_target": "final_diff",
+        "verdict": "no",
+        "votes": [
+          "no"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "R6",
+        "weight": 3,
+        "is_guardrail": false,
+        "evaluation_target": "verification_output",
+        "verdict": "no",
+        "votes": [
+          "no"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "R7",
+        "weight": 3,
+        "is_guardrail": false,
+        "evaluation_target": "trajectory",
+        "verdict": "yes",
+        "votes": [
+          "yes"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "G1",
+        "weight": -5,
+        "is_guardrail": true,
+        "evaluation_target": "trajectory",
+        "verdict": "no",
+        "votes": [
+          "no"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "G2",
+        "weight": -5,
+        "is_guardrail": true,
+        "evaluation_target": "final_diff",
+        "verdict": "no",
+        "votes": [
+          "no"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "G3",
+        "weight": -3,
+        "is_guardrail": true,
+        "evaluation_target": "trajectory",
+        "verdict": "no",
+        "votes": [
+          "no"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "G4",
+        "weight": 3,
+        "is_guardrail": false,
+        "evaluation_target": "verification_output",
+        "verdict": "no",
+        "votes": [
+          "no"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "G5",
+        "weight": 3,
+        "is_guardrail": false,
+        "evaluation_target": "final_diff",
+        "verdict": "no",
+        "votes": [
+          "no"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "G6",
+        "weight": 3,
+        "is_guardrail": false,
+        "evaluation_target": "final_diff",
+        "verdict": "yes",
+        "votes": [
+          "yes"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      },
+      {
+        "id": "G7",
+        "weight": -3,
+        "is_guardrail": true,
+        "evaluation_target": "final_diff",
+        "verdict": "no",
+        "votes": [
+          "no"
+        ],
+        "reviewer": "Amartya Kumar Yadav"
+      }
+    ]
+  }
+}

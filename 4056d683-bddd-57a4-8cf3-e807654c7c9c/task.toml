@@ -1,0 +1,85 @@
+schema_version = "1.4"
+artifacts = [ "/logs/agent/trajectory.json",]
+
+[task]
+name = "argos/secdev__scapy-3461"
+description = "RTCP Support"
+keywords = [ "python", "issue-resolving", "scapy",]
+[[task.authors]]
+name = "Amartya Kumar Yadav"
+email = "amartya.yadav@ethara.ai"
+
+[metadata]
+uuid_v5 = "4056d683-bddd-57a4-8cf3-e807654c7c9c"
+project_id = "Argos-001"
+difficulty = "easy"
+category = "feature_development"
+argos_task_format = 1
+network_profile = "dev-open"
+
+[metadata.upstream_provenance]
+origin = "derived"
+provenance_date = "2022-02-01"
+source_kind = "public_repository"
+upstream_benchmark = "multi-swe-bench"
+upstream_toolchain = "github.com/Ethara-Ai/multi-swe-bench@447ddbd639e4ec60376282ccee32ad1ab60afb69"
+license = "GPL-2.0"
+modifications = [ "harbor-repackage", "rubric-added", "instruction-rewritten",]
+base_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/secdev__scapy:pr-3461@sha256:24ab8ff8455380b94070759541e046ffc54ffc1efa73d8ba82b7c57121c3a82c"
+agent_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/secdev__scapy:pr-3461-prebaked@sha256:066aa36d6ffd74a237cf190c231dceef675c03e13a526eabc2ddf932f0a451df"
+verifier_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/secdev__scapy:pr-3461-verifier@sha256:cfa0850aa85d9b389e7c23993c194de72292ffd0fe93f74115832e8080f5634c"
+
+[metadata.upstream_provenance.source]
+canonical_repo = "secdev/scapy"
+base_commit = "adaa923db82be88e5bd84b4046faa23f2b69d0ed"
+pull_request = 3461
+event_timestamp = "2021-11-26T22:13:09Z"
+
+[verifier]
+network_mode = "public"
+timeout_sec = 7200.0
+environment_mode = "separate"
+[[verifier.collect]]
+command = "bash -c 'set -euo pipefail; set -f; rm -f /logs/artifacts/agent.patch /logs/artifacts/agent.patch.tmp; mkdir -p /logs/artifacts; cd /workspace/scapy; export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1; git -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null -c core.fsmonitor=false -c diff.noprefix=false -c diff.mnemonicPrefix=false -c diff.srcPrefix=a/ -c diff.dstPrefix=b/ -c safe.directory=* add -A; git -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null -c core.fsmonitor=false -c diff.noprefix=false -c diff.mnemonicPrefix=false -c diff.srcPrefix=a/ -c diff.dstPrefix=b/ -c safe.directory=* diff --cached --binary --full-index --no-ext-diff --no-textconv --no-color adaa923db82be88e5bd84b4046faa23f2b69d0ed > /logs/artifacts/agent.patch.tmp; mv /logs/artifacts/agent.patch.tmp /logs/artifacts/agent.patch'"
+service = "main"
+timeout_sec = 600.0
+
+[verifier.env]
+# Rubric judge used inside the verifier: set your model, endpoint and key (see tests/argos_grader/README.md).
+ARGOS_JUDGE_MODEL = "openai/<judge-model>"
+ARGOS_JUDGE_BASE_URL = "https://api.openai.com/v1"
+# Anthropic instead: ARGOS_JUDGE_MODEL = "anthropic/<judge-model>", ARGOS_JUDGE_BASE_URL = "https://api.anthropic.com"
+ARGOS_JUDGE_API_KEY = "<your-api-key>"
+ARGOS_JUDGE_VOTES = "1"
+
+[verifier.environment]
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/secdev__scapy:pr-3461-verifier@sha256:cfa0850aa85d9b389e7c23993c194de72292ffd0fe93f74115832e8080f5634c"
+network_mode = "public"
+build_timeout_sec = 1800.0
+os = "linux"
+cpus = 8
+memory_mb = 12288
+storage_mb = 10240
+mcp_servers = []
+
+[verifier.environment.env]
+
+[agent]
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.z.ai"]
+timeout_sec = 14400.0
+
+[environment]
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/secdev__scapy:pr-3461-prebaked@sha256:066aa36d6ffd74a237cf190c231dceef675c03e13a526eabc2ddf932f0a451df"
+network_mode = "public"
+build_timeout_sec = 1800.0
+os = "linux"
+cpus = 8
+memory_mb = 12288
+storage_mb = 10240
+gpus = 0
+mcp_servers = []
+
+[environment.env]
+
+[solution.env]

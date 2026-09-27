@@ -1,0 +1,15 @@
+{
+    "task": {
+        "path": "24d2a5dc-2e40-5735-8fe2-342c4fd8e311"
+    },
+    "trial_name": "GitoxideLabs_gitoxide_2191",
+    "trials_dir": "24d2a5dc-2e40-5735-8fe2-342c4fd8e311/trajectories/opus-5/run_5",
+    "agent": {
+        "name": "openhands-sdk",
+        "model_name": "anthropic/claude-opus-5",
+        "extra_allowed_hosts": [
+            "api.anthropic.com"
+        ]
+    },
+    "job_id": "0f6284cb-a2ad-474e-b962-10b65d1f5164"
+}

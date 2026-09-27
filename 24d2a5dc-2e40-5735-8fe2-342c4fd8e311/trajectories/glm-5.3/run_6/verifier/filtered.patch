@@ -1,0 +1,166 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 072b45faf984b155a68ab324a71a9695c3162d1d..4d4b9e827ed8631ad6c670c5f7b76a4e95572703 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1338,7 +1338,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "gitoxide-core"
+-version = "0.48.0"
++version = "0.48.1"
+ dependencies = [
+  "anyhow",
+  "async-io",
+@@ -1626,7 +1626,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "gix-credentials"
+-version = "0.30.0"
++version = "0.30.1"
+ dependencies = [
+  "bstr",
+  "document-features",
+diff --git a/gitoxide-core/CHANGELOG.md b/gitoxide-core/CHANGELOG.md
+index 00679072d60377d2f9a9a97b1ede51ef81080447..8bae6ddc44021d447ab982e8d5e75710d57de0af 100644
+--- a/gitoxide-core/CHANGELOG.md
++++ b/gitoxide-core/CHANGELOG.md
+@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
+ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+ 
++## 0.48.1 (2026-09-26)
++
++### Bug Fixes
++
++ - <csr-id-2190/> `gix credential fill/approve/reject` no longer requires the `url` field
++   The location to obtain credentials for can now also be described by its parts, `protocol` and `host`,
++   just like `git credential` allows it.
++
+ ## 0.48.0 (2025-07-15)
+ 
+ ### New Features
+diff --git a/gitoxide-core/Cargo.toml b/gitoxide-core/Cargo.toml
+index 46b17853f691900c53c2d6363303c4fe78a8444c..eeecd4f93d9d7a6b0d4995fac6c2e9a6e9d155af 100644
+--- a/gitoxide-core/Cargo.toml
++++ b/gitoxide-core/Cargo.toml
+@@ -4,7 +4,7 @@ lints.workspace = true
+ name = "gitoxide-core"
+ description = "The library implementing all capabilities of the gitoxide CLI"
+ repository = "https://github.com/GitoxideLabs/gitoxide"
+-version = "0.48.0"
++version = "0.48.1"
+ authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
+ license = "MIT OR Apache-2.0"
+ edition = "2021"
+diff --git a/gitoxide-core/src/repository/credential.rs b/gitoxide-core/src/repository/credential.rs
+index c901f06f2baa095a85dec5789be3c86366c65ac0..d7d03899f9fe2cc6205c0f34af327cbba60a5cec 100644
+--- a/gitoxide-core/src/repository/credential.rs
++++ b/gitoxide-core/src/repository/credential.rs
+@@ -15,8 +15,15 @@ pub fn function(repo: gix::Repository, action: gix::credentials::program::main::
+         std::io::stdin(),
+         std::io::stdout(),
+         |action, context| -> Result<_, Error> {
++            // `url` is only set if it was provided verbatim, otherwise the context is made of parts
++            // which we re-assemble into a url for configuration lookup.
++            let url = context
++                .url
++                .clone()
++                .or_else(|| context.to_url())
++                .expect("framework assures url or protocol and host are present");
+             let (mut cascade, _action, prompt_options) = repo.config_snapshot().credential_helpers(gix::url::parse(
+-                context.url.as_ref().expect("framework assures URL is present").as_ref(),
++                url.as_ref(),
+             )?)?;
+             cascade
+                 .invoke(
+diff --git a/gix-credentials/CHANGELOG.md b/gix-credentials/CHANGELOG.md
+index 93ad1367da23b272984b5f8d4e0cab50be6c65e5..d819f3ee0dfcf9c43ac733ae474b034691b92b23 100644
+--- a/gix-credentials/CHANGELOG.md
++++ b/gix-credentials/CHANGELOG.md
+@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
+ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+ 
++## 0.30.1 (2026-09-26)
++
++### Bug Fixes
++
++ - <csr-id-2190/> allow `protocol` and `host` fields as alternative to the `url` field in `program::main()`
++   Just like `git credential`, the `url` field is no longer required if the location to obtain credentials for
++   is already described by its parts, namely `protocol` and `host`. Both forms are documented
++   [here](https://git-scm.com/docs/git-credential#Documentation/git-credential.txt-url).
++
+ ## 0.30.0 (2025-07-15)
+ 
+ ### New Features
+diff --git a/gix-credentials/Cargo.toml b/gix-credentials/Cargo.toml
+index ee18dd5552b89338bcf5ed2894b825ab3eea99d8..8d0e9973a04c593062a33a89f8d9136d6174f81f 100644
+--- a/gix-credentials/Cargo.toml
++++ b/gix-credentials/Cargo.toml
+@@ -2,7 +2,7 @@ lints.workspace = true
+ 
+ [package]
+ name = "gix-credentials"
+-version = "0.30.0"
++version = "0.30.1"
+ repository = "https://github.com/GitoxideLabs/gitoxide"
+ license = "MIT OR Apache-2.0"
+ description = "A crate of the gitoxide project to interact with git credentials helpers"
+diff --git a/gix-credentials/src/helper/cascade.rs b/gix-credentials/src/helper/cascade.rs
+index 3d5b31a5ef6bacf8ec9926a33c1a627daccf239a..1c182320cb159b110ae66a33c1cde36ddac84230 100644
+--- a/gix-credentials/src/helper/cascade.rs
++++ b/gix-credentials/src/helper/cascade.rs
+@@ -73,6 +73,10 @@ impl Cascade {
+         let mut url = action
+             .context_mut()
+             .map(|ctx| {
++                // The url may not be present if the context was created from parts (protocol/host/…) directly.
++                if ctx.url.is_none() {
++                    return Ok(ctx);
++                }
+                 ctx.destructure_url_in_place(self.use_http_path).map(|ctx| {
+                     if self.query_user_only && ctx.password.is_none() {
+                         ctx.password = Some("".into());
+diff --git a/gix-credentials/src/program/main.rs b/gix-credentials/src/program/main.rs
+index 34f4163a01eef3d9b363668fa5ea6cfc3d8e3a39..f91cf8ea440f4d7d7aa50d744a92bf83c2ae4197 100644
+--- a/gix-credentials/src/program/main.rs
++++ b/gix-credentials/src/program/main.rs
+@@ -55,7 +55,7 @@ pub enum Error {
+     Context(#[from] crate::protocol::context::decode::Error),
+     #[error("Credentials for {url:?} could not be obtained")]
+     CredentialsMissing { url: BString },
+-    #[error("The url wasn't provided in input - the git credentials protocol mandates this")]
++    #[error("The url or the protocol and host fields weren't provided in input - the git credentials protocol mandates either of them")]
+     UrlMissing,
+ }
+ 
+@@ -73,6 +73,9 @@ pub(crate) mod function {
+     /// `credentials` is the API version of such call, where`Ok(Some(context))` returns credentials, and `Ok(None)` indicates
+     /// no credentials could be found for `url`, which is always set when called.
+     ///
++    /// The context read from `stdin` must identify the location credentials are needed for, either with the `url` field
++    /// or with its parts, namely `protocol` and `host`, just like `git credential` requires it.
++    ///
+     /// Call this function from a programs `main`, passing `std::env::args_os()`, `stdin()` and `stdout` accordingly, along with
+     /// your own helper implementation.
+     pub fn main<CredentialsFn, E>(
+@@ -89,14 +92,17 @@ pub(crate) mod function {
+         let mut buf = Vec::<u8>::with_capacity(512);
+         stdin.read_to_end(&mut buf)?;
+         let ctx = Context::from_bytes(&buf)?;
+-        if ctx.url.is_none() {
++        // The location to obtain credentials for can be described either by a `url` or by its parts,
++        // namely `protocol` and `host`, just like `git credential` does it.
++        if ctx.url.is_none() && (ctx.protocol.is_none() || ctx.host.is_none()) {
+             return Err(Error::UrlMissing);
+         }
+         let res = credentials(action, ctx).map_err(|err| Error::Helper { source: Box::new(err) })?;
+         match (action, res) {
+             (Action::Get, None) => {
++                let ctx = Context::from_bytes(&buf)?;
+                 return Err(Error::CredentialsMissing {
+-                    url: Context::from_bytes(&buf)?.url.expect("present and checked above"),
++                    url: ctx.url.clone().or_else(|| ctx.to_url()).unwrap_or_default(),
+                 })
+             }
+             (Action::Get, Some(ctx)) => ctx.write_to(stdout)?,

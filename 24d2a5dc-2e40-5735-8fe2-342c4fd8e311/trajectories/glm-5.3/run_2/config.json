@@ -1,0 +1,15 @@
+{
+    "task": {
+        "path": "24d2a5dc-2e40-5735-8fe2-342c4fd8e311"
+    },
+    "trial_name": "GitoxideLabs_gitoxide_2191",
+    "trials_dir": "24d2a5dc-2e40-5735-8fe2-342c4fd8e311/trajectories/glm-5.3/run_2",
+    "agent": {
+        "name": "openhands-sdk",
+        "model_name": "zai/glm-5.3",
+        "extra_allowed_hosts": [
+            "api.z.ai"
+        ]
+    },
+    "job_id": "5c3eb71b-e2ea-48f6-98f5-3f3ac22acad1"
+}

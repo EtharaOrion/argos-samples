@@ -1,0 +1,15 @@
+{
+    "task": {
+        "path": "4056d683-bddd-57a4-8cf3-e807654c7c9c"
+    },
+    "trial_name": "secdev_scapy_3461",
+    "trials_dir": "4056d683-bddd-57a4-8cf3-e807654c7c9c/trajectories/glm-5.3/run_3",
+    "agent": {
+        "name": "openhands-sdk",
+        "model_name": "zai/glm-5.3",
+        "extra_allowed_hosts": [
+            "api.z.ai"
+        ]
+    },
+    "job_id": "04cf8977-a7a3-4ebb-84ca-8506f37136ac"
+}

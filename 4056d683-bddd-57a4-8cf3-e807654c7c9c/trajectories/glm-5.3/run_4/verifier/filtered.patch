@@ -1,0 +1,449 @@
+diff --git a/scapy/layers/rtp.py b/scapy/layers/rtp.py
+index ee8f0b9c9c4fd3485c80589251de7ba8b1e46e6c..5c4b9cfba1859a1ba5b49d4f4f3bb26fe6ef73a3 100644
+--- a/scapy/layers/rtp.py
++++ b/scapy/layers/rtp.py
+@@ -4,18 +4,31 @@
+ # This program is published under a GPLv2 license
+ 
+ """
+-RTP (Real-time Transport Protocol).
++RTP (Real-time Transport Protocol) and RTCP (RTP Control Protocol).
+ 
+ Remember to use::
+ 
+     bind_layers(UDP, RTP, dport=XXX)
++    bind_layers(UDP, RTCP, dport=XXX)
+ 
+-To register the port you are using
++To register the ports you are using
++
++RTCP, specified in RFC 3550, supports the Sender Report, Receiver
++Report, Source Description, Goodbye and Application Defined packets,
++along with the reception report blocks and the SDES chunks and items
++they contain. RTCP packets are usually sent compound (several packets
++concatenated in the same datagram), which is handled by binding RTCP
++packets together.
+ """
+ 
+-from scapy.packet import Packet, bind_layers
++import struct
++
++from scapy.compat import bytes_encode, orb
++from scapy.config import conf
++from scapy.packet import NoPayload, Packet, bind_layers
+ from scapy.fields import BitEnumField, BitField, BitFieldLenField, \
+-    FieldLenField, FieldListField, IntField, ShortField
++    ByteEnumField, ByteField, FieldLenField, FieldListField, IntField, \
++    PacketListField, ShortField, StrField, StrFixedLenField, StrLenField
+ 
+ _rtp_payload_types = {
+     # http://www.iana.org/assignments/rtp-parameters
+@@ -55,3 +68,408 @@ class RTP(Packet):
+ 
+ 
+ bind_layers(RTP, RTPExtension, extension=1)
++
++# RTCP is specified in RFC 3550 (sections 6 and 6.4 to 6.7). Additional
++# packet types were registered afterwards by RFC 3611, RFC 4585, etc.
++
++_rtcp_packet_types = {
++    # RFC 3550
++    200: "Sender Report",
++    201: "Receiver Report",
++    202: "Source Description",
++    203: "Goodbye",
++    204: "Application Defined",
++    # RFC 3611
++    207: "Extended Report",
++    # RFC 4585
++    205: "Transport Layer Feedback",
++    206: "Payload Specific Feedback",
++    # Pre-RFC 3550 values (RFC 2032), still met in the wild
++    192: "FIR",
++    193: "NACK",
++    # RFC 5484 / RFC 5450
++    194: "SMPTETC",
++    195: "IJ",
++}
++
++_rtcp_sdes_types = {
++    0: "END",
++    1: "CNAME",
++    2: "NAME",
++    3: "EMAIL",
++    4: "PHONE",
++    5: "LOC",
++    6: "TOOL",
++    7: "NOTE",
++    8: "PRIV",
++}
++
++# RTCP packet types that have their own layer
++_rtcp_packettype_cls = {}  # type: Dict[int, Type[RTCP]]
++
++
++class RTCPReportBlock(Packet):
++    """Reception report block, part of a Sender or Receiver Report.
++
++    See RFC 3550 section 6.4.1.
++    """
++    name = "RTCP Report Block"
++    fields_desc = [
++        IntField("ssrc", 0),
++        ByteField("fraction_lost", 0),
++        BitField("cumulative_lost", 0, 24),
++        IntField("highest_seq", 0),
++        IntField("jitter", 0),
++        IntField("last_sr_timestamp", 0),
++        IntField("delay_last_sr", 0),
++    ]
++
++    def default_payload_class(self, payload):
++        # type: (bytes) -> Type[Packet]
++        # The bytes which follow a report block belong to a sibling
++        # report block, they must not be considered as a payload.
++        return conf.padding_layer
++
++    def post_dissect(self, s):
++        # type: (bytes) -> bytes
++        # The last report block of a report is followed by the padding
++        # (or the next packet of a compound), which is kept as padding.
++        self.raw_packet_cache = None
++        return s
++
++
++class _SdesValueField(StrLenField):
++    """Value of an SDES item. Its length is encoded on one byte, so it
++    cannot exceed 255 bytes (RFC 3550 section 6.5)."""
++    __slots__ = []
++
++    def i2m(self, pkt, x):
++        # type: (Optional[Packet], Optional[bytes]) -> bytes
++        return bytes_encode(x)[:255]
++
++
++class RTCPSdesItem(Packet):
++    """SDES item (type, length and text), part of an SDES chunk.
++
++    See RFC 3550 section 6.5.
++    """
++    name = "RTCP SDES item"
++    fields_desc = [
++        ByteEnumField("type", 0, _rtcp_sdes_types),
++        FieldLenField("len", None, fmt="B", length_of="value"),
++        _SdesValueField("value", b"", length_from=lambda pkt: pkt.len),
++    ]
++
++    def default_payload_class(self, payload):
++        # type: (bytes) -> Type[Packet]
++        # The bytes which follow an SDES item belong to a sibling SDES
++        # item, they must not be considered as a payload.
++        return conf.padding_layer
++
++    def post_dissect(self, s):
++        # type: (bytes) -> bytes
++        # The last SDES item of a chunk is followed by the null item
++        # and the padding which terminate the chunk.
++        self.raw_packet_cache = None
++        return s
++
++
++def _sdes_items_next_cls(pkt, lst, cur, remain):
++    # type: (Packet, List[Packet], Optional[Packet], bytes) -> Optional[Type[Packet]]  # noqa: E501
++    """SDES items are dissected until a null (END) item or the end of
++    the chunk is met."""
++    if not remain or orb(remain[0]) == 0:
++        return None
++    return RTCPSdesItem
++
++
++def _null_pad(s):
++    # type: (bytes) -> bytes
++    """Zero padding to a 32-bit boundary, as required by RFC 3550."""
++    return b"\x00" * (-len(s) % 4)
++
++
++class _SdesItemsField(PacketListField):
++    """List of the SDES items of a chunk.
++
++    Such a list is terminated by a null item, and padded with null
++    bytes so that the chunk which contains it is 32-bit aligned
++    (RFC 3550 section 6.5). Those bytes belong to the chunk, not to the
++    items, so they are skipped when the list is dissected (and are
++    rebuilt by RTCPSdesChunk.post_build()).
++    """
++    __slots__ = []
++
++    def getfield(self, pkt, s):
++        # type: (Packet, bytes) -> Tuple[bytes, List[Packet]]
++        remain, lst = super(_SdesItemsField, self).getfield(pkt, s)
++        # 4 is the size of the SSRC of the chunk
++        consumed = 4 + sum(len(bytes(item)) for item in lst)
++        padlen = (-consumed) % 4 or 4
++        return remain[min(padlen, len(remain)):], lst
++
++
++class RTCPSdesChunk(Packet):
++    """SDES chunk, containing a source and a list of SDES items.
++
++    See RFC 3550 section 6.5.
++    """
++    name = "RTCP SDES chunk"
++    fields_desc = [
++        IntField("ssrc", 0),
++        _SdesItemsField("items", [], RTCPSdesItem,
++                        next_cls_cb=_sdes_items_next_cls),
++    ]
++
++    def default_payload_class(self, payload):
++        # type: (bytes) -> Type[Packet]
++        # The bytes which follow a chunk belong to a sibling chunk,
++        # they must not be considered as a payload.
++        return conf.padding_layer
++
++    def post_dissect(self, s):
++        # type: (bytes) -> bytes
++        # The last chunk of an SDES packet is followed by the padding
++        # of the packet, which is kept as padding.
++        self.raw_packet_cache = None
++        return s
++
++    def post_build(self, pkt, pay):
++        # type: (bytes, bytes) -> bytes
++        if isinstance(self.payload, NoPayload) or \
++                isinstance(self.payload, RTCP):
++            # The list of items is null-terminated and the chunk is
++            # null-padded up to a 32-bit boundary (RFC 3550 section
++            # 6.5), unless the trailing bytes are already provided by
++            # the padding of a dissected chunk.
++            if not (self.items and self.items[-1].type == 0):
++                pkt += b"\x00"
++            pay = _null_pad(pkt) + pay
++        return pkt + pay
++
++
++def _rtcp_pktlen(pkt):
++    # type: (RTCP) -> int
++    """Total length in bytes of an RTCP packet, from its *pkt_length*
++    field (which counts 32-bit words, the header included, minus one)."""
++    if pkt.pkt_length is None:
++        return 0
++    return (pkt.pkt_length + 1) * 4
++
++
++def _rtcp_next_cls_cbk(cls, count_field, min_len):
++    # type: (Type[Packet], str, int) -> Callable[[Packet, List[Packet], Optional[Packet], bytes], Optional[Type[Packet]]]  # noqa: E501
++    """Builds a PacketListField next_cls_cb callback which stops the
++    dissection of a list of packets once *count_field* packets have
++    been dissected. Used along a length_from parameter, this allows a
++    list to be bounded both by the number of packets it contains and by
++    the number of bytes they use. *min_len* is the minimal number of
++    bytes a packet of that list is made of."""
++    def cbk(pkt, lst, cur, remain):
++        # type: (Packet, List[Packet], Optional[Packet], bytes) -> Optional[Type[Packet]]  # noqa: E501
++        if remain and len(remain) >= min_len and \
++                len(lst) < pkt.getfieldval(count_field):
++            return cls
++        return None
++    return cbk
++
++
++def _rtcp_header_fields(packettype, count_of=None):
++    # type: (Optional[int], Optional[str]) -> List[Any]
++    """The fields of the common RTCP packet header, with the given
++    packet type (RFC 3550 section 6.1). *count_of* is the name of the
++    field of the packet whose number of elements the *rx_report_count*
++    field counts; when set, that count is computed when building."""
++    if count_of is None:
++        count = BitField("rx_report_count", 0, 5)  # type: Field[int, int]
++    else:
++        count = BitFieldLenField("rx_report_count", None, 5,
++                                 count_of=count_of)
++    return [
++        BitField("version", 2, 2),
++        BitField("padding", 0, 1),
++        count,
++        ByteEnumField("packettype", packettype, _rtcp_packet_types),
++        ShortField("pkt_length", None),
++    ]
++
++
++class RTCP(Packet):
++    """Base RTCP packet, for the packet types which are not dissected
++    further (XR, RTPFB, PSFB, etc.).
++
++    The concrete RTCP packets of RFC 3550 (Sender Report, Receiver
++    Report, SDES, BYE, APP) are dissected using
++    :func:`RTCP.dispatch_hook`, which relies on the *packettype* field.
++    """
++    name = "RTCP"
++    fields_desc = _rtcp_header_fields(200) + [
++        # The bytes of the packet which are not dissected further; the
++        # bytes which follow them belong to the next packet of a
++        # compound (hence the length_from).
++        StrLenField("data", b"",
++                    length_from=lambda pkt: max(_rtcp_pktlen(pkt) - 4, 0)),
++    ]
++
++    def post_build(self, pkt, pay):
++        # type: (bytes, bytes) -> bytes
++        # An RTCP packet is null-padded up to a 32-bit boundary
++        # (RFC 3550 section 6). The padding is not added when the
++        # trailing bytes are already provided by the padding of a
++        # dissected packet.
++        if isinstance(self.payload, NoPayload) or \
++                isinstance(self.payload, RTCP):
++            pad = _null_pad(pkt)
++            if self.padding:
++                # When the padding bit is set, the packet contains at
++                # least one padding word, and the last byte of the
++                # packet holds the number of padding bytes.
++                if not pad:
++                    pad = b"\x00\x00\x00\x04"
++                else:
++                    pad = pad[:-1] + struct.pack("!B", len(pad))
++        else:
++            pad = b""
++        if self.pkt_length is None:
++            # The length counts 32-bit words minus one, the header
++            # included; it does not include the next packet of a
++            # compound (RFC 3550 section 6.4.1).
++            length = len(pkt) + len(pad)
++            if not isinstance(self.payload, RTCP):
++                length += len(pay)
++            pkt = pkt[:2] + struct.pack("!H", (length + 3) // 4 - 1) + \
++                pkt[4:]
++        return pkt + pad + pay
++
++    @classmethod
++    def dispatch_hook(cls, _pkt=None, *args, **kargs):
++        # type: (Optional[bytes], *Any, **Any) -> Type[Packet]
++        if _pkt and orb(_pkt[0]) >> 6 == 2:
++            return _rtcp_packettype_cls.get(orb(_pkt[1]), cls)
++        return cls
++
++
++class RTCPSenderReport(RTCP):
++    """Sender Report (RTCP packet type 200).
++
++    See RFC 3550 section 6.4.1.
++    """
++    name = "RTCP Sender Report"
++    fields_desc = _rtcp_header_fields(200, "reportblock") + [
++        IntField("ssrc", 0),
++        IntField("ntp_sec", 0),
++        IntField("ntp_frac", 0),
++        IntField("rtp_timestamp", 0),
++        IntField("packet_count", 0),
++        IntField("octet_count", 0),
++        PacketListField(
++            "reportblock", [], RTCPReportBlock,
++            length_from=lambda pkt: max(_rtcp_pktlen(pkt) - 28, 0),
++            next_cls_cb=_rtcp_next_cls_cbk(RTCPReportBlock,
++                                           "rx_report_count", 24)),
++    ]
++
++
++class RTCPReceiverReport(RTCP):
++    """Receiver Report (RTCP packet type 201).
++
++    See RFC 3550 section 6.4.2.
++    """
++    name = "RTCP Receiver Report"
++    fields_desc = _rtcp_header_fields(201, "reportblock") + [
++        IntField("ssrc", 0),
++        PacketListField(
++            "reportblock", [], RTCPReportBlock,
++            length_from=lambda pkt: max(_rtcp_pktlen(pkt) - 8, 0),
++            next_cls_cb=_rtcp_next_cls_cbk(RTCPReportBlock,
++                                           "rx_report_count", 24)),
++    ]
++
++
++class RTCPSourceDescription(RTCP):
++    """Source Description (RTCP packet type 202).
++
++    See RFC 3550 section 6.5.
++    """
++    name = "RTCP Source Description"
++    fields_desc = _rtcp_header_fields(202, "chunk") + [
++        PacketListField(
++            "chunk", [], RTCPSdesChunk,
++            length_from=lambda pkt: max(_rtcp_pktlen(pkt) - 4, 0),
++            next_cls_cb=_rtcp_next_cls_cbk(RTCPSdesChunk,
++                                           "rx_report_count", 4)),
++    ]
++
++
++class _ByeReasonField(StrField):
++    """Optional length-prefixed reason for leaving, of a BYE packet
++    (RFC 3550 section 6.6)."""
++    __slots__ = []
++
++    def getfield(self, pkt, s):
++        # type: (Packet, bytes) -> Tuple[bytes, bytes]
++        # The reason is optional, and must fit in the packet; the bytes
++        # which follow it (the null padding of the packet, then the
++        # next packet of a compound) are not part of it. The padding is
++        # rebuilt by RTCP.post_build().
++        limit = max(_rtcp_pktlen(pkt) - 4 - 4 * pkt.rx_report_count, 0)
++        s, rest = s[:limit], s[limit:]
++        if not s or orb(s[0]) == 0:
++            # No reason: only the null padding of the packet is left
++            return rest, b""
++        length = min(orb(s[0]), len(s) - 1)
++        return rest, s[1:1 + length]
++
++    def addfield(self, pkt, s, val):
++        # type: (Optional[Packet], bytes, Optional[bytes]) -> bytes
++        if not val:
++            return s
++        # The length of the reason is encoded on one byte
++        val = bytes_encode(val)[:255]
++        return s + struct.pack("!B", len(val)) + val
++
++
++class RTCPGoodbye(RTCP):
++    """Goodbye (RTCP packet type 203).
++
++    See RFC 3550 section 6.6.
++    """
++    name = "RTCP Goodbye"
++    fields_desc = _rtcp_header_fields(203, "srcs") + [
++        FieldListField("srcs", [], IntField("id", 0),
++                       count_from=lambda pkt: pkt.rx_report_count),
++        _ByeReasonField("reason", b""),
++    ]
++
++
++class RTCPApplicationDefined(RTCP):
++    """Application-defined RTCP packet (RTCP packet type 204).
++
++    See RFC 3550 section 6.7.
++    """
++    name = "RTCP Application Defined"
++    fields_desc = _rtcp_header_fields(204) + [
++        IntField("ssrc", 0),
++        StrFixedLenField("name", b"", length=4),
++        StrLenField("data", b"",
++                    length_from=lambda pkt: max(_rtcp_pktlen(pkt) - 12, 0)),
++    ]
++
++
++_rtcp_packettype_cls.update({
++    200: RTCPSenderReport,
++    201: RTCPReceiverReport,
++    202: RTCPSourceDescription,
++    203: RTCPGoodbye,
++    204: RTCPApplicationDefined,
++})
++
++# Make sure the dissection of every RTCP packet is dispatched, even
++# when it is dissected as one of the concrete packet types.
++for _cls in tuple(_rtcp_packettype_cls.values()):
++    _cls.dispatch_hook = RTCP.__dict__["dispatch_hook"]
++del _cls
++
++# RTCP packets are usually sent compound, i.e. several packets are
++# concatenated in the same datagram.
++bind_layers(RTCP, RTCP)

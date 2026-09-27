@@ -1,0 +1,85 @@
+schema_version = "1.4"
+artifacts = [ "/logs/agent/trajectory.json",]
+
+[task]
+name = "argos/feldroy__air-246"
+description = "Add function signatures to Air SVG Tags"
+keywords = [ "python", "issue-resolving", "air",]
+[[task.authors]]
+name = "Abhishek Kumar"
+email = "abhishek.kumar1151@ethara.ai"
+
+[metadata]
+uuid_v5 = "276ad6ba-10da-5f87-82ea-c2abc44dfdea"
+project_id = "Argos-001"
+difficulty = "hard"
+category = "feature_development"
+argos_task_format = 1
+network_profile = "dev-open"
+
+[metadata.upstream_provenance]
+origin = "derived"
+provenance_date = "2025-08-14"
+source_kind = "public_repository"
+upstream_benchmark = "multi-swe-bench"
+upstream_toolchain = "github.com/Ethara-Ai/multi-swe-bench@447ddbd639e4ec60376282ccee32ad1ab60afb69"
+license = "MIT"
+modifications = [ "harbor-repackage", "rubric-added", "instruction-rewritten",]
+base_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/feldroy__air:pr-246@sha256:9c1dac5c9035de9e3336ce0438fcb38ab603d87fade50c892d6d61d765fbbd11"
+agent_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/feldroy__air:pr-246-prebaked@sha256:7216292f954cf2b96b2e73e7c2fa2dc387417da3db6c27ae0287977b2c9215a5"
+verifier_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/feldroy__air:pr-246-verifier@sha256:f80274a223b251ca81fec977fa60c43ab49e8429eac4d8e81575c8fa3fbb77f8"
+
+[metadata.upstream_provenance.source]
+canonical_repo = "feldroy/air"
+base_commit = "ded401afc29232b251a1cd2bdb8d62890e8c76d0"
+pull_request = 246
+event_timestamp = "2025-08-05T01:57:28Z"
+
+[verifier]
+network_mode = "public"
+timeout_sec = 7200.0
+environment_mode = "separate"
+[[verifier.collect]]
+command = "bash -c 'set -euo pipefail; set -f; rm -f /logs/artifacts/agent.patch /logs/artifacts/agent.patch.tmp; mkdir -p /logs/artifacts; cd /workspace/air; export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1; git -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null -c core.fsmonitor=false -c diff.noprefix=false -c diff.mnemonicPrefix=false -c diff.srcPrefix=a/ -c diff.dstPrefix=b/ -c safe.directory=* add -A; git -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null -c core.fsmonitor=false -c diff.noprefix=false -c diff.mnemonicPrefix=false -c diff.srcPrefix=a/ -c diff.dstPrefix=b/ -c safe.directory=* diff --cached --binary --full-index --no-ext-diff --no-textconv --no-color ded401afc29232b251a1cd2bdb8d62890e8c76d0 > /logs/artifacts/agent.patch.tmp; mv /logs/artifacts/agent.patch.tmp /logs/artifacts/agent.patch'"
+service = "main"
+timeout_sec = 600.0
+
+[verifier.env]
+# Rubric judge used inside the verifier: set your model, endpoint and key (see tests/argos_grader/README.md).
+ARGOS_JUDGE_MODEL = "openai/<judge-model>"
+ARGOS_JUDGE_BASE_URL = "https://api.openai.com/v1"
+# Anthropic instead: ARGOS_JUDGE_MODEL = "anthropic/<judge-model>", ARGOS_JUDGE_BASE_URL = "https://api.anthropic.com"
+ARGOS_JUDGE_API_KEY = "<your-api-key>"
+ARGOS_JUDGE_VOTES = "1"
+
+[verifier.environment]
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/feldroy__air:pr-246-verifier@sha256:f80274a223b251ca81fec977fa60c43ab49e8429eac4d8e81575c8fa3fbb77f8"
+network_mode = "public"
+build_timeout_sec = 1800.0
+os = "linux"
+cpus = 8
+memory_mb = 12288
+storage_mb = 10240
+mcp_servers = []
+
+[verifier.environment.env]
+
+[agent]
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.z.ai"]
+timeout_sec = 14400.0
+
+[environment]
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/feldroy__air:pr-246-prebaked@sha256:7216292f954cf2b96b2e73e7c2fa2dc387417da3db6c27ae0287977b2c9215a5"
+network_mode = "public"
+build_timeout_sec = 1800.0
+os = "linux"
+cpus = 8
+memory_mb = 12288
+storage_mb = 10240
+gpus = 0
+mcp_servers = []
+
+[environment.env]
+
+[solution.env]

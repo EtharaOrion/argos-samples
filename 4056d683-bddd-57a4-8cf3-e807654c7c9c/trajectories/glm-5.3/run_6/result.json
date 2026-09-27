@@ -1,0 +1,168 @@
+{
+    "id": "21970b8f-48d1-4394-82eb-72bfd993482a",
+    "task_name": "argos/secdev__scapy-3461",
+    "trial_name": "secdev_scapy_3461",
+    "trial_uri": "file:///4056d683-bddd-57a4-8cf3-e807654c7c9c/trajectories/glm-5.3/run_6",
+    "task_id": {
+        "path": "4056d683-bddd-57a4-8cf3-e807654c7c9c"
+    },
+    "source": null,
+    "task_checksum": "ab7fd85767d3d7134d8ed16abb2ca8a0ccb990b7ce30ef64dc7275ffa0318eb4",
+    "config": {
+        "task": {
+            "path": "4056d683-bddd-57a4-8cf3-e807654c7c9c",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "secdev_scapy_3461",
+        "trials_dir": "4056d683-bddd-57a4-8cf3-e807654c7c9c/trajectories/glm-5.3/run_6",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "openhands-sdk",
+            "import_path": null,
+            "model_name": "zai/glm-5.3",
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [
+                "api.z.ai"
+            ],
+            "kwargs": {},
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "stream": false,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "bb189cd8-c92a-4034-96bb-79913dd84b20",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "openhands-sdk",
+        "version": "1.49.3",
+        "model_info": {
+            "name": "glm-5.3",
+            "provider": "zai"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 29395660,
+        "n_cache_tokens": 29050944,
+        "n_output_tokens": 128493,
+        "cost_usd": 8.601217039999998,
+        "model_usage": null,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0469,
+            "score_outcome": 0.0,
+            "score_binary": 0.0,
+            "score_process": 0.4689,
+            "gate": 1,
+            "alpha": 0.05
+        },
+        "scores": {
+            "score": 0.0,
+            "score_continuous_v2": 0.0,
+            "score_binary": 0.0,
+            "reward": 0.0469,
+            "score_outcome": 0.0,
+            "score_process": 0.4689
+        },
+        "status": "reviewed",
+        "diagnostics": {
+            "targets_total": 3,
+            "t_baseline_total": 0,
+            "t_eff_total": 3,
+            "pollution_rate": 0.0,
+            "t_p_run_total": 4216,
+            "t_p_dataset_total": 4242,
+            "baseline_drift": 28,
+            "targets_hit": 0,
+            "hits_new": 0,
+            "recall": 0.0,
+            "gold_p2p_total": 4242,
+            "preserve_set_total": 4216,
+            "broken_p2p_count": 0,
+            "unknown_breaks_count": 0,
+            "environment_excluded_p2p": 27,
+            "R0": 20,
+            "regression_denom": 20,
+            "penalty_applied": 0.0,
+            "regression_factor": 1.0,
+            "f2s_count": 0,
+            "evasion_ratio": 0.0,
+            "f2p_baseline_pass_count": 0,
+            "lang": "python",
+            "lazy_recurated": false,
+            "regression_channel_active": true
+        },
+        "assay": {
+            "alpha": 0.05,
+            "gate": 1,
+            "panel": {
+                "size": 46,
+                "method": "human_panel",
+                "reviewer": "Amartya Kumar Yadav"
+            },
+            "status": "reviewed"
+        }
+    },
+    "verifier_environment_mode": "separate",
+    "exception_info": null,
+    "started_at": "2026-09-25T16:41:30.950198Z",
+    "finished_at": "2026-09-25T17:29:58.060162Z",
+    "environment_setup": {
+        "started_at": "2026-09-25T16:41:30.969468Z",
+        "finished_at": "2026-09-25T16:41:34.361397Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-09-25T16:41:34.361452Z",
+        "finished_at": "2026-09-25T16:41:41.841177Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-09-25T16:41:41.841288Z",
+        "finished_at": "2026-09-25T17:24:52.193023Z"
+    },
+    "step_results": null
+}

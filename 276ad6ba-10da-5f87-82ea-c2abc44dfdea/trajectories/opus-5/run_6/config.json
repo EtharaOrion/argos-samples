@@ -1,0 +1,15 @@
+{
+    "task": {
+        "path": "276ad6ba-10da-5f87-82ea-c2abc44dfdea"
+    },
+    "trial_name": "feldroy_air_246",
+    "trials_dir": "276ad6ba-10da-5f87-82ea-c2abc44dfdea/trajectories/opus-5/run_6",
+    "agent": {
+        "name": "openhands-sdk",
+        "model_name": "anthropic/claude-opus-5",
+        "extra_allowed_hosts": [
+            "api.anthropic.com"
+        ]
+    },
+    "job_id": "d3582839-44d6-469c-be25-2560ccf25372"
+}

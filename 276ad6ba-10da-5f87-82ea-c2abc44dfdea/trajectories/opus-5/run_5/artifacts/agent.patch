@@ -1,0 +1,3560 @@
+diff --git a/src/air/tags/config.py b/src/air/tags/config.py
+index fd984dc2fa8efeff0dee00ad5d5d0ffe3abd45cc..8430b933a099f2c8615d467cf12668517636eec1 100644
+--- a/src/air/tags/config.py
++++ b/src/air/tags/config.py
+@@ -364,3 +364,712 @@ HTML_ATTRIBUTES: Final[dict[str, list[str]]] = {
+         "preload",
+     ],
+ }
++
++# SVG tag attribute map
++SVG_ATTRIBUTES: Final[dict[str, list[str]]] = {
++    "A": [
++        "href",
++        "target",
++        "download",
++        "ping",
++        "rel",
++        "hreflang",
++        "referrerpolicy",
++        "type",
++        "transform",
++    ],
++    "Animate": [
++        "attributeName",
++        "attributeType",
++        "calcMode",
++        "values",
++        "keyTimes",
++        "keySplines",
++        "from_",
++        "to",
++        "by",
++        "additive",
++        "accumulate",
++        "dur",
++        "begin",
++        "end",
++        "min",
++        "max",
++        "restart",
++        "repeatCount",
++        "repeatDur",
++        "fill",
++        "href",
++    ],
++    "AnimateMotion": [
++        "path",
++        "keyPoints",
++        "rotate",
++        "origin",
++        "calcMode",
++        "values",
++        "keyTimes",
++        "keySplines",
++        "from_",
++        "to",
++        "by",
++        "additive",
++        "accumulate",
++        "dur",
++        "begin",
++        "end",
++        "min",
++        "max",
++        "restart",
++        "repeatCount",
++        "repeatDur",
++        "fill",
++        "href",
++    ],
++    "AnimateTransform": [
++        "attributeName",
++        "attributeType",
++        "type",
++        "calcMode",
++        "values",
++        "keyTimes",
++        "keySplines",
++        "from_",
++        "to",
++        "by",
++        "additive",
++        "accumulate",
++        "dur",
++        "begin",
++        "end",
++        "min",
++        "max",
++        "restart",
++        "repeatCount",
++        "repeatDur",
++        "fill",
++        "href",
++    ],
++    "Circle": [
++        "cx",
++        "cy",
++        "r",
++        "pathLength",
++        "fill",
++        "fill_opacity",
++        "fill_rule",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "stroke_dasharray",
++        "stroke_dashoffset",
++        "stroke_linecap",
++        "stroke_linejoin",
++        "opacity",
++        "transform",
++    ],
++    "ClipPath": [
++        "clipPathUnits",
++        "transform",
++    ],
++    "Defs": [
++        "transform",
++        "fill",
++        "fill_opacity",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "opacity",
++    ],
++    "Ellipse": [
++        "cx",
++        "cy",
++        "rx",
++        "ry",
++        "pathLength",
++        "fill",
++        "fill_opacity",
++        "fill_rule",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "stroke_dasharray",
++        "stroke_dashoffset",
++        "stroke_linecap",
++        "stroke_linejoin",
++        "opacity",
++        "transform",
++    ],
++    "FeBlend": [
++        "in_",
++        "in2",
++        "mode",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeColorMatrix": [
++        "in_",
++        "type",
++        "values",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeComponentTransfer": [
++        "in_",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeComposite": [
++        "in_",
++        "in2",
++        "operator",
++        "k1",
++        "k2",
++        "k3",
++        "k4",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeConvolveMatrix": [
++        "in_",
++        "order",
++        "kernelMatrix",
++        "divisor",
++        "bias",
++        "targetX",
++        "targetY",
++        "edgeMode",
++        "kernelUnitLength",
++        "preserveAlpha",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeDiffuseLighting": [
++        "in_",
++        "surfaceScale",
++        "diffuseConstant",
++        "kernelUnitLength",
++        "lighting_color",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeDisplacementMap": [
++        "in_",
++        "in2",
++        "scale",
++        "xChannelSelector",
++        "yChannelSelector",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeDistantLight": [
++        "azimuth",
++        "elevation",
++    ],
++    "FeDropShadow": [
++        "in_",
++        "dx",
++        "dy",
++        "stdDeviation",
++        "flood_color",
++        "flood_opacity",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeFlood": [
++        "flood_color",
++        "flood_opacity",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeFuncA": [
++        "type",
++        "tableValues",
++        "slope",
++        "intercept",
++        "amplitude",
++        "exponent",
++        "offset",
++    ],
++    "FeFuncB": [
++        "type",
++        "tableValues",
++        "slope",
++        "intercept",
++        "amplitude",
++        "exponent",
++        "offset",
++    ],
++    "FeFuncG": [
++        "type",
++        "tableValues",
++        "slope",
++        "intercept",
++        "amplitude",
++        "exponent",
++        "offset",
++    ],
++    "FeFuncR": [
++        "type",
++        "tableValues",
++        "slope",
++        "intercept",
++        "amplitude",
++        "exponent",
++        "offset",
++    ],
++    "FeGaussianBlur": [
++        "in_",
++        "stdDeviation",
++        "edgeMode",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeImage": [
++        "href",
++        "preserveAspectRatio",
++        "crossorigin",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeMerge": [
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeMergeNode": [
++        "in_",
++    ],
++    "FeMorphology": [
++        "in_",
++        "operator",
++        "radius",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeOffset": [
++        "in_",
++        "dx",
++        "dy",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FePointLight": [
++        "x",
++        "y",
++        "z",
++    ],
++    "FeSpecularLighting": [
++        "in_",
++        "surfaceScale",
++        "specularConstant",
++        "specularExponent",
++        "kernelUnitLength",
++        "lighting_color",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeSpotLight": [
++        "x",
++        "y",
++        "z",
++        "pointsAtX",
++        "pointsAtY",
++        "pointsAtZ",
++        "specularExponent",
++        "limitingConeAngle",
++    ],
++    "FeTile": [
++        "in_",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "FeTurbulence": [
++        "baseFrequency",
++        "numOctaves",
++        "seed",
++        "stitchTiles",
++        "type",
++        "x",
++        "y",
++        "width",
++        "height",
++        "result",
++    ],
++    "Filter": [
++        "x",
++        "y",
++        "width",
++        "height",
++        "filterUnits",
++        "primitiveUnits",
++        "href",
++    ],
++    "ForeignObject": [
++        "x",
++        "y",
++        "width",
++        "height",
++        "opacity",
++        "transform",
++    ],
++    "G": [
++        "transform",
++        "fill",
++        "fill_opacity",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "opacity",
++    ],
++    "Image": [
++        "href",
++        "x",
++        "y",
++        "width",
++        "height",
++        "preserveAspectRatio",
++        "crossorigin",
++        "decoding",
++        "opacity",
++        "transform",
++    ],
++    "Line": [
++        "x1",
++        "y1",
++        "x2",
++        "y2",
++        "pathLength",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "stroke_dasharray",
++        "stroke_dashoffset",
++        "stroke_linecap",
++        "opacity",
++        "transform",
++    ],
++    "LinearGradient": [
++        "x1",
++        "y1",
++        "x2",
++        "y2",
++        "gradientUnits",
++        "gradientTransform",
++        "spreadMethod",
++        "href",
++    ],
++    "Marker": [
++        "markerWidth",
++        "markerHeight",
++        "markerUnits",
++        "orient",
++        "refX",
++        "refY",
++        "viewBox",
++        "preserveAspectRatio",
++    ],
++    "Mask": [
++        "x",
++        "y",
++        "width",
++        "height",
++        "maskUnits",
++        "maskContentUnits",
++    ],
++    "Mpath": [
++        "href",
++    ],
++    "Path": [
++        "d",
++        "pathLength",
++        "fill",
++        "fill_opacity",
++        "fill_rule",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "stroke_dasharray",
++        "stroke_dashoffset",
++        "stroke_linecap",
++        "stroke_linejoin",
++        "opacity",
++        "transform",
++    ],
++    "Pattern": [
++        "x",
++        "y",
++        "width",
++        "height",
++        "patternUnits",
++        "patternContentUnits",
++        "patternTransform",
++        "viewBox",
++        "preserveAspectRatio",
++        "href",
++    ],
++    "Polygon": [
++        "points",
++        "pathLength",
++        "fill",
++        "fill_opacity",
++        "fill_rule",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "stroke_dasharray",
++        "stroke_dashoffset",
++        "stroke_linecap",
++        "stroke_linejoin",
++        "opacity",
++        "transform",
++    ],
++    "Polyline": [
++        "points",
++        "pathLength",
++        "fill",
++        "fill_opacity",
++        "fill_rule",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "stroke_dasharray",
++        "stroke_dashoffset",
++        "stroke_linecap",
++        "stroke_linejoin",
++        "opacity",
++        "transform",
++    ],
++    "RadialGradient": [
++        "cx",
++        "cy",
++        "r",
++        "fx",
++        "fy",
++        "fr",
++        "gradientUnits",
++        "gradientTransform",
++        "spreadMethod",
++        "href",
++    ],
++    "Rect": [
++        "x",
++        "y",
++        "width",
++        "height",
++        "rx",
++        "ry",
++        "pathLength",
++        "fill",
++        "fill_opacity",
++        "fill_rule",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "stroke_dasharray",
++        "stroke_dashoffset",
++        "stroke_linecap",
++        "stroke_linejoin",
++        "opacity",
++        "transform",
++    ],
++    "Script": [
++        "href",
++        "type",
++        "crossorigin",
++    ],
++    "Set": [
++        "attributeName",
++        "attributeType",
++        "to",
++        "dur",
++        "begin",
++        "end",
++        "min",
++        "max",
++        "restart",
++        "repeatCount",
++        "repeatDur",
++        "fill",
++        "href",
++    ],
++    "Stop": [
++        "offset",
++        "stop_color",
++        "stop_opacity",
++    ],
++    "Style": [
++        "type",
++        "media",
++        "title",
++    ],
++    "Svg": [
++        "width",
++        "height",
++        "viewBox",
++        "preserveAspectRatio",
++        "x",
++        "y",
++        "xmlns",
++        "version",
++        "fill",
++        "fill_opacity",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "opacity",
++        "transform",
++    ],
++    "Switch": [
++        "transform",
++        "opacity",
++    ],
++    "Symbol": [
++        "x",
++        "y",
++        "width",
++        "height",
++        "viewBox",
++        "preserveAspectRatio",
++        "refX",
++        "refY",
++    ],
++    "Text": [
++        "x",
++        "y",
++        "dx",
++        "dy",
++        "rotate",
++        "textLength",
++        "lengthAdjust",
++        "font_family",
++        "font_size",
++        "font_style",
++        "font_weight",
++        "text_anchor",
++        "dominant_baseline",
++        "text_decoration",
++        "letter_spacing",
++        "word_spacing",
++        "fill",
++        "fill_opacity",
++        "stroke",
++        "stroke_width",
++        "opacity",
++        "transform",
++    ],
++    "TextPath": [
++        "href",
++        "path",
++        "startOffset",
++        "method",
++        "spacing",
++        "side",
++        "textLength",
++        "lengthAdjust",
++        "font_family",
++        "font_size",
++        "font_style",
++        "font_weight",
++        "text_anchor",
++        "dominant_baseline",
++        "text_decoration",
++        "letter_spacing",
++        "word_spacing",
++        "fill",
++        "fill_opacity",
++        "stroke",
++        "stroke_width",
++        "opacity",
++        "transform",
++    ],
++    "Tspan": [
++        "x",
++        "y",
++        "dx",
++        "dy",
++        "rotate",
++        "textLength",
++        "lengthAdjust",
++        "font_family",
++        "font_size",
++        "font_style",
++        "font_weight",
++        "text_anchor",
++        "dominant_baseline",
++        "text_decoration",
++        "letter_spacing",
++        "word_spacing",
++        "fill",
++        "fill_opacity",
++        "stroke",
++        "stroke_width",
++        "opacity",
++        "transform",
++    ],
++    "Use": [
++        "href",
++        "x",
++        "y",
++        "width",
++        "height",
++        "fill",
++        "fill_opacity",
++        "stroke",
++        "stroke_width",
++        "stroke_opacity",
++        "opacity",
++        "transform",
++    ],
++    "View": [
++        "viewBox",
++        "preserveAspectRatio",
++    ],
++}
+diff --git a/src/air/tags/models/base.py b/src/air/tags/models/base.py
+index f87187917e9e3dd42ab0fbcc4cc12e08173ade45..b1493bc003ed29d90de786645e70aed83772356e 100644
+--- a/src/air/tags/models/base.py
++++ b/src/air/tags/models/base.py
+@@ -1,7 +1,8 @@
+ import html
+ from functools import cached_property
+-from typing import Any
++from typing import Any, ClassVar
+ 
++from ..config import HTML_ATTRIBUTES
+ from ..utils import SafeStr, clean_html_attr_key
+ 
+ 
+@@ -15,6 +16,8 @@ class Tag:
+     """
+ 
+     self_closing = False
++    # The specification used to convert named arguments into tag attributes.
++    attribute_map: ClassVar[dict[str, list[str]]] = HTML_ATTRIBUTES
+ 
+     def __init__(self, *children: Any, **kwargs: str | int | float | bool):
+         """
+diff --git a/src/air/tags/models/svg.py b/src/air/tags/models/svg.py
+index 9f6a29687837fc0092bd3caac693f512ac2835fb..a0b549098e7e4fd1f334440b5b8dfc67890f823d 100644
+--- a/src/air/tags/models/svg.py
++++ b/src/air/tags/models/svg.py
+@@ -1,387 +1,2572 @@
++from typing import Any
++
++from ..config import SVG_ATTRIBUTES
++from ..utils import locals_cleanup
+ from .base import Tag
+ 
+ 
+ class CaseTag(Tag):
+     """This is for case-sensitive tags like those used in SVG generation."""
+ 
++    attribute_map = SVG_ATTRIBUTES
++
+     @property
+     def name(self) -> str:
+         return self._name[0].lower() + self._name[1:]
+ 
+ 
+ class A(CaseTag):
+-    """Defines an SVG hyperlink"""
+-
+-    pass
++    """Defines an SVG hyperlink
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        href: The URL or URL fragment the element points to.
++        target: Where to display the linked document.
++        download: That the linked resource is to be downloaded rather than displayed.
++        ping: A space-separated list of URLs notified when the hyperlink is followed.
++        rel: The relationship between the current document and the linked resource.
++        hreflang: The language of the linked resource.
++        referrerpolicy: Which referrer information to send when fetching the linked resource.
++        type: The media type of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        href: str | None = None,
++        target: str | None = None,
++        download: str | None = None,
++        ping: str | None = None,
++        rel: str | None = None,
++        hreflang: str | None = None,
++        referrerpolicy: str | None = None,
++        type: str | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Animate(CaseTag):
+-    """Defines animation on an SVG element"""
+-
+-    pass
++    """Defines animation on an SVG element
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        attributeName: The name of the attribute that is animated.
++        attributeType: The namespace of the attribute that is animated.
++        calcMode: The interpolation mode of the animation.
++        values: The list of values used during the animation.
++        keyTimes: The time values that control the pacing of the animation.
++        keySplines: The Bézier control points that control the pacing of the animation.
++        from_: The starting value of the animation.
++        to: The ending value of the animation.
++        by: The relative offset value applied by the animation.
++        additive: Whether the animation is additive, one of `replace` or `sum`.
++        accumulate: Whether the animation is cumulative, one of `none` or `sum`.
++        dur: The simple duration of the animation.
++        begin: When the animation begins.
++        end: When the animation ends.
++        min: The minimum value of the active animation duration.
++        max: The maximum value of the active animation duration.
++        restart: When the animation can be restarted, one of `always`, `whenNotActive`, or `never`.
++        repeatCount: The number of times the animation is repeated.
++        repeatDur: The total duration for repeating the animation.
++        fill: The final state of the animation, either `freeze` or `remove`.
++        href: The element that is the target of the animation.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        attributeName: str | None = None,
++        attributeType: str | None = None,
++        calcMode: str | None = None,
++        values: str | None = None,
++        keyTimes: str | None = None,
++        keySplines: str | None = None,
++        from_: str | None = None,
++        to: str | None = None,
++        by: str | None = None,
++        additive: str | None = None,
++        accumulate: str | None = None,
++        dur: str | None = None,
++        begin: str | None = None,
++        end: str | None = None,
++        min: str | None = None,
++        max: str | None = None,
++        restart: str | None = None,
++        repeatCount: str | None = None,
++        repeatDur: str | None = None,
++        fill: str | None = None,
++        href: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class AnimateMotion(CaseTag):
+-    """Defines how an element moves along a motion path"""
+-
+-    pass
++    """Defines how an element moves along a motion path
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        path: The motion path expressed with the same syntax as the `d` attribute.
++        keyPoints: How far along the motion path the element travels at each keyTimes value.
++        rotate: How the animated element rotates as it travels along the motion path.
++        origin: The origin of the motion, defined by the SMIL specification.
++        calcMode: The interpolation mode of the animation.
++        values: The list of values used during the animation.
++        keyTimes: The time values that control the pacing of the animation.
++        keySplines: The Bézier control points that control the pacing of the animation.
++        from_: The starting value of the animation.
++        to: The ending value of the animation.
++        by: The relative offset value applied by the animation.
++        additive: Whether the animation is additive, one of `replace` or `sum`.
++        accumulate: Whether the animation is cumulative, one of `none` or `sum`.
++        dur: The simple duration of the animation.
++        begin: When the animation begins.
++        end: When the animation ends.
++        min: The minimum value of the active animation duration.
++        max: The maximum value of the active animation duration.
++        restart: When the animation can be restarted, one of `always`, `whenNotActive`, or `never`.
++        repeatCount: The number of times the animation is repeated.
++        repeatDur: The total duration for repeating the animation.
++        fill: The final state of the animation, either `freeze` or `remove`.
++        href: The element that is the target of the animation.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        path: str | None = None,
++        keyPoints: str | None = None,
++        rotate: str | None = None,
++        origin: str | None = None,
++        calcMode: str | None = None,
++        values: str | None = None,
++        keyTimes: str | None = None,
++        keySplines: str | None = None,
++        from_: str | None = None,
++        to: str | None = None,
++        by: str | None = None,
++        additive: str | None = None,
++        accumulate: str | None = None,
++        dur: str | None = None,
++        begin: str | None = None,
++        end: str | None = None,
++        min: str | None = None,
++        max: str | None = None,
++        restart: str | None = None,
++        repeatCount: str | None = None,
++        repeatDur: str | None = None,
++        fill: str | None = None,
++        href: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class AnimateTransform(CaseTag):
+-    """Animates transform attributes on an element"""
+-
+-    pass
++    """Animates transform attributes on an element
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        attributeName: The name of the attribute that is animated.
++        attributeType: The namespace of the attribute that is animated.
++        type: The type of transform to animate, one of `translate`, `scale`, `rotate`, `skewX`, or `skewY`.
++        calcMode: The interpolation mode of the animation.
++        values: The list of values used during the animation.
++        keyTimes: The time values that control the pacing of the animation.
++        keySplines: The Bézier control points that control the pacing of the animation.
++        from_: The starting value of the animation.
++        to: The ending value of the animation.
++        by: The relative offset value applied by the animation.
++        additive: Whether the animation is additive, one of `replace` or `sum`.
++        accumulate: Whether the animation is cumulative, one of `none` or `sum`.
++        dur: The simple duration of the animation.
++        begin: When the animation begins.
++        end: When the animation ends.
++        min: The minimum value of the active animation duration.
++        max: The maximum value of the active animation duration.
++        restart: When the animation can be restarted, one of `always`, `whenNotActive`, or `never`.
++        repeatCount: The number of times the animation is repeated.
++        repeatDur: The total duration for repeating the animation.
++        fill: The final state of the animation, either `freeze` or `remove`.
++        href: The element that is the target of the animation.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        attributeName: str | None = None,
++        attributeType: str | None = None,
++        type: str | None = None,
++        calcMode: str | None = None,
++        values: str | None = None,
++        keyTimes: str | None = None,
++        keySplines: str | None = None,
++        from_: str | None = None,
++        to: str | None = None,
++        by: str | None = None,
++        additive: str | None = None,
++        accumulate: str | None = None,
++        dur: str | None = None,
++        begin: str | None = None,
++        end: str | None = None,
++        min: str | None = None,
++        max: str | None = None,
++        restart: str | None = None,
++        repeatCount: str | None = None,
++        repeatDur: str | None = None,
++        fill: str | None = None,
++        href: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Circle(CaseTag):
+-    """Defines a circle"""
+-
+-    pass
++    """Defines a circle
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        cx: The x-axis coordinate of the center of the circle.
++        cy: The y-axis coordinate of the center of the circle.
++        r: The radius of the circle.
++        pathLength: The total length of the path, used to calibrate path based calculations.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        fill_rule: The algorithm used to determine the inside part of the shape.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        stroke_dasharray: The pattern of dashes and gaps used to paint the outline of the shape.
++        stroke_dashoffset: The offset used when rendering the associated dash array.
++        stroke_linecap: The shape used at the end of open subpaths when they are stroked.
++        stroke_linejoin: The shape used at the corners of paths when they are stroked.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        cx: str | int | float | None = None,
++        cy: str | int | float | None = None,
++        r: str | int | float | None = None,
++        pathLength: str | int | float | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        fill_rule: str | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        stroke_dasharray: str | None = None,
++        stroke_dashoffset: str | int | float | None = None,
++        stroke_linecap: str | None = None,
++        stroke_linejoin: str | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class ClipPath(CaseTag):
+-    """Defines a clipping path"""
+-
+-    pass
++    """Defines a clipping path
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        clipPathUnits: The coordinate system for the contents of the clip path.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        clipPathUnits: str | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Defs(CaseTag):
+-    """Defines reusable objects"""
+-
+-    pass
++    """Defines reusable objects
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        transform: A list of transform definitions applied to the element and its children.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        opacity: The opacity of the element.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        transform: str | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        opacity: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Desc(CaseTag):
+-    """Defines a description of an element"""
+-
+-    pass
++    """Defines a description of an element
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Ellipse(CaseTag):
+-    """Defines an ellipse"""
+-
+-    pass
++    """Defines an ellipse
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        cx: The x-axis coordinate of the center of the ellipse.
++        cy: The y-axis coordinate of the center of the ellipse.
++        rx: The x-axis radius of the ellipse.
++        ry: The y-axis radius of the ellipse.
++        pathLength: The total length of the path, used to calibrate path based calculations.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        fill_rule: The algorithm used to determine the inside part of the shape.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        stroke_dasharray: The pattern of dashes and gaps used to paint the outline of the shape.
++        stroke_dashoffset: The offset used when rendering the associated dash array.
++        stroke_linecap: The shape used at the end of open subpaths when they are stroked.
++        stroke_linejoin: The shape used at the corners of paths when they are stroked.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        cx: str | int | float | None = None,
++        cy: str | int | float | None = None,
++        rx: str | int | float | None = None,
++        ry: str | int | float | None = None,
++        pathLength: str | int | float | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        fill_rule: str | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        stroke_dasharray: str | None = None,
++        stroke_dashoffset: str | int | float | None = None,
++        stroke_linecap: str | None = None,
++        stroke_linejoin: str | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeBlend(CaseTag):
+-    """Defines image blending"""
+-
+-    pass
++    """Defines image blending
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        in2: The second input for the filter primitive.
++        mode: The image blending mode.
++        x: The x-axis coordinate of the filter primitive subregion.
++        y: The y-axis coordinate of the filter primitive subregion.
++        width: The width of the filter primitive subregion.
++        height: The height of the filter primitive subregion.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        in2: str | None = None,
++        mode: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeColorMatrix(CaseTag):
+-    """Applies a matrix transformation on color values"""
+-
+-    pass
++    """Applies a matrix transformation on color values
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        type: The type of matrix operation, one of `matrix`, `saturate`, `hueRotate`, or `luminanceToAlpha`.
++        values: The values of the color matrix operation.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        type: str | None = None,
++        values: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeComponentTransfer(CaseTag):
+-    """Performs component-wise remapping of data"""
+-
+-    pass
++    """Performs component-wise remapping of data
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeComposite(CaseTag):
+-    """Performs image compositing"""
+-
+-    pass
++    """Performs image compositing
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        in2: The second input for the filter primitive.
++        operator: The compositing operation to perform.
++        k1: The first coefficient of the arithmetic compositing operation.
++        k2: The second coefficient of the arithmetic compositing operation.
++        k3: The third coefficient of the arithmetic compositing operation.
++        k4: The fourth coefficient of the arithmetic compositing operation.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        in2: str | None = None,
++        operator: str | None = None,
++        k1: str | int | float | None = None,
++        k2: str | int | float | None = None,
++        k3: str | int | float | None = None,
++        k4: str | int | float | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeConvolveMatrix(CaseTag):
+-    """Applies a matrix convolution filter"""
+-
+-    pass
++    """Applies a matrix convolution filter
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        order: The number of cells in each dimension of the kernel matrix.
++        kernelMatrix: The list of numbers that make up the kernel matrix.
++        divisor: The value the convolution result is divided by.
++        bias: The value added to each component of the convolution result.
++        targetX: The x-axis position of the convolution kernel matrix target cell.
++        targetY: The y-axis position of the convolution kernel matrix target cell.
++        edgeMode: How to extend the input image when the filter operation reaches its edges.
++        kernelUnitLength: The intended distance between kernel cells in the user coordinate system.
++        preserveAlpha: Whether to preserve the alpha channel of the input image.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        order: str | None = None,
++        kernelMatrix: str | None = None,
++        divisor: str | int | float | None = None,
++        bias: str | int | float | None = None,
++        targetX: str | int | float | None = None,
++        targetY: str | int | float | None = None,
++        edgeMode: str | None = None,
++        kernelUnitLength: str | None = None,
++        preserveAlpha: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeDiffuseLighting(CaseTag):
+-    """Lights an image using diffuse lighting"""
+-
+-    pass
++    """Lights an image using diffuse lighting
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        surfaceScale: The height of the surface for a light filter primitive.
++        diffuseConstant: The constant used in the Phong lighting diffuse equation.
++        kernelUnitLength: The intended distance between kernel cells in the user coordinate system.
++        lighting_color: The color of the light source for the lighting filter primitive.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        surfaceScale: str | int | float | None = None,
++        diffuseConstant: str | int | float | None = None,
++        kernelUnitLength: str | None = None,
++        lighting_color: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeDisplacementMap(CaseTag):
+-    """Displaces an image using another image"""
+-
+-    pass
++    """Displaces an image using another image
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        in2: The second input for the filter primitive.
++        scale: The displacement scale factor.
++        xChannelSelector: The channel used to displace the pixels along the x-axis.
++        yChannelSelector: The channel used to displace the pixels along the y-axis.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        in2: str | None = None,
++        scale: str | int | float | None = None,
++        xChannelSelector: str | None = None,
++        yChannelSelector: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeDistantLight(CaseTag):
+-    """Defines a distant light source"""
+-
+-    pass
++    """Defines a distant light source
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        azimuth: The direction angle of the light source on the XY plane, in degrees.
++        elevation: The direction angle of the light source from the XY plane, in degrees.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        azimuth: str | int | float | None = None,
++        elevation: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeDropShadow(CaseTag):
+-    """Creates a drop shadow effect"""
+-
+-    pass
++    """Creates a drop shadow effect
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        dx: The shift along the x-axis.
++        dy: The shift along the y-axis.
++        stdDeviation: The standard deviation of the blur operation.
++        flood_color: The color used to flood the filter subregion.
++        flood_opacity: The opacity used to flood the filter subregion.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        dx: str | int | float | None = None,
++        dy: str | int | float | None = None,
++        stdDeviation: str | None = None,
++        flood_color: str | None = None,
++        flood_opacity: str | int | float | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeFlood(CaseTag):
+-    """Fills the filter region with a color"""
+-
+-    pass
++    """Fills the filter region with a color
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        flood_color: The color used to flood the filter subregion.
++        flood_opacity: The opacity used to flood the filter subregion.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        flood_color: str | None = None,
++        flood_opacity: str | int | float | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeFuncA(CaseTag):
+-    """Defines the alpha transfer function"""
+-
+-    pass
++    """Defines the alpha transfer function
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        type: The type of transfer function for the alpha channel.
++        tableValues: The lookup table of the transfer function.
++        slope: The slope of the linear transfer function.
++        intercept: The intercept of the linear transfer function.
++        amplitude: The amplitude of the gamma transfer function.
++        exponent: The exponent of the gamma transfer function.
++        offset: The offset of the transfer function.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        type: str | None = None,
++        tableValues: str | None = None,
++        slope: str | int | float | None = None,
++        intercept: str | int | float | None = None,
++        amplitude: str | int | float | None = None,
++        exponent: str | int | float | None = None,
++        offset: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeFuncB(CaseTag):
+-    """Defines the blue transfer function"""
+-
+-    pass
++    """Defines the blue transfer function
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        type: The type of transfer function for the blue channel.
++        tableValues: The lookup table of the transfer function.
++        slope: The slope of the linear transfer function.
++        intercept: The intercept of the linear transfer function.
++        amplitude: The amplitude of the gamma transfer function.
++        exponent: The exponent of the gamma transfer function.
++        offset: The offset of the transfer function.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        type: str | None = None,
++        tableValues: str | None = None,
++        slope: str | int | float | None = None,
++        intercept: str | int | float | None = None,
++        amplitude: str | int | float | None = None,
++        exponent: str | int | float | None = None,
++        offset: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeFuncG(CaseTag):
+-    """Defines the green transfer function"""
+-
+-    pass
++    """Defines the green transfer function
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        type: The type of transfer function for the green channel.
++        tableValues: The lookup table of the transfer function.
++        slope: The slope of the linear transfer function.
++        intercept: The intercept of the linear transfer function.
++        amplitude: The amplitude of the gamma transfer function.
++        exponent: The exponent of the gamma transfer function.
++        offset: The offset of the transfer function.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        type: str | None = None,
++        tableValues: str | None = None,
++        slope: str | int | float | None = None,
++        intercept: str | int | float | None = None,
++        amplitude: str | int | float | None = None,
++        exponent: str | int | float | None = None,
++        offset: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeFuncR(CaseTag):
+-    """Defines the red transfer function"""
+-
+-    pass
++    """Defines the red transfer function
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        type: The type of transfer function for the red channel.
++        tableValues: The lookup table of the transfer function.
++        slope: The slope of the linear transfer function.
++        intercept: The intercept of the linear transfer function.
++        amplitude: The amplitude of the gamma transfer function.
++        exponent: The exponent of the gamma transfer function.
++        offset: The offset of the transfer function.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        type: str | None = None,
++        tableValues: str | None = None,
++        slope: str | int | float | None = None,
++        intercept: str | int | float | None = None,
++        amplitude: str | int | float | None = None,
++        exponent: str | int | float | None = None,
++        offset: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeGaussianBlur(CaseTag):
+-    """Applies Gaussian blur to an image"""
+-
+-    pass
++    """Applies Gaussian blur to an image
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        stdDeviation: The standard deviation of the blur operation.
++        edgeMode: How to extend the input image when the filter operation reaches its edges.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        stdDeviation: str | None = None,
++        edgeMode: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeImage(CaseTag):
+-    """Refers to an external image"""
+-
+-    pass
++    """Refers to an external image
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        href: The URL of the image to render.
++        preserveAspectRatio: How the element is scaled to fit a viewport that has a different aspect ratio.
++        crossorigin: How the element handles crossorigin requests.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        href: str | None = None,
++        preserveAspectRatio: str | None = None,
++        crossorigin: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeMerge(CaseTag):
+-    """Merges multiple filter nodes"""
+-
+-    pass
++    """Merges multiple filter nodes
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeMergeNode(CaseTag):
+-    """Defines a node for feMerge"""
+-
+-    pass
++    """Defines a node for feMerge
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeMorphology(CaseTag):
+-    """Applies morphological operations"""
+-
+-    pass
++    """Applies morphological operations
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        operator: The morphology operation, either `erode` or `dilate`.
++        radius: The radius of the morphology operation.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        operator: str | None = None,
++        radius: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeOffset(CaseTag):
+-    """Offsets an image"""
+-
+-    pass
++    """Offsets an image
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        dx: The shift along the x-axis.
++        dy: The shift along the y-axis.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        dx: str | int | float | None = None,
++        dy: str | int | float | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FePointLight(CaseTag):
+-    """Defines a point light source"""
+-
+-    pass
++    """Defines a point light source
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the light source.
++        y: The y-axis coordinate of the light source.
++        z: The z-axis coordinate of the light source.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        z: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeSpecularLighting(CaseTag):
+-    """Lights an image using specular lighting"""
+-
+-    pass
++    """Lights an image using specular lighting
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        surfaceScale: The height of the surface for a light filter primitive.
++        specularConstant: The constant used in the Phong lighting specular equation.
++        specularExponent: The exponent used in the Phong lighting specular equation.
++        kernelUnitLength: The intended distance between kernel cells in the user coordinate system.
++        lighting_color: The color of the light source for the lighting filter primitive.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        surfaceScale: str | int | float | None = None,
++        specularConstant: str | int | float | None = None,
++        specularExponent: str | int | float | None = None,
++        kernelUnitLength: str | None = None,
++        lighting_color: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeSpotLight(CaseTag):
+-    """Defines a spot light source"""
+-
+-    pass
++    """Defines a spot light source
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the light source.
++        y: The y-axis coordinate of the light source.
++        z: The z-axis coordinate of the light source.
++        pointsAtX: The x-axis coordinate of the point the light source points at.
++        pointsAtY: The y-axis coordinate of the point the light source points at.
++        pointsAtZ: The z-axis coordinate of the point the light source points at.
++        specularExponent: The exponent used in the Phong lighting specular equation.
++        limitingConeAngle: The angle that restricts the region where the light source is projected.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        z: str | int | float | None = None,
++        pointsAtX: str | int | float | None = None,
++        pointsAtY: str | int | float | None = None,
++        pointsAtZ: str | int | float | None = None,
++        specularExponent: str | int | float | None = None,
++        limitingConeAngle: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeTile(CaseTag):
+-    """Tiles an image to fill a rectangle"""
+-
+-    pass
++    """Tiles an image to fill a rectangle
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        in_: The input for the filter primitive.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        in_: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class FeTurbulence(CaseTag):
+-    """Creates turbulence noise"""
+-
+-    pass
++    """Creates turbulence noise
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        baseFrequency: The base frequency of the turbulence noise function.
++        numOctaves: The number of octaves of the turbulence noise function.
++        seed: The starting number for the turbulence pseudo random number generator.
++        stitchTiles: How the turbulence tiles behave at their borders.
++        type: The type of turbulence, either `fractalNoise` or `turbulence`.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        result: The name assigned to this filter primitive so it can be referenced as an input.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        baseFrequency: str | None = None,
++        numOctaves: str | int | float | None = None,
++        seed: str | int | float | None = None,
++        stitchTiles: str | None = None,
++        type: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        result: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Filter(CaseTag):
+-    """Defines a filter effect"""
+-
+-    pass
++    """Defines a filter effect
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the filter region.
++        y: The y-axis coordinate of the filter region.
++        width: The width of the filter region.
++        height: The height of the filter region.
++        filterUnits: The coordinate system for the `x`, `y`, `width`, and `height` attributes.
++        primitiveUnits: The coordinate system for the attributes of the filter primitives.
++        href: The filter whose attributes are inherited by this filter.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        filterUnits: str | None = None,
++        primitiveUnits: str | None = None,
++        href: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class ForeignObject(CaseTag):
+-    """Allows inclusion of foreign XML"""
+-
+-    pass
++    """Allows inclusion of foreign XML
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the foreign object.
++        y: The y-axis coordinate of the foreign object.
++        width: The width of the foreign object.
++        height: The height of the foreign object.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class G(CaseTag):
+-    """Groups SVG elements"""
+-
+-    pass
++    """Groups SVG elements
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        transform: A list of transform definitions applied to the element and its children.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        opacity: The opacity of the element.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        transform: str | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        opacity: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Image(CaseTag):
+-    """Embeds an image"""
+-
+-    pass
++    """Embeds an image
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        href: The URL of the image to render.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        preserveAspectRatio: How the element is scaled to fit a viewport that has a different aspect ratio.
++        crossorigin: How the element handles crossorigin requests.
++        decoding: A hint of the relative priority to use when decoding the image.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        href: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        preserveAspectRatio: str | None = None,
++        crossorigin: str | None = None,
++        decoding: str | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Line(CaseTag):
+-    """Defines a line"""
+-
+-    pass
++    """Defines a line
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x1: The x-axis coordinate of the start of the line.
++        y1: The y-axis coordinate of the start of the line.
++        x2: The x-axis coordinate of the end of the line.
++        y2: The y-axis coordinate of the end of the line.
++        pathLength: The total length of the path, used to calibrate path based calculations.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        stroke_dasharray: The pattern of dashes and gaps used to paint the outline of the shape.
++        stroke_dashoffset: The offset used when rendering the associated dash array.
++        stroke_linecap: The shape used at the end of open subpaths when they are stroked.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x1: str | int | float | None = None,
++        y1: str | int | float | None = None,
++        x2: str | int | float | None = None,
++        y2: str | int | float | None = None,
++        pathLength: str | int | float | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        stroke_dasharray: str | None = None,
++        stroke_dashoffset: str | int | float | None = None,
++        stroke_linecap: str | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class LinearGradient(CaseTag):
+-    """Defines a linear gradient"""
+-
+-    pass
++    """Defines a linear gradient
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x1: The x-axis coordinate of the start of the gradient.
++        y1: The y-axis coordinate of the start of the gradient.
++        x2: The x-axis coordinate of the end of the gradient.
++        y2: The y-axis coordinate of the end of the gradient.
++        gradientUnits: The coordinate system for the gradient attributes.
++        gradientTransform: The transform applied to the gradient.
++        spreadMethod: How a gradient paints beyond its defined edges.
++        href: The gradient whose attributes and stops are inherited by this gradient.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x1: str | int | float | None = None,
++        y1: str | int | float | None = None,
++        x2: str | int | float | None = None,
++        y2: str | int | float | None = None,
++        gradientUnits: str | None = None,
++        gradientTransform: str | None = None,
++        spreadMethod: str | None = None,
++        href: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Marker(CaseTag):
+-    """Defines a graphic for drawing on lines"""
+-
+-    pass
++    """Defines a graphic for drawing on lines
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        markerWidth: The width of the marker viewport.
++        markerHeight: The height of the marker viewport.
++        markerUnits: The coordinate system for the marker attributes.
++        orient: The orientation of the marker relative to the shape it is attached to.
++        refX: The x-axis coordinate of the reference point of the marker.
++        refY: The y-axis coordinate of the reference point of the marker.
++        viewBox: The position and dimension of the user coordinate system, as `min-x min-y width height`.
++        preserveAspectRatio: How the element is scaled to fit a viewport that has a different aspect ratio.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        markerWidth: str | int | float | None = None,
++        markerHeight: str | int | float | None = None,
++        markerUnits: str | None = None,
++        orient: str | None = None,
++        refX: str | int | float | None = None,
++        refY: str | int | float | None = None,
++        viewBox: str | None = None,
++        preserveAspectRatio: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Mask(CaseTag):
+-    """Defines a mask"""
+-
+-    pass
++    """Defines a mask
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the masking area.
++        y: The y-axis coordinate of the masking area.
++        width: The width of the masking area.
++        height: The height of the masking area.
++        maskUnits: The coordinate system for the `x`, `y`, `width`, and `height` attributes.
++        maskContentUnits: The coordinate system for the contents of the mask.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        maskUnits: str | None = None,
++        maskContentUnits: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Metadata(CaseTag):
+-    """Defines metadata"""
+-
+-    pass
++    """Defines metadata
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Mpath(CaseTag):
+-    """Defines a motion path"""
+-
+-    pass
++    """Defines a motion path
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        href: The path element that defines the motion path.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        href: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Path(CaseTag):
+-    """Defines a path"""
+-
+-    pass
++    """Defines a path
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        d: The definition of the outline of the path.
++        pathLength: The total length of the path, used to calibrate path based calculations.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        fill_rule: The algorithm used to determine the inside part of the shape.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        stroke_dasharray: The pattern of dashes and gaps used to paint the outline of the shape.
++        stroke_dashoffset: The offset used when rendering the associated dash array.
++        stroke_linecap: The shape used at the end of open subpaths when they are stroked.
++        stroke_linejoin: The shape used at the corners of paths when they are stroked.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        d: str | None = None,
++        pathLength: str | int | float | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        fill_rule: str | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        stroke_dasharray: str | None = None,
++        stroke_dashoffset: str | int | float | None = None,
++        stroke_linecap: str | None = None,
++        stroke_linejoin: str | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Pattern(CaseTag):
+-    """Defines a pattern"""
+-
+-    pass
++    """Defines a pattern
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        patternUnits: The coordinate system for the `x`, `y`, `width`, and `height` attributes.
++        patternContentUnits: The coordinate system for the contents of the pattern.
++        patternTransform: The transform applied to the pattern tile.
++        viewBox: The position and dimension of the user coordinate system, as `min-x min-y width height`.
++        preserveAspectRatio: How the element is scaled to fit a viewport that has a different aspect ratio.
++        href: The pattern whose attributes and children are inherited by this pattern.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        patternUnits: str | None = None,
++        patternContentUnits: str | None = None,
++        patternTransform: str | None = None,
++        viewBox: str | None = None,
++        preserveAspectRatio: str | None = None,
++        href: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Polygon(CaseTag):
+-    """Defines a polygon"""
+-
+-    pass
++    """Defines a polygon
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        points: The list of points that make up the polygon.
++        pathLength: The total length of the path, used to calibrate path based calculations.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        fill_rule: The algorithm used to determine the inside part of the shape.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        stroke_dasharray: The pattern of dashes and gaps used to paint the outline of the shape.
++        stroke_dashoffset: The offset used when rendering the associated dash array.
++        stroke_linecap: The shape used at the end of open subpaths when they are stroked.
++        stroke_linejoin: The shape used at the corners of paths when they are stroked.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        points: str | None = None,
++        pathLength: str | int | float | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        fill_rule: str | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        stroke_dasharray: str | None = None,
++        stroke_dashoffset: str | int | float | None = None,
++        stroke_linecap: str | None = None,
++        stroke_linejoin: str | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Polyline(CaseTag):
+-    """Defines a polyline"""
+-
+-    pass
++    """Defines a polyline
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        points: The list of points that make up the polyline.
++        pathLength: The total length of the path, used to calibrate path based calculations.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        fill_rule: The algorithm used to determine the inside part of the shape.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        stroke_dasharray: The pattern of dashes and gaps used to paint the outline of the shape.
++        stroke_dashoffset: The offset used when rendering the associated dash array.
++        stroke_linecap: The shape used at the end of open subpaths when they are stroked.
++        stroke_linejoin: The shape used at the corners of paths when they are stroked.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        points: str | None = None,
++        pathLength: str | int | float | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        fill_rule: str | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        stroke_dasharray: str | None = None,
++        stroke_dashoffset: str | int | float | None = None,
++        stroke_linecap: str | None = None,
++        stroke_linejoin: str | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class RadialGradient(CaseTag):
+-    """Defines a radial gradient"""
+-
+-    pass
++    """Defines a radial gradient
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        cx: The x-axis coordinate of the end circle of the radial gradient.
++        cy: The y-axis coordinate of the end circle of the radial gradient.
++        r: The radius of the end circle of the radial gradient.
++        fx: The x-axis coordinate of the focal point of the radial gradient.
++        fy: The y-axis coordinate of the focal point of the radial gradient.
++        fr: The radius of the focal point of the radial gradient.
++        gradientUnits: The coordinate system for the gradient attributes.
++        gradientTransform: The transform applied to the gradient.
++        spreadMethod: How a gradient paints beyond its defined edges.
++        href: The gradient whose attributes and stops are inherited by this gradient.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        cx: str | int | float | None = None,
++        cy: str | int | float | None = None,
++        r: str | int | float | None = None,
++        fx: str | int | float | None = None,
++        fy: str | int | float | None = None,
++        fr: str | int | float | None = None,
++        gradientUnits: str | None = None,
++        gradientTransform: str | None = None,
++        spreadMethod: str | None = None,
++        href: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Rect(CaseTag):
+-    """Defines a rectangle"""
+-
+-    pass
++    """Defines a rectangle
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the top left corner of the rectangle.
++        y: The y-axis coordinate of the top left corner of the rectangle.
++        width: The width of the rectangle.
++        height: The height of the rectangle.
++        rx: The horizontal corner radius of the rectangle.
++        ry: The vertical corner radius of the rectangle.
++        pathLength: The total length of the path, used to calibrate path based calculations.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        fill_rule: The algorithm used to determine the inside part of the shape.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        stroke_dasharray: The pattern of dashes and gaps used to paint the outline of the shape.
++        stroke_dashoffset: The offset used when rendering the associated dash array.
++        stroke_linecap: The shape used at the end of open subpaths when they are stroked.
++        stroke_linejoin: The shape used at the corners of paths when they are stroked.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        rx: str | int | float | None = None,
++        ry: str | int | float | None = None,
++        pathLength: str | int | float | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        fill_rule: str | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        stroke_dasharray: str | None = None,
++        stroke_dashoffset: str | int | float | None = None,
++        stroke_linecap: str | None = None,
++        stroke_linejoin: str | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Script(CaseTag):
+-    """Defines a script"""
+-
+-    pass
++    """Defines a script
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        href: The URL of the script to load.
++        type: The media type of the script.
++        crossorigin: How the element handles crossorigin requests.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        href: str | None = None,
++        type: str | None = None,
++        crossorigin: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Set(CaseTag):
+-    """Sets an attribute value"""
+-
+-    pass
++    """Sets an attribute value
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        attributeName: The name of the attribute that is animated.
++        attributeType: The namespace of the attribute that is animated.
++        to: The value the targeted attribute is set to for the duration of the animation.
++        dur: The simple duration of the animation.
++        begin: When the animation begins.
++        end: When the animation ends.
++        min: The minimum value of the active animation duration.
++        max: The maximum value of the active animation duration.
++        restart: When the animation can be restarted, one of `always`, `whenNotActive`, or `never`.
++        repeatCount: The number of times the animation is repeated.
++        repeatDur: The total duration for repeating the animation.
++        fill: The final state of the animation, either `freeze` or `remove`.
++        href: The element that is the target of the animation.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        attributeName: str | None = None,
++        attributeType: str | None = None,
++        to: str | None = None,
++        dur: str | None = None,
++        begin: str | None = None,
++        end: str | None = None,
++        min: str | None = None,
++        max: str | None = None,
++        restart: str | None = None,
++        repeatCount: str | None = None,
++        repeatDur: str | None = None,
++        fill: str | None = None,
++        href: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Stop(CaseTag):
+-    """Defines a gradient stop"""
+-
+-    pass
++    """Defines a gradient stop
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        offset: Where the gradient stop is placed along the gradient vector.
++        stop_color: The color of the gradient stop.
++        stop_opacity: The opacity of the gradient stop.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        offset: str | None = None,
++        stop_color: str | None = None,
++        stop_opacity: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Style(CaseTag):
+-    """Defines style information"""
+-
+-    pass
++    """Defines style information
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        type: The media type of the style sheet.
++        media: Which media the style sheet applies to.
++        title: The title of the style sheet.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        type: str | None = None,
++        media: str | None = None,
++        title: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Svg(CaseTag):
+-    """Defines an SVG document fragment"""
+-
+-    pass
++    """Defines an SVG document fragment
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        width: The displayed width of the viewport.
++        height: The displayed height of the viewport.
++        viewBox: The position and dimension of the user coordinate system, as `min-x min-y width height`.
++        preserveAspectRatio: How the element is scaled to fit a viewport that has a different aspect ratio.
++        x: The displayed x-axis coordinate of the svg container.
++        y: The displayed y-axis coordinate of the svg container.
++        xmlns: The XML namespace of the document.
++        version: The SVG language version the document conforms to.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        viewBox: str | None = None,
++        preserveAspectRatio: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        xmlns: str | None = None,
++        version: str | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Switch(CaseTag):
+-    """Defines conditional processing"""
+-
+-    pass
++    """Defines conditional processing
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        transform: A list of transform definitions applied to the element and its children.
++        opacity: The opacity of the element.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        transform: str | None = None,
++        opacity: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Symbol(CaseTag):
+-    """Defines a reusable symbol"""
+-
+-    pass
++    """Defines a reusable symbol
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the symbol.
++        height: The height of the symbol.
++        viewBox: The position and dimension of the user coordinate system, as `min-x min-y width height`.
++        preserveAspectRatio: How the element is scaled to fit a viewport that has a different aspect ratio.
++        refX: The x-axis coordinate of the reference point of the element.
++        refY: The y-axis coordinate of the reference point of the element.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        viewBox: str | None = None,
++        preserveAspectRatio: str | None = None,
++        refX: str | int | float | None = None,
++        refY: str | int | float | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Text(CaseTag):
+-    """Defines text content"""
+-
+-    pass
++    """Defines text content
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the starting point of the text baseline.
++        y: The y-axis coordinate of the starting point of the text baseline.
++        dx: The shift of the text along the x-axis.
++        dy: The shift of the text along the y-axis.
++        rotate: The rotation applied to each individual character of the text.
++        textLength: The width that the text must fit into.
++        lengthAdjust: How the text is stretched or compressed to fit `textLength`.
++        font_family: The font family used to render the text.
++        font_size: The size of the font used to render the text.
++        font_style: The style of the font used to render the text.
++        font_weight: The weight of the font used to render the text.
++        text_anchor: How the text is aligned relative to its starting point.
++        dominant_baseline: The baseline used to align the text.
++        text_decoration: The decoration added to the text.
++        letter_spacing: The spacing between text characters.
++        word_spacing: The spacing between words of text.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        dx: str | int | float | None = None,
++        dy: str | int | float | None = None,
++        rotate: str | None = None,
++        textLength: str | int | float | None = None,
++        lengthAdjust: str | None = None,
++        font_family: str | None = None,
++        font_size: str | None = None,
++        font_style: str | None = None,
++        font_weight: str | None = None,
++        text_anchor: str | None = None,
++        dominant_baseline: str | None = None,
++        text_decoration: str | None = None,
++        letter_spacing: str | None = None,
++        word_spacing: str | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class TextPath(CaseTag):
+-    """Defines text along a path"""
+-
+-    pass
++    """Defines text along a path
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        href: The path or shape the text is rendered along.
++        path: The path the text is rendered along, using the same syntax as the `d` attribute.
++        startOffset: How far from the start of the path the text is rendered.
++        method: How the text is rendered along the path, either `align` or `stretch`.
++        spacing: How space between glyphs is handled, either `auto` or `exact`.
++        side: Which side of the path the text is rendered on.
++        textLength: The width that the text must fit into.
++        lengthAdjust: How the text is stretched or compressed to fit `textLength`.
++        font_family: The font family used to render the text.
++        font_size: The size of the font used to render the text.
++        font_style: The style of the font used to render the text.
++        font_weight: The weight of the font used to render the text.
++        text_anchor: How the text is aligned relative to its starting point.
++        dominant_baseline: The baseline used to align the text.
++        text_decoration: The decoration added to the text.
++        letter_spacing: The spacing between text characters.
++        word_spacing: The spacing between words of text.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        href: str | None = None,
++        path: str | None = None,
++        startOffset: str | None = None,
++        method: str | None = None,
++        spacing: str | None = None,
++        side: str | None = None,
++        textLength: str | int | float | None = None,
++        lengthAdjust: str | None = None,
++        font_family: str | None = None,
++        font_size: str | None = None,
++        font_style: str | None = None,
++        font_weight: str | None = None,
++        text_anchor: str | None = None,
++        dominant_baseline: str | None = None,
++        text_decoration: str | None = None,
++        letter_spacing: str | None = None,
++        word_spacing: str | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Title(CaseTag):
+-    """Defines a title for the SVG document"""
+-
+-    pass
++    """Defines a title for the SVG document
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Tspan(CaseTag):
+-    """Defines a text span"""
+-
+-    pass
++    """Defines a text span
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        x: The x-axis coordinate of the starting point of the text baseline.
++        y: The y-axis coordinate of the starting point of the text baseline.
++        dx: The shift of the text span along the x-axis.
++        dy: The shift of the text span along the y-axis.
++        rotate: The rotation applied to each individual character of the text span.
++        textLength: The width that the text must fit into.
++        lengthAdjust: How the text is stretched or compressed to fit `textLength`.
++        font_family: The font family used to render the text.
++        font_size: The size of the font used to render the text.
++        font_style: The style of the font used to render the text.
++        font_weight: The weight of the font used to render the text.
++        text_anchor: How the text is aligned relative to its starting point.
++        dominant_baseline: The baseline used to align the text.
++        text_decoration: The decoration added to the text.
++        letter_spacing: The spacing between text characters.
++        word_spacing: The spacing between words of text.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        dx: str | int | float | None = None,
++        dy: str | int | float | None = None,
++        rotate: str | None = None,
++        textLength: str | int | float | None = None,
++        lengthAdjust: str | None = None,
++        font_family: str | None = None,
++        font_size: str | None = None,
++        font_style: str | None = None,
++        font_weight: str | None = None,
++        text_anchor: str | None = None,
++        dominant_baseline: str | None = None,
++        text_decoration: str | None = None,
++        letter_spacing: str | None = None,
++        word_spacing: str | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class Use(CaseTag):
+-    """References another element"""
+-
+-    pass
++    """References another element
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        href: The element that is duplicated by this element.
++        x: The x-axis coordinate of the element.
++        y: The y-axis coordinate of the element.
++        width: The width of the element.
++        height: The height of the element.
++        fill: The color (or gradient or pattern) used to paint the element.
++        fill_opacity: The opacity of the paint applied to the element.
++        stroke: The color (or gradient or pattern) used to paint the outline of the shape.
++        stroke_width: The width of the stroke painted on the outline of the shape.
++        stroke_opacity: The opacity of the stroke painted on the outline of the shape.
++        opacity: The opacity of the element.
++        transform: A list of transform definitions applied to the element and its children.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        href: str | None = None,
++        x: str | int | float | None = None,
++        y: str | int | float | None = None,
++        width: str | int | float | None = None,
++        height: str | int | float | None = None,
++        fill: str | None = None,
++        fill_opacity: str | int | float | None = None,
++        stroke: str | None = None,
++        stroke_width: str | int | float | None = None,
++        stroke_opacity: str | int | float | None = None,
++        opacity: str | int | float | None = None,
++        transform: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+ 
+ class View(CaseTag):
+-    """Defines a view"""
++    """Defines a view
++
++    Args:
++        children: Tags, strings, or other rendered content.
++        viewBox: The position and dimension of the user coordinate system, as `min-x min-y width height`.
++        preserveAspectRatio: How the element is scaled to fit a viewport that has a different aspect ratio.
++        class_: Substituted as the DOM `class` attribute.
++        id: DOM ID attribute.
++        style: Inline style attribute.
++        kwargs: Keyword arguments transformed into tag attributes.
++    """
++
++    def __init__(
++        self,
++        *children: Any,
++        viewBox: str | None = None,
++        preserveAspectRatio: str | None = None,
++        class_: str | None = None,
++        id: str | None = None,
++        style: str | None = None,
++        **kwargs: str | float | int | bool,
++    ):
++        super().__init__(*children, **kwargs | locals_cleanup(locals(), self))
+ 
+-    pass
+diff --git a/src/air/tags/utils.py b/src/air/tags/utils.py
+index 5c639d28fc24e82c5975d9d34ddf44f1e1a60e51..2abfe89889a841e95ddc03fd5dc00c57f7166b03 100644
+--- a/src/air/tags/utils.py
++++ b/src/air/tags/utils.py
+@@ -1,4 +1,4 @@
+-from .config import HTML_ATTRIBUTES
++from typing import Any
+ 
+ 
+ def clean_html_attr_key(key: str) -> str:
+@@ -11,9 +11,16 @@ def clean_html_attr_key(key: str) -> str:
+ 
+         Cleaned HTML attribute key
+     """
+-    # If a "_"-suffixed proxy for "class", "for", or "id" is used,
++    # If a "_"-suffixed proxy for a reserved Python word is used,
+     # convert it to its normal HTML equivalent.
+-    key = dict(class_="class", for_="for", id_="id", as_="as").get(key, key)
++    key = dict(
++        class_="class",
++        for_="for",
++        id_="id",
++        as_="as",
++        in_="in",
++        from_="from",
++    ).get(key, key)
+     # Remove leading underscores and replace underscores with dashes
+     return key.lstrip("_").replace("_", "-")
+ 
+@@ -33,11 +40,21 @@ class SafeStr(str):
+         return super().__repr__()
+ 
+ 
+-def locals_cleanup(local_data, obj):
+-    """Converts arguments to kwargs per the html_attributes structure"""
++def locals_cleanup(local_data: dict[str, Any], obj: Any) -> dict[str, Any]:
++    """Converts arguments to kwargs per the attribute structure of the tag
++
++    Args:
++        local_data: The result of calling `locals()` within a Tag's `__init__`.
++        obj: The Tag instance being constructed.
++
++    Returns:
++
++        The named arguments that were given a value, in the order defined by
++        the attribute map of the tag.
++    """
+     data = {}
+-    attrs = HTML_ATTRIBUTES.get(obj.__class__.__name__, [])
+-    attrs += ["class_", "id", "style"]
++    tag_attrs = obj.attribute_map.get(obj.__class__.__name__, [])
++    attrs = [*tag_attrs, "class_", "id", "style"]
+     for attr in attrs:
+         if local_data.get(attr) is not None:
+             data[attr] = local_data[attr]

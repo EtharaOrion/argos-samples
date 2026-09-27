@@ -1,0 +1,15 @@
+{
+    "task": {
+        "path": "4056d683-bddd-57a4-8cf3-e807654c7c9c"
+    },
+    "trial_name": "secdev_scapy_3461",
+    "trials_dir": "4056d683-bddd-57a4-8cf3-e807654c7c9c/trajectories/opus-5/run_8",
+    "agent": {
+        "name": "openhands-sdk",
+        "model_name": "anthropic/claude-opus-5",
+        "extra_allowed_hosts": [
+            "api.anthropic.com"
+        ]
+    },
+    "job_id": "5556d093-d7bd-4a07-b661-19f3e7c49948"
+}

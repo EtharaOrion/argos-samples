@@ -1,0 +1,137 @@
+diff --git a/gitoxide-core/CHANGELOG.md b/gitoxide-core/CHANGELOG.md
+index 00679072d60377d2f9a9a97b1ede51ef81080447..d7f4bab952cdbfe885a38502a977be9382fc5e6f 100644
+--- a/gitoxide-core/CHANGELOG.md
++++ b/gitoxide-core/CHANGELOG.md
+@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
+ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+ 
++## Unreleased
++
++### Bug Fixes
++
++ - `gix credential fill` (and `approve`/`reject`) now work when only `protocol` and `host` are provided,
++   just like `git credential`, instead of requiring a `url` field.
++
+ ## 0.48.0 (2025-07-15)
+ 
+ ### New Features
+diff --git a/gitoxide-core/src/repository/credential.rs b/gitoxide-core/src/repository/credential.rs
+index c901f06f2baa095a85dec5789be3c86366c65ac0..063527e8c22c82652ea1d52f22eeed4782923527 100644
+--- a/gitoxide-core/src/repository/credential.rs
++++ b/gitoxide-core/src/repository/credential.rs
+@@ -15,9 +15,23 @@ pub fn function(repo: gix::Repository, action: gix::credentials::program::main::
+         std::io::stdin(),
+         std::io::stdout(),
+         |action, context| -> Result<_, Error> {
+-            let (mut cascade, _action, prompt_options) = repo.config_snapshot().credential_helpers(gix::url::parse(
+-                context.url.as_ref().expect("framework assures URL is present").as_ref(),
+-            )?)?;
++            // The context may identify the credential by `protocol` and `host` alone, so build a url
++            // from its parts if there is none.
++            let url = match context.url.as_ref() {
++                Some(url) => gix::url::parse(url.as_ref())?,
++                None => {
++                    let mut url = context
++                        .to_url()
++                        .expect("framework assures url or protocol and host to be present");
++                    if context.path.is_none() {
++                        // A trailing slash makes the url valid even if there is no path, like `ssh://host`,
++                        // which urls for repositories must have.
++                        url.push(b'/');
++                    }
++                    gix::url::parse(url.as_ref())?
++                }
++            };
++            let (mut cascade, _action, prompt_options) = repo.config_snapshot().credential_helpers(url)?;
+             cascade
+                 .invoke(
+                     match action {
+diff --git a/gix-credentials/CHANGELOG.md b/gix-credentials/CHANGELOG.md
+index 93ad1367da23b272984b5f8d4e0cab50be6c65e5..18dc5e0b6f26a08963ddca0e4a7625ee15a0271d 100644
+--- a/gix-credentials/CHANGELOG.md
++++ b/gix-credentials/CHANGELOG.md
+@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
+ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+ 
++## Unreleased
++
++### Bug Fixes
++
++ - `program::main()` no longer requires the `url` field, as `protocol` and `host` identify the credential just as well.
++   This is what `git credential fill` expects, and now `Cascade::invoke()` won't fail either if the context has no `url`.
++
+ ## 0.30.0 (2025-07-15)
+ 
+ ### New Features
+diff --git a/gix-credentials/src/helper/cascade.rs b/gix-credentials/src/helper/cascade.rs
+index 3d5b31a5ef6bacf8ec9926a33c1a627daccf239a..2423e945435a6edcf16a2a3a383043debca9d2a4 100644
+--- a/gix-credentials/src/helper/cascade.rs
++++ b/gix-credentials/src/helper/cascade.rs
+@@ -72,13 +72,16 @@ impl Cascade {
+     pub fn invoke(&mut self, mut action: helper::Action, mut prompt: gix_prompt::Options<'_>) -> protocol::Result {
+         let mut url = action
+             .context_mut()
+-            .map(|ctx| {
+-                ctx.destructure_url_in_place(self.use_http_path).map(|ctx| {
++            .and_then(|ctx| {
++                // A context without url is already complete with `protocol`, `host` and other fields,
++                // so there is nothing to destructure.
++                ctx.url.as_ref()?;
++                Some(ctx.destructure_url_in_place(self.use_http_path).map(|ctx| {
+                     if self.query_user_only && ctx.password.is_none() {
+                         ctx.password = Some("".into());
+                     }
+                     ctx
+-                })
++                }))
+             })
+             .transpose()?
+             .and_then(|ctx| ctx.url.take());
+diff --git a/gix-credentials/src/program/main.rs b/gix-credentials/src/program/main.rs
+index 34f4163a01eef3d9b363668fa5ea6cfc3d8e3a39..74117c5627fb6ad6ce8406c0e6090b5bce404cb5 100644
+--- a/gix-credentials/src/program/main.rs
++++ b/gix-credentials/src/program/main.rs
+@@ -55,7 +55,7 @@ pub enum Error {
+     Context(#[from] crate::protocol::context::decode::Error),
+     #[error("Credentials for {url:?} could not be obtained")]
+     CredentialsMissing { url: BString },
+-    #[error("The url wasn't provided in input - the git credentials protocol mandates this")]
++    #[error("The 'url' field, or the 'protocol' and 'host' fields must be provided in input - the git credentials protocol mandates this")]
+     UrlMissing,
+ }
+ 
+@@ -89,14 +89,17 @@ pub(crate) mod function {
+         let mut buf = Vec::<u8>::with_capacity(512);
+         stdin.read_to_end(&mut buf)?;
+         let ctx = Context::from_bytes(&buf)?;
+-        if ctx.url.is_none() {
++        // Just like `git credential`, we need a `url` to take all identifying information from, or
++        // the `protocol` and `host` that identify the credential directly.
++        let identifying_url = ctx.url.clone().or_else(|| ctx.to_url());
++        if ctx.url.is_none() && !(ctx.protocol.is_some() && ctx.host.is_some()) {
+             return Err(Error::UrlMissing);
+         }
+         let res = credentials(action, ctx).map_err(|err| Error::Helper { source: Box::new(err) })?;
+         match (action, res) {
+             (Action::Get, None) => {
+                 return Err(Error::CredentialsMissing {
+-                    url: Context::from_bytes(&buf)?.url.expect("present and checked above"),
++                    url: identifying_url.expect("checked to be present"),
+                 })
+             }
+             (Action::Get, Some(ctx)) => ctx.write_to(stdout)?,
+diff --git a/src/plumbing/options/mod.rs b/src/plumbing/options/mod.rs
+index 597c7b7aaeae63493258d2e4cc998d2e13397195..e7114ea4a72e413a0707664a7ff7c5e21ad8c297 100644
+--- a/src/plumbing/options/mod.rs
++++ b/src/plumbing/options/mod.rs
+@@ -969,7 +969,7 @@ pub mod tag {
+ pub mod credential {
+     #[derive(Debug, clap::Subcommand)]
+     pub enum Subcommands {
+-        /// Get the credentials fed for `url=<url>` via STDIN.
++        /// Get the credentials for the context fed via STDIN, which needs `url` or `protocol` and `host`.
+         #[clap(visible_alias = "get")]
+         Fill,
+         /// Approve the information piped via STDIN as obtained with last call to `fill`

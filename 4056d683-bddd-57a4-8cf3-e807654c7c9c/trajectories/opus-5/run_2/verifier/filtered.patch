@@ -1,0 +1,113 @@
+diff --git a/scapy/layers/rtp.py b/scapy/layers/rtp.py
+index ee8f0b9c9c4fd3485c80589251de7ba8b1e46e6c..eebdf0a5c036375f1f1dc93c9010f9d0ab2db7d5 100644
+--- a/scapy/layers/rtp.py
++++ b/scapy/layers/rtp.py
+@@ -13,9 +13,13 @@ Remember to use::
+ To register the port you are using
+ """
+ 
++import struct
++
+ from scapy.packet import Packet, bind_layers
+ from scapy.fields import BitEnumField, BitField, BitFieldLenField, \
+-    FieldLenField, FieldListField, IntField, ShortField
++    ByteEnumField, ByteField, ConditionalField, FieldLenField, \
++    FieldListField, IntField, LenField, PacketField, PacketListField, \
++    ShortField, StrLenField
+ 
+ _rtp_payload_types = {
+     # http://www.iana.org/assignments/rtp-parameters
+@@ -32,6 +36,26 @@ _rtp_payload_types = {
+     31: 'H261', 32: 'MPV',
+     33: 'MP2T', 34: 'H263'}
+ 
++_rtcp_packet_types = {
++    # https://www.iana.org/assignments/rtp-parameters
++    200: 'Sender Report',
++    201: 'Receiver Report',
++    202: 'Source Description',
++    203: 'Goodbye',
++    204: 'Application-Defined'}
++
++_rtcp_sdes_types = {
++    # https://www.iana.org/assignments/rtp-parameters
++    0: 'END',
++    1: 'CNAME',
++    2: 'NAME',
++    3: 'EMAIL',
++    4: 'PHONE',
++    5: 'LOC',
++    6: 'TOOL',
++    7: 'NOTE',
++    8: 'PRIV'}
++
+ 
+ class RTPExtension(Packet):
+     name = "RTP extension"
+@@ -54,4 +78,66 @@ class RTP(Packet):
+                    FieldListField('sync', [], IntField("id", 0), count_from=lambda pkt:pkt.numsync)]  # noqa: E501
+ 
+ 
++class RTCPSenderInfo(Packet):
++    name = "Sender Info"
++    fields_desc = [IntField('ntp_timestamp_msw', 0),
++                   IntField('ntp_timestamp_lsw', 0),
++                   IntField('rtp_timestamp', 0),
++                   IntField('senders_packet_count', 0),
++                   IntField('senders_octet_count', 0)]
++
++    def extract_padding(self, p):
++        return "", p
++
++
++class RTCPReportBlock(Packet):
++    name = "Report block"
++    fields_desc = [IntField('sourcesync', 0),
++                   ByteField('fraction_lost', 0),
++                   BitField('cumulative_lost', 0, 24),
++                   IntField('highest_seqnum_recv', 0),
++                   IntField('interarrival_jitter', 0),
++                   IntField('last_SR_timestamp', 0),
++                   IntField('delay_since_last_SR', 0)]
++
++    def extract_padding(self, p):
++        return "", p
++
++
++class RTCPChunk(Packet):
++    name = "Chunk"
++    fields_desc = [IntField('sourcesync', 0),
++                   ByteEnumField('chunk_type', 1, _rtcp_sdes_types),
++                   FieldLenField('chunk_length', None, length_of='chunk_value', fmt='B'),  # noqa: E501
++                   StrLenField('chunk_value', '', length_from=lambda pkt: pkt.chunk_length)]  # noqa: E501
++
++    def extract_padding(self, p):
++        return "", p
++
++
++class RTCP(Packet):
++    name = "RTCP"
++    fields_desc = [BitField('version', 2, 2),
++                   BitField('padding', 0, 1),
++                   # the count field either holds the number of report blocks
++                   # (SR/RR) or the number of SDES chunks, both being
++                   # mutually exclusive
++                   BitFieldLenField('count', None, 5, count_of='report_blocks', adjust=lambda pkt, x: x + len(pkt.sdes_chunks or [])),  # noqa: E501
++                   ByteEnumField('packet_type', 0, _rtcp_packet_types),
++                   LenField('length', None, fmt='!H'),
++                   # SR/RR
++                   ConditionalField(IntField('sourcesync', 0), lambda pkt: pkt.packet_type in (200, 201)),  # noqa: E501
++                   ConditionalField(PacketField('sender_info', RTCPSenderInfo(), RTCPSenderInfo), lambda pkt: pkt.packet_type == 200),  # noqa: E501
++                   ConditionalField(PacketListField('report_blocks', [], RTCPReportBlock, count_from=lambda pkt: pkt.count), lambda pkt: pkt.packet_type in (200, 201)),  # noqa: E501
++                   # SDES
++                   ConditionalField(PacketListField('sdes_chunks', [], RTCPChunk, count_from=lambda pkt: pkt.count), lambda pkt: pkt.packet_type == 202)]  # noqa: E501
++
++    def post_build(self, pkt, pay):
++        pkt += pay
++        if self.length is None:
++            # the length is expressed in 32-bit words, minus one
++            pkt = pkt[:2] + struct.pack('!H', len(pkt) // 4 - 1) + pkt[4:]
++        return pkt
++
++
+ bind_layers(RTP, RTPExtension, extension=1)

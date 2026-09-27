@@ -1,0 +1,39 @@
+{
+    "schema_version": 2,
+    "task": {
+        "name": "feldroy_air_246",
+        "type": "local",
+        "digest": "sha256:aa62c8afb352acf86cbf0ba6515dbb0006fe0208a4a5c209d5f4110300a8bba6",
+        "path": "276ad6ba-10da-5f87-82ea-c2abc44dfdea"
+    },
+    "install_only": false,
+    "timeout_multiplier": 1.0,
+    "agent": {
+        "name": "openhands-sdk",
+        "model_name": "zai/glm-5.3",
+        "skills": [],
+        "resume_trajectory": false,
+        "extra_allowed_hosts": [
+            "api.z.ai"
+        ],
+        "kwargs": {},
+        "mcp_servers": []
+    },
+    "bridge_inputs": {},
+    "skills": [],
+    "environment": {
+        "type": "docker",
+        "force_build": false,
+        "delete": true,
+        "stream": false,
+        "cpu_enforcement_policy": "auto",
+        "memory_enforcement_policy": "auto",
+        "extra_docker_compose": [],
+        "kwargs": {},
+        "extra_allowed_hosts": []
+    },
+    "verifier": {
+        "disable": false,
+        "environment_mode": "separate"
+    }
+}

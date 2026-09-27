@@ -1,0 +1,98 @@
+diff --git a/gitoxide-core/src/repository/credential.rs b/gitoxide-core/src/repository/credential.rs
+index c901f06f2baa095a85dec5789be3c86366c65ac0..5242a335be2e7d167501c8e7e66f1a1b1f7d3e6b 100644
+--- a/gitoxide-core/src/repository/credential.rs
++++ b/gitoxide-core/src/repository/credential.rs
+@@ -15,9 +15,17 @@ pub fn function(repo: gix::Repository, action: gix::credentials::program::main::
+         std::io::stdin(),
+         std::io::stdout(),
+         |action, context| -> Result<_, Error> {
+-            let (mut cascade, _action, prompt_options) = repo.config_snapshot().credential_helpers(gix::url::parse(
+-                context.url.as_ref().expect("framework assures URL is present").as_ref(),
+-            )?)?;
++            use gix::bstr::ByteSlice;
++            let url = context
++                .url
++                .clone()
++                .or_else(|| context.to_url())
++                .ok_or(gix::credentials::protocol::Error::UrlMissing)?;
++            // urls like `ssh://host` can't be parsed without a path, even though the path is irrelevant
++            // when obtaining credentials.
++            let url = gix::url::parse(url.as_ref())
++                .or_else(|_| gix::url::parse(format!("{url}/").as_bytes().as_bstr()))?;
++            let (mut cascade, _action, prompt_options) = repo.config_snapshot().credential_helpers(url)?;
+             cascade
+                 .invoke(
+                     match action {
+diff --git a/gix-credentials/src/helper/cascade.rs b/gix-credentials/src/helper/cascade.rs
+index 3d5b31a5ef6bacf8ec9926a33c1a627daccf239a..013c4e3130386a5d97c262c32195354c4821be6f 100644
+--- a/gix-credentials/src/helper/cascade.rs
++++ b/gix-credentials/src/helper/cascade.rs
+@@ -73,15 +73,16 @@ impl Cascade {
+         let mut url = action
+             .context_mut()
+             .map(|ctx| {
+-                ctx.destructure_url_in_place(self.use_http_path).map(|ctx| {
+-                    if self.query_user_only && ctx.password.is_none() {
+-                        ctx.password = Some("".into());
+-                    }
+-                    ctx
+-                })
++                if ctx.url.is_some() {
++                    ctx.destructure_url_in_place(self.use_http_path)?;
++                }
++                if self.query_user_only && ctx.password.is_none() {
++                    ctx.password = Some(String::new());
++                }
++                Ok::<_, protocol::Error>(ctx.url.take())
+             })
+             .transpose()?
+-            .and_then(|ctx| ctx.url.take());
++            .flatten();
+ 
+         for program in &mut self.programs {
+             program.stderr = self.stderr;
+diff --git a/gix-credentials/src/program/main.rs b/gix-credentials/src/program/main.rs
+index 34f4163a01eef3d9b363668fa5ea6cfc3d8e3a39..6823673d7c2e9c6ef72ef1139381e2778b3deb45 100644
+--- a/gix-credentials/src/program/main.rs
++++ b/gix-credentials/src/program/main.rs
+@@ -55,7 +55,7 @@ pub enum Error {
+     Context(#[from] crate::protocol::context::decode::Error),
+     #[error("Credentials for {url:?} could not be obtained")]
+     CredentialsMissing { url: BString },
+-    #[error("The url wasn't provided in input - the git credentials protocol mandates this")]
++    #[error("Neither 'url' nor 'protocol' and 'host' were provided in input - the git credentials protocol requires one of them")]
+     UrlMissing,
+ }
+ 
+@@ -71,7 +71,8 @@ pub(crate) mod function {
+     /// action to perform (as opposed to the program name).
+     /// Then read context information from `stdin` and if the action is `Action::Get`, then write the result to `stdout`.
+     /// `credentials` is the API version of such call, where`Ok(Some(context))` returns credentials, and `Ok(None)` indicates
+-    /// no credentials could be found for `url`, which is always set when called.
++    /// no credentials could be found, which is only possible if the input provided either `url`, or `protocol` and `host`.
++    /// Any other input is rejected before the `credentials` implementation is called.
+     ///
+     /// Call this function from a programs `main`, passing `std::env::args_os()`, `stdin()` and `stdout` accordingly, along with
+     /// your own helper implementation.
+@@ -89,14 +90,19 @@ pub(crate) mod function {
+         let mut buf = Vec::<u8>::with_capacity(512);
+         stdin.read_to_end(&mut buf)?;
+         let ctx = Context::from_bytes(&buf)?;
+-        if ctx.url.is_none() {
++        // Like git, we require either a `url` or its constituent parts to identify the credentials to obtain.
++        if matches!(action, Action::Get)
++            && ctx.url.is_none()
++            && (ctx.protocol.is_none() || ctx.host.is_none())
++        {
+             return Err(Error::UrlMissing);
+         }
+         let res = credentials(action, ctx).map_err(|err| Error::Helper { source: Box::new(err) })?;
+         match (action, res) {
+             (Action::Get, None) => {
++                let ctx = Context::from_bytes(&buf)?;
+                 return Err(Error::CredentialsMissing {
+-                    url: Context::from_bytes(&buf)?.url.expect("present and checked above"),
++                    url: ctx.url.clone().or_else(|| ctx.to_url()).unwrap_or_default(),
+                 })
+             }
+             (Action::Get, Some(ctx)) => ctx.write_to(stdout)?,

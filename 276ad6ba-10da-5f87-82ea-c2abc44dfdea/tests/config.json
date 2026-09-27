@@ -1,0 +1,690 @@
+{
+  "instance_id": "feldroy__air-246",
+  "org": "feldroy",
+  "repo": "air",
+  "number": 246,
+  "number_interval": "",
+  "tag": "",
+  "language": "python",
+  "base_commit": "ded401afc29232b251a1cd2bdb8d62890e8c76d0",
+  "repo_dir": "/home/air",
+  "home_repo_dir": "/home/air",
+  "test_patch_path": "/tests/test.patch",
+  "home_test_patch": "/home/test.patch",
+  "run_cmd": "bash /home/run.sh",
+  "test_cmd": "bash /home/test-run.sh",
+  "fix_cmd": "bash /home/fix-run.sh",
+  "run_result": {
+    "passed_count": 70,
+    "failed_count": 1,
+    "skipped_count": 0,
+    "passed_tests": [
+      "tests/test_templates.py::test_JinjaRenderer",
+      "tests/test_tags.py::test_tags_support_global_attributes",
+      "tests/test_tags.py::test_subclassing_nested",
+      "tests/test_responses.py::test_TagResponse_obj",
+      "tests/test_forms.py::test_form_render",
+      "tests/test_templates.py::test_JinjaRenderer_with_kwargs",
+      "tests/test_forms.py::test_form_validation_in_view",
+      "tests/test_tags.py::test_raw_html_invalid_args",
+      "tests/test_tags.py::test_text_child_with_sibling_elements",
+      "tests/test_background.py::test_background_task_in_view",
+      "tests/test_templates.py::test_JinjaRenderer_with_Air",
+      "tests/test_tags.py::test_tag_for_tag_subclass_wrapper",
+      "tests/test_forms.py::test_form_render_with_values",
+      "tests/test_tags.py::test_atag_no_attrs_no_children",
+      "tests/test_applications.py::test_air_plus_fastapi",
+      "tests/test_tags.py::test_divtag_yes_attrs_multiple_a_children",
+      "tests/test_tags.py::test_style_tag",
+      "tests/test_applications.py::test_air_404_response",
+      "tests/test_svg.py::test_cased_tag_no_children",
+      "tests/test_tags.py::test_subclassing",
+      "tests/test_svg.py::test_atag_no_attrs_no_children",
+      "tests/test_responses.py::test_TagResponse_with_layout_names",
+      "tests/test_tags.py::test_divtag_yes_attrs_nested_children",
+      "tests/test_responses.py::test_AirResponse",
+      "tests/test_tags.py::test_atag_yes_attrs_text_children",
+      "tests/test_applications.py::test_air_app_factory",
+      "tests/test_tags.py::test_bool_attributes",
+      "tests/test_forms.py::test_form_validation_dependency_injection",
+      "tests/test_forms.py::test_air_field",
+      "tests/test_background.py::test_add_background_task",
+      "tests/test_tags.py::test_pico_card",
+      "tests/test_tags.py::test_safestr",
+      "tests/test_svg.py::test_cased_tags_with_children",
+      "tests/test_tags.py::test_divtag_yes_attrs_a_child",
+      "tests/test_templates.py::test_JinjaRenderer_no_context",
+      "tests/test_applications.py::test_page_decorator",
+      "tests/test_tags.py::test_tags_head_tag_injection",
+      "tests/test_tags.py::test_other_children_types",
+      "tests/test_responses.py::test_TagResponse_with_layout_strings",
+      "tests/test_layouts.py::test_pico_layout",
+      "tests/test_tags.py::test_special_characters",
+      "tests/test_responses.py::test_SSEResponse_multiline_tag_content",
+      "tests/test_layouts.py::test_mvpcss_layout",
+      "tests/test_responses.py::test_TagResponse_html",
+      "tests/test_tags.py::test_self_closing_tags",
+      "tests/test_tags.py::test_children_tag",
+      "tests/test_responses.py::test_SSEResponse",
+      "tests/test_responses.py::test_SSEResponse_string_content",
+      "tests/test_requests.py::test_is_htmx",
+      "tests/test_forms.py::test_html_input_field_types",
+      "tests/test_tags.py::test_name_types",
+      "tests/test_forms.py::test_form_render_in_view",
+      "tests/test_applications.py::test_default_500_exception_handler",
+      "tests/test_tags.py::test_atag_yes_attrs_no_children",
+      "tests/test_forms.py::test_form_render_with_errors",
+      "tests/test_tags.py::test_special_attributes",
+      "tests/test_tags.py::test_raw_html_basic",
+      "tests/test_responses.py::test_strings_and_tag_children",
+      "tests/test_tags.py::test_functions_as_tags",
+      "tests/test_tags.py::test_script_tag",
+      "tests/test_forms.py::test_airform_notimplementederror",
+      "tests/test_tags.py::test_raw_html_with_script",
+      "tests/test_templates.py::test_jinja_plus_airtags",
+      "tests/test_tags.py::test_tag_generation",
+      "tests/test_templates.py::test_jinja_plus_airtags_autorender",
+      "tests/test_responses.py::test_TagResponse_type",
+      "tests/test_tags.py::test_escape_html",
+      "tests/test_tags.py::test_raw_html_ignores_kwargs",
+      "tests/test_layouts.py::test_mvpcss_layout_header",
+      "tests/test_responses.py::test_custom_name_in_response"
+    ],
+    "failed_tests": [
+      "tests/test_forms.py::test_form_sync_check"
+    ],
+    "skipped_tests": []
+  },
+  "test_patch_result": {
+    "passed_count": 89,
+    "failed_count": 7,
+    "skipped_count": 0,
+    "passed_tests": [
+      "tests/test_templates.py::test_JinjaRenderer",
+      "tests/test_svg.py::test_svg_with_viewbox",
+      "tests/test_templates.py::test_JinjaRenderer_with_kwargs",
+      "tests/test_tags.py::test_tag_for_tag_subclass_wrapper",
+      "tests/test_svg.py::test_animate_with_values",
+      "tests/test_svg.py::test_line_coordinates",
+      "tests/test_forms.py::test_air_field",
+      "tests/test_svg.py::test_path_with_data",
+      "tests/test_svg.py::test_tspan_in_text",
+      "tests/test_responses.py::test_TagResponse_with_layout_strings",
+      "tests/test_tags.py::test_children_tag",
+      "tests/test_responses.py::test_SSEResponse_string_content",
+      "tests/test_forms.py::test_html_input_field_types",
+      "tests/test_tags.py::test_atag_yes_attrs_no_children",
+      "tests/test_templates.py::test_jinja_plus_airtags_autorender",
+      "tests/test_templates.py::test_jinja_plus_airtags",
+      "tests/test_responses.py::test_custom_name_in_response",
+      "tests/test_tags.py::test_tags_support_global_attributes",
+      "tests/test_svg.py::test_linear_gradient_with_stops",
+      "tests/test_forms.py::test_form_render",
+      "tests/test_responses.py::test_TagResponse_obj",
+      "tests/test_svg.py::test_ellipse_coordinates",
+      "tests/test_forms.py::test_form_validation_in_view",
+      "tests/test_svg.py::test_radial_gradient",
+      "tests/test_forms.py::test_form_render_with_values",
+      "tests/test_tags.py::test_divtag_yes_attrs_multiple_a_children",
+      "tests/test_applications.py::test_air_404_response",
+      "tests/test_svg.py::test_atag_no_attrs_no_children",
+      "tests/test_applications.py::test_air_app_factory",
+      "tests/test_tags.py::test_bool_attributes",
+      "tests/test_background.py::test_add_background_task",
+      "tests/test_tags.py::test_pico_card",
+      "tests/test_tags.py::test_safestr",
+      "tests/test_tags.py::test_divtag_yes_attrs_a_child",
+      "tests/test_tags.py::test_other_children_types",
+      "tests/test_svg.py::test_text_with_positioning",
+      "tests/test_tags.py::test_special_characters",
+      "tests/test_svg.py::test_mask_with_content",
+      "tests/test_responses.py::test_TagResponse_html",
+      "tests/test_forms.py::test_form_render_in_view",
+      "tests/test_forms.py::test_form_render_with_errors",
+      "tests/test_tags.py::test_script_tag",
+      "tests/test_svg.py::test_rect_with_all_attributes",
+      "tests/test_tags.py::test_raw_html_ignores_kwargs",
+      "tests/test_layouts.py::test_mvpcss_layout_header",
+      "tests/test_tags.py::test_text_child_with_sibling_elements",
+      "tests/test_background.py::test_background_task_in_view",
+      "tests/test_svg.py::test_cased_tag_no_children",
+      "tests/test_tags.py::test_subclassing",
+      "tests/test_tags.py::test_divtag_yes_attrs_nested_children",
+      "tests/test_tags.py::test_atag_yes_attrs_text_children",
+      "tests/test_forms.py::test_form_validation_dependency_injection",
+      "tests/test_svg.py::test_atag_with_all_attributes",
+      "tests/test_layouts.py::test_pico_layout",
+      "tests/test_layouts.py::test_mvpcss_layout",
+      "tests/test_svg.py::test_group_with_children",
+      "tests/test_tags.py::test_name_types",
+      "tests/test_applications.py::test_default_500_exception_handler",
+      "tests/test_tags.py::test_functions_as_tags",
+      "tests/test_svg.py::test_fe_distant_light",
+      "tests/test_tags.py::test_subclassing_nested",
+      "tests/test_tags.py::test_raw_html_invalid_args",
+      "tests/test_svg.py::test_mixed_type_attributes",
+      "tests/test_templates.py::test_JinjaRenderer_with_Air",
+      "tests/test_tags.py::test_atag_no_attrs_no_children",
+      "tests/test_applications.py::test_air_plus_fastapi",
+      "tests/test_svg.py::test_marker_definition",
+      "tests/test_tags.py::test_style_tag",
+      "tests/test_responses.py::test_TagResponse_with_layout_names",
+      "tests/test_responses.py::test_AirResponse",
+      "tests/test_svg.py::test_circle_with_attributes",
+      "tests/test_svg.py::test_cased_tags_with_children",
+      "tests/test_templates.py::test_JinjaRenderer_no_context",
+      "tests/test_applications.py::test_page_decorator",
+      "tests/test_tags.py::test_tags_head_tag_injection",
+      "tests/test_responses.py::test_SSEResponse_multiline_tag_content",
+      "tests/test_tags.py::test_self_closing_tags",
+      "tests/test_responses.py::test_SSEResponse",
+      "tests/test_svg.py::test_filter_with_effects",
+      "tests/test_requests.py::test_is_htmx",
+      "tests/test_tags.py::test_special_attributes",
+      "tests/test_tags.py::test_raw_html_basic",
+      "tests/test_responses.py::test_strings_and_tag_children",
+      "tests/test_svg.py::test_fe_drop_shadow",
+      "tests/test_forms.py::test_airform_notimplementederror",
+      "tests/test_tags.py::test_raw_html_with_script",
+      "tests/test_tags.py::test_tag_generation",
+      "tests/test_responses.py::test_TagResponse_type",
+      "tests/test_tags.py::test_escape_html"
+    ],
+    "failed_tests": [
+      "tests/test_svg.py::test_script_with_experimental_attributes",
+      "tests/test_forms.py::test_form_sync_check",
+      "tests/test_svg.py::test_none_attributes_filtered",
+      "tests/test_svg.py::test_complex_svg_structure",
+      "tests/test_svg.py::test_image_with_experimental_attributes",
+      "tests/test_svg.py::test_animate_with_extended_attributes",
+      "tests/test_svg.py::test_animate_motion_with_path"
+    ],
+    "skipped_tests": []
+  },
+  "p2p_tests": {
+    "tests/test_templates.py::test_JinjaRenderer": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_svg_with_viewbox": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_templates.py::test_JinjaRenderer_with_kwargs": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_text_child_with_sibling_elements": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_background.py::test_background_task_in_view": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_tag_for_tag_subclass_wrapper": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_animate_with_values": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_cased_tag_no_children": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_subclassing": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_divtag_yes_attrs_nested_children": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_atag_yes_attrs_text_children": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_line_coordinates": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_forms.py::test_form_validation_dependency_injection": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_forms.py::test_air_field": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_path_with_data": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_atag_with_all_attributes": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_tspan_in_text": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_TagResponse_with_layout_strings": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_layouts.py::test_pico_layout": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_layouts.py::test_mvpcss_layout": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_children_tag": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_SSEResponse_string_content": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_group_with_children": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_name_types": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_forms.py::test_html_input_field_types": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_applications.py::test_default_500_exception_handler": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_atag_yes_attrs_no_children": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_functions_as_tags": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_templates.py::test_jinja_plus_airtags_autorender": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_templates.py::test_jinja_plus_airtags": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_fe_distant_light": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_custom_name_in_response": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_rect_with_all_attributes": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_tags_support_global_attributes": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_subclassing_nested": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_forms.py::test_form_render": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_TagResponse_obj": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_linear_gradient_with_stops": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_ellipse_coordinates": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_forms.py::test_form_validation_in_view": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_raw_html_invalid_args": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_mixed_type_attributes": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_templates.py::test_JinjaRenderer_with_Air": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_radial_gradient": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_forms.py::test_form_render_with_values": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_atag_no_attrs_no_children": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_applications.py::test_air_plus_fastapi": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_marker_definition": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_divtag_yes_attrs_multiple_a_children": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_style_tag": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_applications.py::test_air_404_response": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_atag_no_attrs_no_children": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_TagResponse_with_layout_names": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_AirResponse": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_applications.py::test_air_app_factory": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_bool_attributes": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_background.py::test_add_background_task": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_pico_card": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_circle_with_attributes": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_safestr": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_cased_tags_with_children": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_divtag_yes_attrs_a_child": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_templates.py::test_JinjaRenderer_no_context": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_applications.py::test_page_decorator": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_tags_head_tag_injection": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_other_children_types": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_text_with_positioning": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_special_characters": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_SSEResponse_multiline_tag_content": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_mask_with_content": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_TagResponse_html": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_self_closing_tags": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_SSEResponse": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_filter_with_effects": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_requests.py::test_is_htmx": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_special_attributes": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_forms.py::test_form_render_in_view": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_raw_html_basic": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_forms.py::test_form_render_with_errors": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_script_tag": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_strings_and_tag_children": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_fe_drop_shadow": {
+      "run": "NONE",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_forms.py::test_airform_notimplementederror": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_raw_html_with_script": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_tag_generation": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_responses.py::test_TagResponse_type": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_escape_html": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_tags.py::test_raw_html_ignores_kwargs": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    },
+    "tests/test_layouts.py::test_mvpcss_layout_header": {
+      "run": "PASS",
+      "test": "PASS",
+      "fix": "PASS"
+    }
+  },
+  "f2p_tests": {
+    "tests/test_svg.py::test_complex_svg_structure": {
+      "run": "NONE",
+      "test": "FAIL",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_image_with_experimental_attributes": {
+      "run": "NONE",
+      "test": "FAIL",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_animate_motion_with_path": {
+      "run": "NONE",
+      "test": "FAIL",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_none_attributes_filtered": {
+      "run": "NONE",
+      "test": "FAIL",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_animate_with_extended_attributes": {
+      "run": "NONE",
+      "test": "FAIL",
+      "fix": "PASS"
+    },
+    "tests/test_svg.py::test_script_with_experimental_attributes": {
+      "run": "NONE",
+      "test": "FAIL",
+      "fix": "PASS"
+    }
+  },
+  "s2p_tests": {},
+  "n2p_tests": {},
+  "task_name": "argos/feldroy__air-246",
+  "uuid_v5": "276ad6ba-10da-5f87-82ea-c2abc44dfdea",
+  "lang": "python",
+  "harness_commit": "2f4513d1673a3492ffa257cf60ee185000542e27",
+  "msb_rev": "447ddbd639e4ec60376282ccee32ad1ab60afb69"
+}

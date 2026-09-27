@@ -1,0 +1,144 @@
+{
+    "id": "b0b75453-bcbf-4dcc-9fa5-9cc54b67f6d0",
+    "task_name": "argos/GitoxideLabs__gitoxide-2191",
+    "trial_name": "GitoxideLabs_gitoxide_2191",
+    "trial_uri": "file:///24d2a5dc-2e40-5735-8fe2-342c4fd8e311/trajectories/glm-5.3/run_5",
+    "task_id": {
+        "path": "24d2a5dc-2e40-5735-8fe2-342c4fd8e311"
+    },
+    "source": null,
+    "task_checksum": "0171a169f1d54018c861d465c49716ac96201bb0e917eed9334fc8dc57906970",
+    "config": {
+        "task": {
+            "path": "24d2a5dc-2e40-5735-8fe2-342c4fd8e311",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "GitoxideLabs_gitoxide_2191",
+        "trials_dir": "24d2a5dc-2e40-5735-8fe2-342c4fd8e311/trajectories/glm-5.3/run_5",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "openhands-sdk",
+            "import_path": null,
+            "model_name": "zai/glm-5.3",
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [
+                "api.z.ai"
+            ],
+            "kwargs": {},
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "stream": false,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "8b74510a-47f2-43a3-9646-8c2349ed0fb5",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "openhands-sdk",
+        "version": "1.49.3",
+        "model_info": {
+            "name": "glm-5.3",
+            "provider": "anthropic"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 7250851,
+        "n_cache_tokens": 7163008,
+        "n_output_tokens": 83186,
+        "cost_usd": 2.351380680000001,
+        "model_usage": null,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0477,
+            "score_outcome": 0.0,
+            "score_binary": 0.0,
+            "score_process": 0.477,
+            "gate": 1,
+            "alpha": 0.05
+        },
+        "scores": {
+            "score": 0.0,
+            "score_continuous_v2": 0.0,
+            "score_binary": 0.0,
+            "reward": 0.0477,
+            "score_outcome": 0.0,
+            "score_process": 0.477
+        },
+        "status": "reviewed",
+        "diagnostics": {
+            "fix_stage": "no_test_results"
+        },
+        "assay": {
+            "alpha": 0.05,
+            "gate": 1,
+            "panel": {
+                "size": 46,
+                "method": "human_panel",
+                "reviewer": "Abhishek Verma"
+            },
+            "status": "reviewed"
+        }
+    },
+    "verifier_environment_mode": "separate",
+    "exception_info": null,
+    "started_at": "2026-09-26T20:53:42.143502Z",
+    "finished_at": "2026-09-26T21:19:43.663093Z",
+    "environment_setup": {
+        "started_at": "2026-09-26T20:53:42.163316Z",
+        "finished_at": "2026-09-26T20:53:48.232002Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-09-26T20:53:48.232048Z",
+        "finished_at": "2026-09-26T20:53:56.570580Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-09-26T20:53:56.570692Z",
+        "finished_at": "2026-09-26T21:19:43.663093Z"
+    },
+    "step_results": null
+}

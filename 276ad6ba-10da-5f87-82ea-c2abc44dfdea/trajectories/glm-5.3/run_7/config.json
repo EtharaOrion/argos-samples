@@ -1,0 +1,15 @@
+{
+    "task": {
+        "path": "276ad6ba-10da-5f87-82ea-c2abc44dfdea"
+    },
+    "trial_name": "feldroy_air_246",
+    "trials_dir": "276ad6ba-10da-5f87-82ea-c2abc44dfdea/trajectories/glm-5.3/run_7",
+    "agent": {
+        "name": "openhands-sdk",
+        "model_name": "zai/glm-5.3",
+        "extra_allowed_hosts": [
+            "api.z.ai"
+        ]
+    },
+    "job_id": "a04f708c-7987-4f3b-b753-98c145417475"
+}

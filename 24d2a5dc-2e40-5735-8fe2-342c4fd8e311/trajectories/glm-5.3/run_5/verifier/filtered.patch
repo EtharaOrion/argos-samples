@@ -1,0 +1,149 @@
+diff --git a/gitoxide-core/src/repository/credential.rs b/gitoxide-core/src/repository/credential.rs
+index c901f06f2baa095a85dec5789be3c86366c65ac0..fa184792a15b77713275559d919216ca20c2b024 100644
+--- a/gitoxide-core/src/repository/credential.rs
++++ b/gitoxide-core/src/repository/credential.rs
+@@ -15,9 +15,13 @@ pub fn function(repo: gix::Repository, action: gix::credentials::program::main::
+         std::io::stdin(),
+         std::io::stdout(),
+         |action, context| -> Result<_, Error> {
+-            let (mut cascade, _action, prompt_options) = repo.config_snapshot().credential_helpers(gix::url::parse(
+-                context.url.as_ref().expect("framework assures URL is present").as_ref(),
+-            )?)?;
++            let url = context
++                .url
++                .clone()
++                .or_else(|| context.to_url())
++                .ok_or(gix::credentials::protocol::Error::UrlMissing)?;
++            let (mut cascade, _action, prompt_options) =
++                repo.config_snapshot().credential_helpers(gix::url::parse(url.as_ref())?)?;
+             cascade
+                 .invoke(
+                     match action {
+diff --git a/gix-credentials/src/helper/cascade.rs b/gix-credentials/src/helper/cascade.rs
+index 3d5b31a5ef6bacf8ec9926a33c1a627daccf239a..02c2e8fb7d72a15ad5d25dd4488594390fecc440 100644
+--- a/gix-credentials/src/helper/cascade.rs
++++ b/gix-credentials/src/helper/cascade.rs
+@@ -72,6 +72,8 @@ impl Cascade {
+     pub fn invoke(&mut self, mut action: helper::Action, mut prompt: gix_prompt::Options<'_>) -> protocol::Result {
+         let mut url = action
+             .context_mut()
++            // A url is optional, `protocol` and `host` may be enough to identify the credentials.
++            .filter(|ctx| ctx.url.is_some())
+             .map(|ctx| {
+                 ctx.destructure_url_in_place(self.use_http_path).map(|ctx| {
+                     if self.query_user_only && ctx.password.is_none() {
+diff --git a/gix-credentials/src/program/main.rs b/gix-credentials/src/program/main.rs
+index 34f4163a01eef3d9b363668fa5ea6cfc3d8e3a39..63502f5099897177109bc170294ec24a312d2082 100644
+--- a/gix-credentials/src/program/main.rs
++++ b/gix-credentials/src/program/main.rs
+@@ -53,10 +53,12 @@ pub enum Error {
+     Io(#[from] std::io::Error),
+     #[error(transparent)]
+     Context(#[from] crate::protocol::context::decode::Error),
+-    #[error("Credentials for {url:?} could not be obtained")]
+-    CredentialsMissing { url: BString },
+-    #[error("The url wasn't provided in input - the git credentials protocol mandates this")]
+-    UrlMissing,
++    #[error(transparent)]
++    Protocol(#[from] crate::protocol::Error),
++    #[error("Credentials for\n{context}could not be obtained")]
++    CredentialsMissing { context: BString },
++    #[error("Neither the 'url' field nor the 'protocol' and 'host' fields were provided - at least one of them is required")]
++    UrlAndHostMissing,
+ }
+ 
+ pub(crate) mod function {
+@@ -70,8 +72,11 @@ pub(crate) mod function {
+     /// Invoke a custom credentials helper which receives program `args`, with the first argument being the
+     /// action to perform (as opposed to the program name).
+     /// Then read context information from `stdin` and if the action is `Action::Get`, then write the result to `stdout`.
+-    /// `credentials` is the API version of such call, where`Ok(Some(context))` returns credentials, and `Ok(None)` indicates
+-    /// no credentials could be found for `url`, which is always set when called.
++    /// `credentials` is the API version of such call, where `Ok(Some(context))` returns credentials, and `Ok(None)` indicates
++    /// no credentials could be found.
++    ///
++    /// Like `git credential`, the input must either contain a `url` or both the `protocol` and the `host` fields, and
++    /// if a `url` is present, its parts are parsed and treated as if they were provided as individual fields.
+     ///
+     /// Call this function from a programs `main`, passing `std::env::args_os()`, `stdin()` and `stdout` accordingly, along with
+     /// your own helper implementation.
+@@ -88,15 +93,20 @@ pub(crate) mod function {
+         let action: Action = args.into_iter().next().ok_or(Error::ActionMissing)?.try_into()?;
+         let mut buf = Vec::<u8>::with_capacity(512);
+         stdin.read_to_end(&mut buf)?;
+-        let ctx = Context::from_bytes(&buf)?;
+-        if ctx.url.is_none() {
+-            return Err(Error::UrlMissing);
++        let mut ctx = Context::from_bytes(&buf)?;
++        // Like git, we only need a `url` or alternatively a `protocol` and a `host` to know which credentials to obtain.
++        if ctx.url.is_none() && (ctx.protocol.is_none() || ctx.host.is_none()) {
++            return Err(Error::UrlAndHostMissing);
++        }
++        // Setting `url` means its parts take precedence over what protocol/host/path said, just like git does it.
++        if ctx.url.is_some() {
++            ctx.destructure_url_in_place(false)?;
+         }
+         let res = credentials(action, ctx).map_err(|err| Error::Helper { source: Box::new(err) })?;
+         match (action, res) {
+             (Action::Get, None) => {
+                 return Err(Error::CredentialsMissing {
+-                    url: Context::from_bytes(&buf)?.url.expect("present and checked above"),
++                    context: Context::from_bytes(&buf)?.redacted().to_bstring(),
+                 })
+             }
+             (Action::Get, Some(ctx)) => ctx.write_to(stdout)?,
+diff --git a/gix-credentials/src/protocol/context/mod.rs b/gix-credentials/src/protocol/context/mod.rs
+index 01ee151f3069b3e57699b089e357778f0c36a808..2044cfa38c58e34ed0bdd08fc11f37e271438098 100644
+--- a/gix-credentials/src/protocol/context/mod.rs
++++ b/gix-credentials/src/protocol/context/mod.rs
+@@ -90,22 +90,30 @@ mod mutate {
+         /// Destructure the url at our `url` field into parts like protocol, host, username and path and store
+         /// them in our respective fields. If `use_http_path` is set, http paths are significant even though
+         /// normally this isn't the case.
++        ///
++        /// Like git, only fields that the url actually contains are overwritten, all others are left untouched.
+         #[allow(clippy::result_large_err)]
+         pub fn destructure_url_in_place(&mut self, use_http_path: bool) -> Result<&mut Self, protocol::Error> {
+             let url = gix_url::parse(self.url.as_ref().ok_or(protocol::Error::UrlMissing)?.as_ref())?;
+             self.protocol = Some(url.scheme.as_str().into());
+-            self.username = url.user().map(ToOwned::to_owned);
+-            self.password = url.password().map(ToOwned::to_owned);
+-            self.host = url.host().map(ToOwned::to_owned).map(|mut host| {
++            if let Some(user) = url.user() {
++                self.username = Some(user.to_owned());
++            }
++            if let Some(password) = url.password() {
++                self.password = Some(password.to_owned());
++            }
++            if let Some(mut host) = url.host().map(ToOwned::to_owned) {
+                 if let Some(port) = url.port {
+                     use std::fmt::Write;
+                     write!(host, ":{port}").expect("infallible");
+                 }
+-                host
+-            });
++                self.host = Some(host);
++            }
+             if !matches!(url.scheme, gix_url::Scheme::Http | gix_url::Scheme::Https) || use_http_path {
+                 let path = url.path.trim_with(|b| b == '/');
+-                self.path = (!path.is_empty()).then(|| path.into());
++                if !path.is_empty() {
++                    self.path = Some(path.into());
++                }
+             }
+             Ok(self)
+         }
+diff --git a/src/plumbing/options/mod.rs b/src/plumbing/options/mod.rs
+index 597c7b7aaeae63493258d2e4cc998d2e13397195..741ecbc5f3ca7f65ba0ffaad73e39357830f934a 100644
+--- a/src/plumbing/options/mod.rs
++++ b/src/plumbing/options/mod.rs
+@@ -969,7 +969,8 @@ pub mod tag {
+ pub mod credential {
+     #[derive(Debug, clap::Subcommand)]
+     pub enum Subcommands {
+-        /// Get the credentials fed for `url=<url>` via STDIN.
++        /// Obtain the credentials as described by the attributes provided via STDIN,
++        /// typically `url=<url>` or `protocol=<protocol>` and `host=<host>`.
+         #[clap(visible_alias = "get")]
+         Fill,
+         /// Approve the information piped via STDIN as obtained with last call to `fill`

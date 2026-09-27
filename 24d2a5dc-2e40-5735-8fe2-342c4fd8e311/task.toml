@@ -1,0 +1,85 @@
+schema_version = "1.4"
+artifacts = [ "/logs/agent/trajectory.json",]
+
+[task]
+name = "argos/GitoxideLabs__gitoxide-2191"
+description = "Fix gix credential fill to accept protocol+host without URL field"
+keywords = [ "rust", "issue-resolving", "gitoxide",]
+[[task.authors]]
+name = "Abhishek Verma"
+email = "abhishek.verma@ethara.ai"
+
+[metadata]
+uuid_v5 = "24d2a5dc-2e40-5735-8fe2-342c4fd8e311"
+project_id = "Argos-001"
+difficulty = "easy"
+category = "bug_fixing"
+argos_task_format = 1
+network_profile = "dev-open"
+
+[metadata.upstream_provenance]
+origin = "derived"
+provenance_date = "2025-09-24"
+source_kind = "public_repository"
+upstream_benchmark = "multi-swe-bench"
+upstream_toolchain = "github.com/Ethara-Ai/multi-swe-bench@b3da4764d80fcac6fc4eb85bd1b0fcdaa2e37aea"
+license = "Apache-2.0"
+modifications = [ "harbor-repackage", "rubric-added", "instruction-rewritten",]
+base_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/gitoxidelabs__gitoxide:pr-2191@sha256:c8fa6b92d9fa4d897227cf494501ea30ad1c2230854c968bffca313075885cc3"
+agent_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/gitoxidelabs__gitoxide:pr-2191-prebaked@sha256:4a44254a41ae11984a40904a0c8b66306febd56a2f34a286c53df584feabd7c9"
+verifier_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/gitoxidelabs__gitoxide:pr-2191-verifier@sha256:eb7c10855b012c64bce79cc34f4f2e45a6e050aba7013d970ea3545ea8fccb46"
+
+[metadata.upstream_provenance.source]
+canonical_repo = "GitoxideLabs/gitoxide"
+base_commit = "a80a150c75f055ffd0f0d9c905760826152fd61e"
+pull_request = 2191
+event_timestamp = "2025-09-24T03:28:14Z"
+
+[verifier]
+network_mode = "public"
+timeout_sec = 7200.0
+environment_mode = "separate"
+[[verifier.collect]]
+command = "bash -c 'set -euo pipefail; set -f; rm -f /logs/artifacts/agent.patch /logs/artifacts/agent.patch.tmp; mkdir -p /logs/artifacts; cd /workspace/gitoxide; export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1; git -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null -c core.fsmonitor=false -c diff.noprefix=false -c diff.mnemonicPrefix=false -c diff.srcPrefix=a/ -c diff.dstPrefix=b/ -c safe.directory=* add -A; git -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null -c core.fsmonitor=false -c diff.noprefix=false -c diff.mnemonicPrefix=false -c diff.srcPrefix=a/ -c diff.dstPrefix=b/ -c safe.directory=* diff --cached --binary --full-index --no-ext-diff --no-textconv --no-color a80a150c75f055ffd0f0d9c905760826152fd61e > /logs/artifacts/agent.patch.tmp; mv /logs/artifacts/agent.patch.tmp /logs/artifacts/agent.patch'"
+service = "main"
+timeout_sec = 600.0
+
+[verifier.env]
+# Rubric judge used inside the verifier: set your model, endpoint and key (see tests/argos_grader/README.md).
+ARGOS_JUDGE_MODEL = "openai/<judge-model>"
+ARGOS_JUDGE_BASE_URL = "https://api.openai.com/v1"
+# Anthropic instead: ARGOS_JUDGE_MODEL = "anthropic/<judge-model>", ARGOS_JUDGE_BASE_URL = "https://api.anthropic.com"
+ARGOS_JUDGE_API_KEY = "<your-api-key>"
+ARGOS_JUDGE_VOTES = "1"
+
+[verifier.environment]
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/gitoxidelabs__gitoxide:pr-2191-verifier@sha256:eb7c10855b012c64bce79cc34f4f2e45a6e050aba7013d970ea3545ea8fccb46"
+network_mode = "public"
+build_timeout_sec = 1800.0
+os = "linux"
+cpus = 8
+memory_mb = 12288
+storage_mb = 10240
+mcp_servers = []
+
+[verifier.environment.env]
+
+[agent]
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.z.ai"]
+timeout_sec = 14400.0
+
+[environment]
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/argos/gitoxidelabs__gitoxide:pr-2191-prebaked@sha256:4a44254a41ae11984a40904a0c8b66306febd56a2f34a286c53df584feabd7c9"
+network_mode = "public"
+build_timeout_sec = 1800.0
+os = "linux"
+cpus = 8
+memory_mb = 12288
+storage_mb = 10240
+gpus = 0
+mcp_servers = []
+
+[environment.env]
+
+[solution.env]

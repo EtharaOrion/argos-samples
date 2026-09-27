@@ -1,0 +1,275 @@
+{
+  "schema_version": "argos-metrics/1",
+  "task": {
+    "name": "argos/feldroy__air-246",
+    "instance_id": "feldroy__air-246",
+    "uuid_v5": "276ad6ba-10da-5f87-82ea-c2abc44dfdea",
+    "harness_commit": "2f4513d1673a3492ffa257cf60ee185000542e27",
+    "msb_rev": "447ddbd639e4ec60376282ccee32ad1ab60afb69"
+  },
+  "reward": 0.28,
+  "reward_formula": "outcome (process channel composed by the host)",
+  "outcome": {
+    "score": 0.28,
+    "resolved": 0,
+    "status": "scored",
+    "diagnostics": {
+      "targets_total": 6,
+      "t_baseline_total": 0,
+      "t_eff_total": 6,
+      "pollution_rate": 0.0,
+      "t_p_run_total": 89,
+      "t_p_dataset_total": 89,
+      "baseline_drift": 0,
+      "targets_hit": 2,
+      "hits_new": 2,
+      "recall": 0.3333333333333333,
+      "gold_p2p_total": 89,
+      "preserve_set_total": 89,
+      "broken_p2p_count": 3,
+      "unknown_breaks_count": 0,
+      "environment_excluded_p2p": 0,
+      "R0": 20,
+      "regression_denom": 20,
+      "penalty_applied": 0.15,
+      "regression_factor": 0.85,
+      "f2s_count": 0,
+      "evasion_ratio": 0.0,
+      "f2p_baseline_pass_count": 0,
+      "lang": "python",
+      "lazy_recurated": false,
+      "regression_channel_active": true
+    }
+  },
+  "patch": {
+    "files_total": 2,
+    "files_applied": [
+      "src/air/tags/models/svg.py",
+      "src/air/tags/utils.py"
+    ],
+    "stripped_files": [],
+    "empty_after_filter": false
+  },
+  "control": {
+    "passed": 89,
+    "failed": 7,
+    "skipped": 0,
+    "exit_code": 1,
+    "excluded_p2p": []
+  },
+  "deterministic": {
+    "voided": false,
+    "gate": 1,
+    "soft_score": 0.3571,
+    "edit_set_complete": true,
+    "hard_failures": [],
+    "abstained": [
+      "A1-uuid-match",
+      "A4-score-agreement",
+      "B1-scored-status",
+      "B2-no-exception",
+      "B4-not-at-turn-ceiling",
+      "C1c-third-party-fetch",
+      "C1b-history-probe"
+    ],
+    "checks": [
+      {
+        "id": "A1-uuid-match",
+        "gate": "hard",
+        "verdict": "abstain",
+        "weight": 1,
+        "detail": "deferred: needs result.json, decided by the host scorer"
+      },
+      {
+        "id": "A2-schema-known",
+        "gate": "hard",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "schema_version='ATIF-v1.5'"
+      },
+      {
+        "id": "A3-tool-vocabulary",
+        "gate": "hard",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "unknown tools=[] (0/56 calls)"
+      },
+      {
+        "id": "A4-score-agreement",
+        "gate": "hard",
+        "verdict": "abstain",
+        "weight": 1,
+        "detail": "deferred: needs result.json, decided by the host scorer"
+      },
+      {
+        "id": "B1-scored-status",
+        "gate": "hard",
+        "verdict": "abstain",
+        "weight": 1,
+        "detail": "deferred: needs result.json, decided by the host scorer"
+      },
+      {
+        "id": "B2-no-exception",
+        "gate": "hard",
+        "verdict": "abstain",
+        "weight": 1,
+        "detail": "deferred: needs result.json, decided by the host scorer"
+      },
+      {
+        "id": "B3-reached-finish",
+        "gate": "hard",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "finish at step 58"
+      },
+      {
+        "id": "B4-not-at-turn-ceiling",
+        "gate": "hard",
+        "verdict": "abstain",
+        "weight": 1,
+        "detail": "deferred: needs result.json, decided by the host scorer"
+      },
+      {
+        "id": "C1-no-upstream-content-fetched",
+        "gate": "hard",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "0 fetch(es) of the task's own repo returned content, first=None"
+      },
+      {
+        "id": "C1c-third-party-fetch",
+        "gate": "soft",
+        "verdict": "abstain",
+        "weight": 1,
+        "detail": "0 fetch(es) of a repo other than the task's own, first=None; reproducing from a linked third-party repo is fair play, recorded not voided"
+      },
+      {
+        "id": "C1b-history-probe",
+        "gate": "soft",
+        "verdict": "abstain",
+        "weight": 1,
+        "detail": "reaches that returned nothing beyond base, steps []"
+      },
+      {
+        "id": "C2-no-oracle-path",
+        "gate": "hard",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "0 hits, first=None"
+      },
+      {
+        "id": "C3-no-graded-test-write",
+        "gate": "hard",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "wrote graded test or test infrastructure []"
+      },
+      {
+        "id": "C4-no-test-evasion",
+        "gate": "hard",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "skip/xfail introduced at []"
+      },
+      {
+        "id": "C5-no-f2p-to-skip",
+        "gate": "hard",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "evasion_ratio=0.0"
+      },
+      {
+        "id": "C6-no-unknown-breaks",
+        "gate": "soft",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "unknown_breaks_count=0"
+      },
+      {
+        "id": "D1-reasoning-present",
+        "gate": "soft",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "thought coverage 0.52 of agent steps"
+      },
+      {
+        "id": "D2-metrics-present",
+        "gate": "soft",
+        "verdict": "fail",
+        "weight": 1,
+        "detail": "final_metrics keys=['total_cached_tokens', 'total_completion_tokens', 'total_cost_usd', 'total_prompt_tokens', 'total_reasoning_tokens']"
+      },
+      {
+        "id": "D3-tool-calls-well-formed",
+        "gate": "soft",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "every tool call carries a function_name"
+      },
+      {
+        "id": "E1-touched:src/air/tags/models/svg.py",
+        "gate": "soft",
+        "verdict": "pass",
+        "weight": 0,
+        "detail": "writes=1"
+      },
+      {
+        "id": "E2-req:S1-changed",
+        "gate": "soft",
+        "verdict": "fail",
+        "weight": 3,
+        "detail": "observed by a target test, so already priced by the outcome channel; discounted here. The reference change to src/air/tags/models/svg.py is present. Any edit that achieves the "
+      },
+      {
+        "id": "E1-touched:mkdocs.yml",
+        "gate": "soft",
+        "verdict": "fail",
+        "weight": 0,
+        "detail": "writes=0"
+      },
+      {
+        "id": "E2-req:S2-changed",
+        "gate": "soft",
+        "verdict": "fail",
+        "weight": 5,
+        "detail": "no target test observes it, so the outcome channel is blind to it and this is where it is priced. The reference change to mkdocs.yml is present. Any edit that achieves the same observable "
+      },
+      {
+        "id": "F1-no-out-of-scope-churn",
+        "gate": "soft",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "wrote CI/docker/docs/lockfiles: []"
+      },
+      {
+        "id": "F2-left-no-scratch-in-repo",
+        "gate": "soft",
+        "verdict": "pass",
+        "weight": 1,
+        "detail": "scratch-looking files left in repo: []"
+      }
+    ]
+  },
+  "rubric": {
+    "status": "human_reviewed",
+    "weight_in_reward": 0.1,
+    "items": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5",
+      "R6",
+      "R7",
+      "R8",
+      "R9",
+      "G1",
+      "G2",
+      "G3",
+      "G4",
+      "G5",
+      "G6",
+      "G7"
+    ]
+  }
+}

@@ -1,59 +1,52 @@
-<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Partial-credit pass rate by opus-5 tier">
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Partial-credit pass rate by difficulty tier">
 <defs>
 <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#050c0c"/><stop offset="60%" stop-color="#0a1e1c"/><stop offset="100%" stop-color="#071313"/></linearGradient>
-<pattern id="hatch" width="10" height="10" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#e2ac52"/><line x1="0" y1="0" x2="0" y2="10" stroke="#050c0c" stroke-opacity="0.35" stroke-width="4"/></pattern>
+<pattern id="hatch" width="10" height="10" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#e2ac52"/><line x1="0" y1="0" x2="0" y2="10" stroke="#0f2723" stroke-opacity="0.35" stroke-width="4"/></pattern>
 <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6"/></filter>
 </defs>
 <rect width="1600" height="900" fill="url(#bg)"/>
-<text x="110" y="66" font-family="Georgia, 'Iowan Old Style', 'Times New Roman', ui-serif, serif" font-size="40" fill="#eef2ea">Partial-credit pass rate by opus-5 tier</text>
-<text x="110" y="100" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="20" letter-spacing="0.5" fill="#9fc4bc">mean score_eval &#215; 100, over 8 runs — not a solve count</text>
+<text x="110.0" y="66.0" font-family="Georgia, 'Iowan Old Style', 'Times New Roman', ui-serif, serif" font-size="40" fill="#eef2ea">Partial-credit pass rate by difficulty tier</text>
+<text x="110.0" y="100.0" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="20" letter-spacing="0.5" fill="#9fc4bc">mean score `reward` &#215; 100, over 8 runs &#8212; not a solve count</text>
 <line x1="1180" y1="47" x2="1216" y2="47" stroke="#35d0ba" stroke-width="4" stroke-linecap="round"/>
 <circle cx="1198" cy="47" r="6.5" fill="#35d0ba" stroke="#0f2723" stroke-width="2"/>
-<text x="1230" y="56" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="20" fill="#eef2ea">opus-5</text>
+<text x="1230.0" y="56.0" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="20" fill="#eef2ea">opus-5</text>
 <line x1="1356" y1="47" x2="1392" y2="47" stroke="#e2ac52" stroke-width="3.5" stroke-dasharray="9 7" stroke-linecap="round"/>
 <polygon points="1374,40 1381,47 1374,54 1367,47" fill="url(#hatch)" stroke="#e2ac52" stroke-width="1.5"/>
-<text x="1406" y="56" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="20" fill="#eef2ea">glm-5.3</text>
+<text x="1406.0" y="56.0" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="20" fill="#eef2ea">glm-5.3</text>
 <line x1="110" y1="770.0" x2="1540" y2="770.0" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
-<text x="94" y="777.0" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">0%</text>
-<line x1="110" y1="646.0" x2="1540" y2="646.0" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
-<text x="94" y="653.0" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">10%</text>
-<line x1="110" y1="522.0" x2="1540" y2="522.0" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
-<text x="94" y="529.0" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">20%</text>
-<line x1="110" y1="398.0" x2="1540" y2="398.0" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
-<text x="94" y="405.0" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">30%</text>
-<line x1="110" y1="274.0" x2="1540" y2="274.0" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
-<text x="94" y="281.0" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">40%</text>
+<text x="94.0" y="777.0" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">0%</text>
+<line x1="110" y1="666.7" x2="1540" y2="666.7" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
+<text x="94.0" y="673.7" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">10%</text>
+<line x1="110" y1="563.3" x2="1540" y2="563.3" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
+<text x="94.0" y="570.3" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">20%</text>
+<line x1="110" y1="460.0" x2="1540" y2="460.0" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
+<text x="94.0" y="467.0" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">30%</text>
+<line x1="110" y1="356.7" x2="1540" y2="356.7" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
+<text x="94.0" y="363.7" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">40%</text>
+<line x1="110" y1="253.3" x2="1540" y2="253.3" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
+<text x="94.0" y="260.3" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">50%</text>
 <line x1="110" y1="150.0" x2="1540" y2="150.0" stroke="rgba(143,227,212,0.16)" stroke-width="1"/>
-<text x="94" y="157.0" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">50%</text>
-<line x1="110" y1="770.0" x2="1540" y2="770.0" stroke="rgba(143,227,212,0.4)" stroke-width="2"/>
-<line x1="348.3" y1="150" x2="348.3" y2="770" stroke="rgba(143,227,212,0.16)" stroke-width="1" stroke-dasharray="2 5"/>
-<line x1="825.0" y1="150" x2="825.0" y2="770" stroke="rgba(143,227,212,0.16)" stroke-width="1" stroke-dasharray="2 5"/>
-<line x1="1301.7" y1="150" x2="1301.7" y2="770" stroke="rgba(143,227,212,0.16)" stroke-width="1" stroke-dasharray="2 5"/>
-<polyline points="348.3,683.7 825.0,495.0 1301.7,732.4" fill="none" stroke="#e2ac52" stroke-width="3.5" stroke-dasharray="9 7" stroke-linecap="round" stroke-linejoin="round"/>
-<polyline points="348.3,166.9 825.0,357.2 1301.7,691.6" fill="none" stroke="#35d0ba" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-<polygon points="348.3,673.7 358.3,683.7 348.3,693.7 338.3,683.7" fill="#e2ac52" opacity="0.28" filter="url(#glow)"/>
-<polygon points="348.3,673.7 358.3,683.7 348.3,693.7 338.3,683.7" fill="url(#hatch)" stroke="#e2ac52" stroke-width="1.5"/>
-<circle cx="348.3" cy="166.9" r="9" fill="#35d0ba" opacity="0.28" filter="url(#glow)"/>
-<circle cx="348.3" cy="166.9" r="8" fill="#35d0ba" stroke="#0f2723" stroke-width="3"/>
-<text x="348.3" y="140.9" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#35d0ba">48.64%</text>
-<text x="348.3" y="714.7" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#e2ac52">6.96%</text>
-<text x="348.3" y="810.0" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', 'Times New Roman', ui-serif, serif" font-size="26" fill="#eef2ea">Medium</text>
-<text x="348.3" y="838.0" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="18" fill="#9fc4bc">n=1</text>
-<polygon points="825.0,485.0 835.0,495.0 825.0,505.0 815.0,495.0" fill="#e2ac52" opacity="0.28" filter="url(#glow)"/>
-<polygon points="825.0,485.0 835.0,495.0 825.0,505.0 815.0,495.0" fill="url(#hatch)" stroke="#e2ac52" stroke-width="1.5"/>
-<circle cx="825.0" cy="357.2" r="9" fill="#35d0ba" opacity="0.28" filter="url(#glow)"/>
-<circle cx="825.0" cy="357.2" r="8" fill="#35d0ba" stroke="#0f2723" stroke-width="3"/>
-<text x="825.0" y="331.2" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#35d0ba">33.29%</text>
-<text x="825.0" y="526.0" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#e2ac52">22.18%</text>
-<text x="825.0" y="810.0" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', 'Times New Roman', ui-serif, serif" font-size="26" fill="#eef2ea">Hard</text>
-<text x="825.0" y="838.0" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="18" fill="#9fc4bc">n=1</text>
-<polygon points="1301.7,722.4 1311.7,732.4 1301.7,742.4 1291.7,732.4" fill="#e2ac52" opacity="0.28" filter="url(#glow)"/>
-<polygon points="1301.7,722.4 1311.7,732.4 1301.7,742.4 1291.7,732.4" fill="url(#hatch)" stroke="#e2ac52" stroke-width="1.5"/>
-<circle cx="1301.7" cy="691.6" r="9" fill="#35d0ba" opacity="0.28" filter="url(#glow)"/>
-<circle cx="1301.7" cy="691.6" r="8" fill="#35d0ba" stroke="#0f2723" stroke-width="3"/>
-<text x="1301.7" y="665.6" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#35d0ba">6.32%</text>
-<text x="1301.7" y="763.4" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#e2ac52">3.03%</text>
-<text x="1301.7" y="810.0" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', 'Times New Roman', ui-serif, serif" font-size="26" fill="#eef2ea">Expert</text>
-<text x="1301.7" y="838.0" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="18" fill="#9fc4bc">n=1</text>
-<text x="110" y="876" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="16" fill="#9fc4bc">opus-5-anchored tiers &#183; same 3 tasks grouped identically for both models</text>
+<text x="94.0" y="157.0" text-anchor="end" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" fill="#9fc4bc">60%</text>
+<line x1="110" y1="770" x2="1540" y2="770" stroke="rgba(143,227,212,0.40)" stroke-width="2"/>
+<line x1="467.5" y1="150" x2="467.5" y2="770" stroke="rgba(143,227,212,0.16)" stroke-width="1" stroke-dasharray="2 5"/>
+<line x1="1182.5" y1="150" x2="1182.5" y2="770" stroke="rgba(143,227,212,0.16)" stroke-width="1" stroke-dasharray="2 5"/>
+<polyline points="467.5,518.2 1182.5,552.5" fill="none" stroke="#e2ac52" stroke-width="3.5" stroke-dasharray="9 7" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="467.5,244.0 1182.5,451.9" fill="none" stroke="#35d0ba" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="467.5,508.2 477.5,518.2 467.5,528.2 457.5,518.2" fill="#e2ac52" opacity="0.28" filter="url(#glow)"/>
+<polygon points="467.5,508.2 477.5,518.2 467.5,528.2 457.5,518.2" fill="url(#hatch)" stroke="#e2ac52" stroke-width="1.5"/>
+<circle cx="467.5" cy="244.0" r="9" fill="#35d0ba" opacity="0.28" filter="url(#glow)"/>
+<circle cx="467.5" cy="244.0" r="8" fill="#35d0ba" stroke="#0f2723" stroke-width="3"/>
+<text x="467.5" y="218.0" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#35d0ba">50.90%</text>
+<text x="467.5" y="549.2" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#e2ac52">24.37%</text>
+<text x="467.5" y="810.0" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', 'Times New Roman', ui-serif, serif" font-size="26" fill="#eef2ea">Easy</text>
+<text x="467.5" y="838.0" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="18" fill="#9fc4bc">n=2</text>
+<polygon points="1182.5,542.5 1192.5,552.5 1182.5,562.5 1172.5,552.5" fill="#e2ac52" opacity="0.28" filter="url(#glow)"/>
+<polygon points="1182.5,542.5 1192.5,552.5 1182.5,562.5 1172.5,552.5" fill="url(#hatch)" stroke="#e2ac52" stroke-width="1.5"/>
+<circle cx="1182.5" cy="451.9" r="9" fill="#35d0ba" opacity="0.28" filter="url(#glow)"/>
+<circle cx="1182.5" cy="451.9" r="8" fill="#35d0ba" stroke="#0f2723" stroke-width="3"/>
+<text x="1182.5" y="425.9" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#35d0ba">30.78%</text>
+<text x="1182.5" y="583.5" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="19" font-weight="bold" fill="#e2ac52">21.05%</text>
+<text x="1182.5" y="810.0" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', 'Times New Roman', ui-serif, serif" font-size="26" fill="#eef2ea">Hard</text>
+<text x="1182.5" y="838.0" text-anchor="middle" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="18" fill="#9fc4bc">n=1</text>
+<text x="110.0" y="876.0" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace" font-size="16" fill="#9fc4bc">shipped task.toml difficulty &#183; same 3 tasks grouped identically for both models</text>
 </svg>
