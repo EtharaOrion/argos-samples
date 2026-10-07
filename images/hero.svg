@@ -1,119 +1,270 @@
-<svg width="1760" height="532" viewBox="0 0 1760 532" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Argos — agentic software-engineering capability, measured offline on outcome and process">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1760 820" width="1760" height="820" role="img" aria-label="Argos: the all-seeing watcher over containerised task bundles">
+  <title>Argos</title>
+  <desc>Original hero art for the Argos task corpus. A many-eyed watcher stands in a hall of pinned repositories, container bundles and a commit chain, holding the sealed verification lamp. Four attendant artifacts carry the work orders ENGRAM, FORGE, CRUCIBLE and MAESTRO; the watcher's own armoured hand carries GAUNTLET.</desc>
+
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#050c0c"/>
-      <stop offset="55%" stop-color="#0a1e1c"/>
-      <stop offset="100%" stop-color="#071313"/>
+    <linearGradient id="sky" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#0a1414"/>
+      <stop offset="0.55" stop-color="#0f2723"/>
+      <stop offset="1" stop-color="#081211"/>
     </linearGradient>
 
-    <radialGradient id="vignette" cx="68%" cy="45%" r="75%">
-      <stop offset="0%" stop-color="#0d2624" stop-opacity="0"/>
-      <stop offset="70%" stop-color="#020707" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#010404" stop-opacity="0.55"/>
+    <radialGradient id="halobloom" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#35d0ba" stop-opacity="0.5"/>
+      <stop offset="0.45" stop-color="#35d0ba" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#35d0ba" stop-opacity="0"/>
     </radialGradient>
 
-    <radialGradient id="iris" cx="42%" cy="38%" r="70%">
-      <stop offset="0%" stop-color="#f4d896"/>
-      <stop offset="28%" stop-color="#e2ac52"/>
-      <stop offset="62%" stop-color="#b9781f"/>
-      <stop offset="100%" stop-color="#4a2c0c"/>
+    <radialGradient id="ember" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#e2ac52" stop-opacity="0.7"/>
+      <stop offset="0.5" stop-color="#e2ac52" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#e2ac52" stop-opacity="0"/>
     </radialGradient>
 
-    <radialGradient id="irisGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#35d0ba" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#35d0ba" stop-opacity="0"/>
+    <linearGradient id="robe" x1="0.1" y1="0" x2="0.95" y2="1">
+      <stop offset="0" stop-color="#1b4641"/>
+      <stop offset="0.38" stop-color="#123230"/>
+      <stop offset="1" stop-color="#071c1a"/>
+    </linearGradient>
+
+    <linearGradient id="robeRim" x1="1" y1="0.1" x2="0.1" y2="0.5">
+      <stop offset="0" stop-color="#8fe3d4" stop-opacity="0.8"/>
+      <stop offset="0.3" stop-color="#35d0ba" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#35d0ba" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="warmBounce" x1="0" y1="1" x2="0.4" y2="0">
+      <stop offset="0" stop-color="#e2ac52" stop-opacity="0.3"/>
+      <stop offset="0.55" stop-color="#e2ac52" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#e2ac52" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#12302e" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#071110" stop-opacity="1"/>
+    </linearGradient>
+
+    <radialGradient id="vignette" cx="0.5" cy="0.44" r="0.8">
+      <stop offset="0.5" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.66"/>
     </radialGradient>
 
-    <filter id="grain">
-      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
-      <feColorMatrix in="noise" type="matrix"
-        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.65 0"/>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <filter id="farblur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.5"/>
     </filter>
 
-    <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="10"/>
-    </filter>
+    <g id="cube">
+      <path d="M 0 -22 L 38 0 L 0 22 L -38 0 Z" fill="#1d4a45"/>
+      <path d="M -38 0 L 0 22 L 0 66 L -38 44 Z" fill="#0e2826"/>
+      <path d="M 38 0 L 0 22 L 0 66 L 38 44 Z" fill="#17403c"/>
+      <path d="M 0 -22 L 38 0 L 0 22 L -38 0 Z M -38 0 L -38 44 L 0 66 L 38 44 L 38 0" fill="none" stroke="#35d0ba" stroke-opacity="0.4" stroke-width="1.6"/>
+    </g>
 
-    <clipPath id="frame">
-      <rect x="0" y="0" width="1760" height="532" rx="0"/>
-    </clipPath>
+    <g id="eye">
+      <path d="M -17 0 C -10 -11 10 -11 17 0 C 10 11 -10 11 -17 0 Z" fill="#08201e" stroke="#35d0ba" stroke-opacity="0.85" stroke-width="1.6"/>
+      <circle cx="0" cy="0" r="5.4" fill="#8fe3d4"/>
+      <circle cx="0" cy="0" r="2.1" fill="#0a1414"/>
+    </g>
   </defs>
 
-  <g clip-path="url(#frame)">
-    <rect width="1760" height="532" fill="url(#bg)"/>
-    <rect width="1760" height="532" fill="url(#vignette)"/>
+  <rect width="1760" height="820" fill="url(#sky)"/>
 
-    <!-- orbital rings, off-center right, some bleeding past the frame -->
-    <g stroke="#35d0ba" fill="none">
-      <ellipse cx="1330" cy="262" rx="330" ry="330" stroke-opacity="0.10" stroke-width="1.5"/>
-      <ellipse cx="1330" cy="262" rx="255" ry="255" stroke-opacity="0.16" stroke-width="1.5"/>
-      <ellipse cx="1300" cy="255" rx="200" ry="176" stroke-opacity="0.22" stroke-width="1.5"
-                transform="rotate(-12 1300 255)"/>
-      <ellipse cx="1330" cy="262" rx="150" ry="150" stroke-opacity="0.28" stroke-width="1.5"
-                stroke-dasharray="2 10"/>
-    </g>
-
-    <!-- satellite node + trailing arc on the outer ring -->
-    <g>
-      <path d="M 1620 130 A 330 330 0 0 1 1655 262" fill="none" stroke="#35d0ba" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="1 7"/>
-      <circle cx="1620" cy="130" r="5.5" fill="#e2ac52"/>
-      <circle cx="1620" cy="130" r="11" fill="none" stroke="#e2ac52" stroke-opacity="0.5" stroke-width="1"/>
-    </g>
-
-    <!-- the eye -->
-    <g>
-      <circle cx="1330" cy="262" r="150" fill="url(#irisGlow)"/>
-      <circle cx="1330" cy="262" r="122" fill="none" stroke="#8fe3d4" stroke-opacity="0.45" stroke-width="1.5"/>
-
-      <!-- iris scan ticks -->
-      <g stroke="#8fe3d4" stroke-opacity="0.5" stroke-width="1.5">
-        <line x1="1330" y1="150" x2="1330" y2="132"/>
-        <line x1="1330" y1="374" x2="1330" y2="392"/>
-        <line x1="1218" y1="262" x2="1200" y2="262"/>
-        <line x1="1442" y1="262" x2="1460" y2="262"/>
-        <line x1="1250.6" y1="182.6" x2="1237.5" y2="169.5"/>
-        <line x1="1409.4" y1="182.6" x2="1422.5" y2="169.5"/>
-        <line x1="1250.6" y1="341.4" x2="1237.5" y2="354.5"/>
-        <line x1="1409.4" y1="341.4" x2="1422.5" y2="354.5"/>
-      </g>
-
-      <circle cx="1330" cy="262" r="92" fill="url(#iris)"/>
-      <circle cx="1330" cy="262" r="92" fill="none" stroke="#2c1a06" stroke-opacity="0.4" stroke-width="1"/>
-      <circle cx="1330" cy="262" r="33" fill="#050c0c"/>
-      <circle cx="1330" cy="262" r="33" fill="none" stroke="#e2ac52" stroke-opacity="0.3" stroke-width="1"/>
-      <ellipse cx="1310" cy="240" rx="12" ry="8" fill="#fdf3df" fill-opacity="0.55" transform="rotate(-28 1310 240)"/>
-    </g>
-
-    <!-- wordmark -->
-    <g font-family="Georgia, 'Iowan Old Style', 'Times New Roman', ui-serif, serif">
-      <text x="112" y="268" font-size="164" letter-spacing="20" fill="#f2f4ee">ARGOS</text>
-    </g>
-
-    <line x1="115" y1="300" x2="700" y2="300" stroke="#35d0ba" stroke-opacity="0.4" stroke-width="1.5"/>
-
-    <text x="114" y="336" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace"
-          font-size="27" letter-spacing="5.5" fill="#35d0ba" fill-opacity="0.92">REAL ISSUES · OFFLINE · OUTCOME + PROCESS</text>
-
-    <text x="114" y="472" font-family="'JetBrains Mono','SF Mono','Berkeley Mono',ui-monospace,'Courier New',monospace"
-          font-size="19" letter-spacing="3.5" fill="#cfe4dd" fill-opacity="0.45">3 TASKS · 2 MODELS · 8 RUNS EACH · 48 GRADED ROLLOUTS</text>
-
-    <!-- measurement ticks, bottom right, echoes a percentage scale -->
-    <g transform="translate(1140,472)" font-family="'JetBrains Mono','SF Mono',ui-monospace,monospace" font-size="15" fill="#8fe3d4" fill-opacity="0.4">
-      <line x1="0" y1="0" x2="500" y2="0" stroke="#8fe3d4" stroke-opacity="0.3" stroke-width="1"/>
-      <g stroke="#8fe3d4" stroke-opacity="0.35" stroke-width="1">
-        <line x1="0" y1="-6" x2="0" y2="0"/>
-        <line x1="125" y1="-6" x2="125" y2="0"/>
-        <line x1="250" y1="-6" x2="250" y2="0"/>
-        <line x1="375" y1="-6" x2="375" y2="0"/>
-        <line x1="500" y1="-6" x2="500" y2="0"/>
-      </g>
-      <text x="-8" y="20" text-anchor="middle">0</text>
-      <text x="125" y="20" text-anchor="middle">25</text>
-      <text x="250" y="20" text-anchor="middle">50</text>
-      <text x="375" y="20" text-anchor="middle">75</text>
-      <text x="508" y="20" text-anchor="middle">100</text>
-    </g>
-
-    <rect width="1760" height="532" filter="url(#grain)" opacity="0.05" style="mix-blend-mode:overlay"/>
+  <!-- far hall: pinned repositories as arches -->
+  <g filter="url(#farblur)" opacity="0.9">
+    <path d="M 120 646 L 120 300 C 120 210 190 150 280 150 C 370 150 440 210 440 300 L 440 646 Z" fill="#0d2422"/>
+    <path d="M 1320 646 L 1320 300 C 1320 210 1390 150 1480 150 C 1570 150 1640 210 1640 300 L 1640 646 Z" fill="#0d2422"/>
+    <path d="M 606 646 L 606 252 C 606 132 706 52 880 52 C 1054 52 1154 132 1154 252 L 1154 646 Z" fill="#102b28"/>
+    <path d="M 646 646 L 646 258 C 646 148 734 76 880 76 C 1026 76 1114 148 1114 258 L 1114 646" fill="none" stroke="#17403c" stroke-width="4"/>
   </g>
+
+  <!-- light from the upper right, kept clear of the figure -->
+  <g opacity="0.11" filter="url(#soft)">
+    <path d="M 1720 -60 L 1780 30 L 1300 660 L 1190 660 Z" fill="#8fe3d4"/>
+    <path d="M 1560 -60 L 1630 10 L 1180 660 L 1110 660 Z" fill="#35d0ba"/>
+  </g>
+
+  <!-- commit chain arcing behind the watcher -->
+  <g>
+    <path d="M 150 334 C 400 196 700 156 880 156 C 1060 156 1360 196 1610 334" fill="none" stroke="#35d0ba" stroke-opacity="0.26" stroke-width="2.6" stroke-dasharray="14 10"/>
+    <circle cx="150" cy="334" r="7" fill="#123230" stroke="#35d0ba" stroke-opacity="0.65" stroke-width="2"/>
+    <circle cx="352" cy="248" r="7" fill="#123230" stroke="#35d0ba" stroke-opacity="0.65" stroke-width="2"/>
+    <circle cx="566" cy="188" r="7" fill="#123230" stroke="#35d0ba" stroke-opacity="0.65" stroke-width="2"/>
+    <circle cx="1293" cy="211" r="9" fill="#0a1414" stroke="#e2ac52" stroke-opacity="0.95" stroke-width="2.6"/>
+    <circle cx="1450" cy="259" r="7" fill="#123230" stroke="#35d0ba" stroke-opacity="0.65" stroke-width="2"/>
+    <circle cx="1610" cy="334" r="7" fill="#123230" stroke="#35d0ba" stroke-opacity="0.65" stroke-width="2"/>
+    <text x="1293" y="184" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" letter-spacing="2" fill="#e2ac52" fill-opacity="0.8" text-anchor="middle">base commit</text>
+  </g>
+
+  <!-- mid layer: container bundles afloat -->
+  <g>
+    <use href="#cube" x="290" y="398"/>
+    <use href="#cube" x="192" y="478"/>
+    <use href="#cube" x="392" y="478"/>
+    <use href="#cube" x="1470" y="398"/>
+    <use href="#cube" x="1372" y="478"/>
+    <use href="#cube" x="1568" y="478"/>
+    <use href="#cube" x="524" y="352" opacity="0.5"/>
+    <use href="#cube" x="1236" y="352" opacity="0.5"/>
+  </g>
+
+  <!-- held-out targets: resolved and unresolved -->
+  <g>
+    <g transform="translate(146,566)">
+      <rect x="0" y="0" width="15" height="15" rx="3" fill="#35d0ba" fill-opacity="0.8"/>
+      <rect x="22" y="0" width="15" height="15" rx="3" fill="#35d0ba" fill-opacity="0.8"/>
+      <rect x="44" y="0" width="15" height="15" rx="3" fill="#0e2826" stroke="#e2ac52" stroke-opacity="0.8" stroke-width="1.6"/>
+    </g>
+    <g transform="translate(1600,566)">
+      <rect x="0" y="0" width="15" height="15" rx="3" fill="#35d0ba" fill-opacity="0.8"/>
+      <rect x="22" y="0" width="15" height="15" rx="3" fill="#0e2826" stroke="#e2ac52" stroke-opacity="0.8" stroke-width="1.6"/>
+      <rect x="44" y="0" width="15" height="15" rx="3" fill="#35d0ba" fill-opacity="0.8"/>
+    </g>
+  </g>
+
+  <!-- bloom behind the watcher -->
+  <ellipse cx="880" cy="262" rx="400" ry="340" fill="url(#halobloom)"/>
+
+  <!-- the watcher -->
+  <g>
+    <ellipse cx="880" cy="650" rx="200" ry="22" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+
+    <!-- robe -->
+    <path d="M 880 248 C 936 252 958 290 966 332 L 1014 618 C 1018 638 1004 650 986 650 L 774 650 C 756 650 742 638 746 618 L 794 332 C 802 290 824 252 880 248 Z" fill="url(#robe)"/>
+    <path d="M 880 276 L 874 650 L 842 650 Z" fill="#09211f" opacity="0.8"/>
+    <path d="M 902 284 L 942 650 L 912 650 Z" fill="#17403c" opacity="0.5"/>
+    <path d="M 852 290 L 810 650 L 788 650 Z" fill="#09211f" opacity="0.65"/>
+    <path d="M 938 320 L 978 618 C 980 634 972 646 960 646 L 936 646 Z" fill="#1d4a45" opacity="0.4"/>
+    <path d="M 820 330 L 792 650 L 776 650 L 802 340 Z" fill="#1b4641" opacity="0.28"/>
+    <!-- teal rim light from the upper right -->
+    <path d="M 880 248 C 936 252 958 290 966 332 L 1014 618 C 1018 638 1004 650 986 650 L 962 650 L 930 332 C 924 296 908 266 880 256 Z" fill="url(#robeRim)"/>
+    <!-- warm bounce from the crucible -->
+    <path d="M 986 528 L 1014 618 C 1018 638 1004 650 986 650 L 962 650 Z" fill="url(#warmBounce)"/>
+    <!-- dim eyes woven into the cloth -->
+    <g opacity="0.35">
+      <use href="#eye" transform="translate(846,388) scale(0.55)"/>
+      <use href="#eye" transform="translate(926,436) scale(0.5)"/>
+      <use href="#eye" transform="translate(866,506) scale(0.45)"/>
+      <use href="#eye" transform="translate(946,556) scale(0.42)"/>
+    </g>
+
+    <!-- armoured arm raised to the right, carrying the lamp -->
+    <path d="M 942 296 C 986 288 1028 294 1058 312 L 1046 348 C 1018 332 984 328 942 334 Z" fill="#17403c"/>
+    <path d="M 948 300 C 984 294 1016 298 1042 312" fill="none" stroke="#8fe3d4" stroke-opacity="0.35" stroke-width="2"/>
+    <!-- the gauntlet: banded plates and a closed grip -->
+    <path d="M 1040 302 L 1064 308 L 1060 344 L 1036 338 Z" fill="#1d4a45" stroke="#35d0ba" stroke-opacity="0.6" stroke-width="1.8"/>
+    <path d="M 1062 304 L 1082 310 L 1078 342 L 1058 336 Z" fill="#22534d" stroke="#35d0ba" stroke-opacity="0.6" stroke-width="1.8"/>
+    <path d="M 1080 306 C 1096 304 1104 312 1102 322 C 1100 334 1090 340 1078 338 Z" fill="#1b4641" stroke="#35d0ba" stroke-opacity="0.55" stroke-width="1.8"/>
+    <path d="M 1084 314 L 1100 316 M 1084 324 L 1098 326" stroke="#8fe3d4" stroke-opacity="0.45" stroke-width="1.8"/>
+
+    <!-- the lamp: a sealed eye, the verification light -->
+    <circle cx="1116" cy="298" r="48" fill="#35d0ba" opacity="0.16" filter="url(#soft)"/>
+    <circle cx="1116" cy="298" r="27" fill="#08201e" stroke="#35d0ba" stroke-width="3"/>
+    <circle cx="1116" cy="298" r="13" fill="#8fe3d4" filter="url(#glow)"/>
+    <circle cx="1116" cy="298" r="5" fill="#0a1414"/>
+    <path d="M 1116 258 L 1116 244 M 1156 298 L 1170 298 M 1116 338 L 1116 352" stroke="#35d0ba" stroke-opacity="0.6" stroke-width="2.4"/>
+
+    <!-- sleeved arm lowered toward the ledger -->
+    <path d="M 818 298 C 786 308 758 332 740 364 L 770 384 C 786 356 808 338 830 328 Z" fill="#123230"/>
+    <path d="M 739 361 L 771 381 L 762 396 L 730 376 Z" fill="#1b4641" stroke="#35d0ba" stroke-opacity="0.45" stroke-width="1.6"/>
+    <ellipse cx="746" cy="401" rx="17" ry="11" transform="rotate(32 746 401)" fill="#17403c"/>
+    <path d="M 736 410 L 728 418 M 746 414 L 740 424" stroke="#17403c" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- hood and head -->
+    <path d="M 880 140 C 930 140 962 182 960 228 C 958 258 942 280 918 288 L 842 288 C 818 280 802 258 800 228 C 798 182 830 140 880 140 Z" fill="#0d2422"/>
+    <path d="M 880 140 C 930 140 962 182 960 228 C 958 248 950 264 938 276 C 944 248 942 210 926 186 C 910 162 894 152 880 150 Z" fill="#35d0ba" opacity="0.3"/>
+    <path d="M 880 140 C 848 146 826 176 820 214 C 816 240 820 264 828 280 C 812 270 802 250 800 228 C 798 182 830 140 880 140 Z" fill="#071c1a" opacity="0.6"/>
+    <ellipse cx="880" cy="214" rx="37" ry="45" fill="#05100f"/>
+    <g transform="translate(880,208) scale(1.28)">
+      <path d="M -17 0 C -10 -11 10 -11 17 0 C 10 11 -10 11 -17 0 Z" fill="#08201e" stroke="#8fe3d4" stroke-opacity="0.95" stroke-width="1.8"/>
+      <circle cx="0" cy="0" r="5.6" fill="#e2ac52" filter="url(#glow)"/>
+      <circle cx="0" cy="0" r="2.2" fill="#0a1414"/>
+    </g>
+
+    <!-- the crown of eyes that do not sleep -->
+    <path d="M 624 272 C 646 152 752 66 880 66 C 1008 66 1114 152 1136 272" fill="none" stroke="#35d0ba" stroke-opacity="0.18" stroke-width="2"/>
+    <g>
+      <use href="#eye" transform="translate(880,66)"/>
+      <use href="#eye" transform="translate(790,82) rotate(-12)"/>
+      <use href="#eye" transform="translate(970,82) rotate(12)"/>
+      <use href="#eye" transform="translate(710,128) rotate(-26)"/>
+      <use href="#eye" transform="translate(1050,128) rotate(26)"/>
+      <use href="#eye" transform="translate(652,196) rotate(-40)"/>
+      <use href="#eye" transform="translate(1108,196) rotate(40)"/>
+      <use href="#eye" transform="translate(624,272) rotate(-56)" opacity="0.75"/>
+      <use href="#eye" transform="translate(1136,272) rotate(56)" opacity="0.75"/>
+      <use href="#eye" transform="translate(832,118) scale(0.7)" opacity="0.65"/>
+      <use href="#eye" transform="translate(928,118) scale(0.7)" opacity="0.65"/>
+    </g>
+  </g>
+
+  <!-- floor -->
+  <rect x="0" y="646" width="1760" height="174" fill="url(#floor)"/>
+  <path d="M 0 646 L 1760 646" stroke="#17403c" stroke-width="2"/>
+
+  <!-- attendant artifacts: one per work order -->
+  <g>
+    <!-- ENGRAM: the append-only ledger -->
+    <g transform="translate(250,0)">
+      <rect x="-60" y="606" width="120" height="40" rx="6" fill="#102b28" stroke="#17403c" stroke-width="2"/>
+      <path d="M -56 606 L 0 574 L 56 606 Z" fill="#0d2422"/>
+      <path d="M -54 598 C -32 582 -10 580 0 584 L 0 552 C -12 546 -36 548 -54 562 Z" fill="#17403c" stroke="#35d0ba" stroke-opacity="0.6" stroke-width="1.8"/>
+      <path d="M 54 598 C 32 582 10 580 0 584 L 0 552 C 12 546 36 548 54 562 Z" fill="#1d4a45" stroke="#35d0ba" stroke-opacity="0.6" stroke-width="1.8"/>
+      <path d="M -44 568 L -12 560 M -44 578 L -12 570 M 12 560 L 44 568 M 12 570 L 44 578" stroke="#8fe3d4" stroke-opacity="0.5" stroke-width="1.6"/>
+      <circle cx="0" cy="538" r="4" fill="#35d0ba" filter="url(#glow)"/>
+    </g>
+
+    <!-- FORGE: the anvil that proves a task -->
+    <g transform="translate(480,0)">
+      <rect x="-60" y="606" width="120" height="40" rx="6" fill="#102b28" stroke="#17403c" stroke-width="2"/>
+      <path d="M -30 606 L 30 606 L 25 592 L -25 592 Z" fill="#123230" stroke="#35d0ba" stroke-opacity="0.4" stroke-width="1.6"/>
+      <path d="M -25 592 L 25 592 L 15 566 L -15 566 Z" fill="#0e2826"/>
+      <path d="M -22 566 L 36 566 L 42 560 L 42 550 L 36 544 L -20 544 C -34 544 -46 550 -58 556 C -46 562 -34 566 -22 566 Z" fill="#17403c" stroke="#35d0ba" stroke-opacity="0.55" stroke-width="1.8"/>
+      <path d="M -20 546 L 36 546" stroke="#8fe3d4" stroke-opacity="0.4" stroke-width="2"/>
+      <path d="M 18 538 L 52 504" stroke="#123230" stroke-width="7" stroke-linecap="round"/>
+      <rect x="40" y="486" width="30" height="18" rx="4" transform="rotate(-42 55 495)" fill="#1d4a45" stroke="#35d0ba" stroke-opacity="0.5" stroke-width="1.6"/>
+      <circle cx="-46" cy="556" r="13" fill="url(#ember)"/>
+    </g>
+
+    <!-- CRUCIBLE: the audit vessel -->
+    <g transform="translate(1280,0)">
+      <rect x="-60" y="606" width="120" height="40" rx="6" fill="#102b28" stroke="#17403c" stroke-width="2"/>
+      <ellipse cx="0" cy="524" rx="60" ry="52" fill="url(#ember)"/>
+      <path d="M -40 554 L 40 554 L 28 606 L -28 606 Z" fill="#17403c" stroke="#35d0ba" stroke-opacity="0.55" stroke-width="2"/>
+      <ellipse cx="0" cy="554" rx="40" ry="11" fill="#08201e" stroke="#35d0ba" stroke-opacity="0.55" stroke-width="2"/>
+      <ellipse cx="0" cy="554" rx="28" ry="7" fill="#e2ac52" fill-opacity="0.9" filter="url(#glow)"/>
+      <path d="M -9 542 C -17 522 -5 514 -2 500 C 4 514 15 522 7 542 Z" fill="#e2ac52" fill-opacity="0.7" filter="url(#glow)"/>
+      <path d="M -44 606 L -34 572 M 44 606 L 34 572" stroke="#123230" stroke-width="6"/>
+    </g>
+
+    <!-- MAESTRO: the rostrum and baton -->
+    <g transform="translate(1510,0)">
+      <rect x="-60" y="606" width="120" height="40" rx="6" fill="#102b28" stroke="#17403c" stroke-width="2"/>
+      <path d="M -38 606 L -32 554 L 32 554 L 38 606 Z" fill="#0d2422" stroke="#17403c" stroke-width="2"/>
+      <path d="M -42 554 L 42 554 L 36 542 L -36 542 Z" fill="#1d4a45" stroke="#35d0ba" stroke-opacity="0.5" stroke-width="1.8"/>
+      <path d="M -28 536 L 32 498" stroke="#8fe3d4" stroke-opacity="0.8" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="-30" cy="538" r="6" fill="#e2ac52"/>
+      <path d="M -24 578 L 24 578 M -24 590 L 10 590" stroke="#35d0ba" stroke-opacity="0.4" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- work order names -->
+  <g font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" letter-spacing="5" fill="#35d0ba" fill-opacity="0.78" text-anchor="middle">
+    <text x="250" y="678">ENGRAM</text>
+    <text x="480" y="678">FORGE</text>
+    <text x="1280" y="678">CRUCIBLE</text>
+    <text x="1510" y="678">MAESTRO</text>
+    <text x="1116" y="236" font-size="15" letter-spacing="4" fill-opacity="0.72">GAUNTLET</text>
+  </g>
+
+  <rect width="1760" height="820" fill="url(#vignette)"/>
+
+  <text x="880" y="742" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="82" font-weight="700" letter-spacing="26" fill="#eef2ea" text-anchor="middle">ARGOS</text>
+  <text x="880" y="788" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" letter-spacing="3" fill="#8fe3d4" fill-opacity="0.9" text-anchor="middle">Every claim settled by running the container, never by reading the manifest.</text>
 </svg>
