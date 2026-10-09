@@ -2,6 +2,7 @@ schema_version = "1.4"
 artifacts = [ "/logs/agent/trajectory.json",]
 
 [task]
+version = "1.0.0"
 name = "argos/GitoxideLabs__gitoxide-2191"
 description = "Fix gix credential fill to accept protocol+host without URL field"
 keywords = [ "rust", "issue-resolving", "gitoxide",]

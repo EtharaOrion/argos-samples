@@ -2,6 +2,7 @@ schema_version = "1.4"
 artifacts = [ "/logs/agent/trajectory.json",]
 
 [task]
+version = "1.0.0"
 name = "argos/secdev__scapy-3461"
 description = "RTCP Support"
 keywords = [ "python", "issue-resolving", "scapy",]

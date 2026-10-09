@@ -2,6 +2,7 @@ schema_version = "1.4"
 artifacts = [ "/logs/agent/trajectory.json",]
 
 [task]
+version = "1.0.0"
 name = "argos/feldroy__air-246"
 description = "Add function signatures to Air SVG Tags"
 keywords = [ "python", "issue-resolving", "air",]
