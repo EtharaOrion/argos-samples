@@ -53,11 +53,11 @@ The verdict is the audit outcome recorded at the sealed digest, and `none` means
 
 ## Dataset structure
 
-| Bundle | Task | Keywords | Registration | Sealed at |
-| --- | --- | --- | --- | --- |
-| [`24d2a5dc-2e40-5735-8fe2-342c4fd8e311`](24d2a5dc-2e40-5735-8fe2-342c4fd8e311/) | `argos/GitoxideLabs__gitoxide-2191` | gitoxide, issue-resolving, rust | unregistered | unsealed |
-| [`276ad6ba-10da-5f87-82ea-c2abc44dfdea`](276ad6ba-10da-5f87-82ea-c2abc44dfdea/) | `argos/feldroy__air-246` | air, issue-resolving, python | unregistered | unsealed |
-| [`4056d683-bddd-57a4-8cf3-e807654c7c9c`](4056d683-bddd-57a4-8cf3-e807654c7c9c/) | `argos/secdev__scapy-3461` | issue-resolving, python, scapy | unregistered | unsealed |
+| Bundle | Task | Keywords | Registration | Sealed at | Tier |
+| --- | --- | --- | --- | --- | --- |
+| [`24d2a5dc-2e40-5735-8fe2-342c4fd8e311`](24d2a5dc-2e40-5735-8fe2-342c4fd8e311/) | `argos/GitoxideLabs__gitoxide-2191` | gitoxide, issue-resolving, rust | unregistered | unsealed | - |
+| [`276ad6ba-10da-5f87-82ea-c2abc44dfdea`](276ad6ba-10da-5f87-82ea-c2abc44dfdea/) | `argos/feldroy__air-246` | air, issue-resolving, python | unregistered | unsealed | - |
+| [`4056d683-bddd-57a4-8cf3-e807654c7c9c`](4056d683-bddd-57a4-8cf3-e807654c7c9c/) | `argos/secdev__scapy-3461` | issue-resolving, python, scapy | unregistered | unsealed | - |
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"primaryColor":"#131a33","primaryTextColor":"#e8ecff","primaryBorderColor":"#845EF7","lineColor":"#22d3ee","fontFamily":"monospace"}}}%%
