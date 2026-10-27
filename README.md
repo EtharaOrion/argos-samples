@@ -104,3 +104,9 @@ Released under the MIT License, Copyright (c) 2026 Ethara.AI. See [LICENSE](LICE
 ## Contact
 
 Ethara.AI is at [github.com/EtharaOrion](https://github.com/EtharaOrion). For a vulnerability or a benchmark-integrity concern, including a leaked task byte, a contamination report, or a gameable shortcut, write to security@ethara.ai rather than opening a public issue. For conduct concerns, write to conduct@ethara.ai.
+
+---
+
+## Copyright
+
+Copyright (c) 2026 Green Rider Technology LLP (Ethara AI). All rights reserved.
